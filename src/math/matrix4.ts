@@ -254,6 +254,77 @@ export class Matrix4 {
 		return this;
 	}
 
+	/**
+	 * Multiplies this matrix with the provided matrix and optionally stores result
+	 * in result Matrix. If a result matrix is not provided, this matrix will be modified
+	 * 
+	 * @param matrix The matrix to multiply this Matrix with
+	 * @param result (optional) The result to store in
+	 */
+	public multiply(matrix: Matrix4, optresult: Matrix4 | undefined): Matrix4 {
+		const result: Matrix4 = optresult || this;
+
+		return Matrix4.multiply(this, matrix, result);
+	}
+
+	/**
+	 * Pre-Multiplies this matrix with the provided matrix and optionally stores result
+	 * in result Matrix. If a result matrix is not provided, this matrix will be modified
+	 * 
+	 * @param matrix The matrix to pre-multiply this Matrix with
+	 * @param optresult (optional) The result to store in
+	 */
+	public preMultiply(matrix: Matrix4, optresult: Matrix4 | undefined): Matrix4 {
+		const result: Matrix4 = optresult || this;
+
+		return Matrix4.multiply(matrix, this, result);
+	}
+
+	/**
+	 * Multiple a * b and store the result in result
+	 * 
+	 * @param a The first Matrix
+	 * @param b The second Matrix
+	 * @param result The container to store results
+	 */
+	public static multiply(a: Matrix4, b: Matrix4, result: Matrix4): Matrix4 {
+		// NOTE: This could at some point move into a WASM module if SIMD becomes available
+		const av: number[] = a.val;
+		const bv: number[] = b.val;
+		const r: number[] = result.val;
+
+		const a11 = av[0], a12 = av[4], a13 = av[8], a14 = av[12];
+		const a21 = av[1], a22 = av[5], a23 = av[9], a24 = av[13];
+		const a31 = av[2], a32 = av[6], a33 = av[10], a34 = av[14];
+		const a41 = av[3], a42 = av[7], a43 = av[11], a44 = av[15];
+
+		const b11 = bv[0], b12 = bv[4], b13 = bv[8], b14 = bv[12];
+		const b21 = bv[1], b22 = bv[5], b23 = bv[9], b24 = bv[13];
+		const b31 = bv[2], b32 = bv[6], b33 = bv[10], b34 = bv[14];
+		const b41 = bv[3], b42 = bv[7], b43 = bv[11], b44 = bv[15];
+
+		r[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		r[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		r[8] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		r[12] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+		r[1] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		r[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		r[9] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		r[13] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+		r[2] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		r[6] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		r[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		r[14] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+		r[3] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		r[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		r[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+		r[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+		return result;
+	}
 
 	/**
 	 * Sets the current matrix with the provided values
