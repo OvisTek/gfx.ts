@@ -105,6 +105,41 @@ export class Matrix4 {
 	}
 
 	/**
+	 * Sets this matrix to a projection matrix useful for controlling a Projection Camera
+	 * 
+	 * @param near The near plane of the projection
+	 * @param far The far plane of the projection
+	 * @param fov The field of view
+	 * @param aspect The aspect ratio, typically width/height of the window
+	 */
+	public setToProjection(near: number, far: number, fov: number, aspect: number): Matrix4 {
+		const fd: number = 1.0 / Math.tan((fov * (Math.PI / 180.0)) / 2.0);
+		const a1: number = (far + near) / (near - far);
+		const a2: number = (2.0 * far * near) / (near - far);
+
+		const m: number[] = this.val;
+
+		m[0] = fd / aspect;
+		m[1] = 0;
+		m[2] = 0;
+		m[3] = 0;
+		m[4] = 0;
+		m[5] = fd;
+		m[6] = 0;
+		m[7] = 0;
+		m[8] = 0;
+		m[9] = 0;
+		m[10] = a1;
+		m[11] = -1;
+		m[12] = 0;
+		m[13] = 0;
+		m[14] = a2;
+		m[15] = 0;
+
+		return this;
+	}
+
+	/**
 	 * Sets the current matrix with the provided values
 	 * 
 	 * [m00, m10, m20, m30]
@@ -311,5 +346,12 @@ export class Matrix4 {
 			* m[4] * m[11] * m[14] - m[0] * m[5] * m[11] * m[14] - m[2] * m[5] * m[8] * m[15]
 			+ m[1] * m[6] * m[8] * m[15] + m[2] * m[4] * m[9] * m[15] - m[0] * m[6] * m[9]
 			* m[15] - m[1] * m[4] * m[10] * m[15] + m[0] * m[5] * m[10] * m[15];
+	}
+
+	/**
+	 * Access the array reference for this matrix
+	 */
+	public get elements(): number[] {
+		return this.val;
 	}
 }
