@@ -1,6 +1,16 @@
 import { Vector3RO } from "./vector3ro";
 
 /**
+ * Interface for serialising and deserialising Vector3 structure
+ * for storage/database purposes
+ */
+export interface Vector3Json {
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+}
+
+/**
  * 3 component (x, y, z) Vector3
  */
 export class Vector3 {
@@ -19,6 +29,36 @@ export class Vector3 {
         this._x = x;
         this._y = y;
         this._z = z;
+    }
+
+    /**
+     * Serialise this Vector3 for storage/database purposes
+     * See Vector3Json Interface for details
+     */
+    public serialise(): Vector3Json {
+        return {
+            x: this._x,
+            y: this._y,
+            z: this._z
+        }
+    }
+
+    /**
+     * Deserialise a previously serialised version of a Vector3
+     * 
+     * @param values The serialised Vector3 to deserialise
+     */
+    public static deserialise(values: Vector3Json): Vector3 {
+        return new Vector3().deserialise(values);
+    }
+
+    /**
+     * Deserialise a previously serialised version of a Vector3
+     *
+     * @param values The serialised Vector3 to deserialise
+     */
+    public deserialise(values: Vector3Json): Vector3 {
+        return this.set(values.x, values.y, values.z);
     }
 
     public get x(): number { return this._x; }
@@ -283,11 +323,18 @@ export class Vector3 {
 
     /**
      * Calculate the dot product between this and other Vector
+     */
+    public dot(x: number, y: number, z: number): number {
+        return this._x * x + this._y * y + this._z * z;
+    }
+
+    /**
+     * Calculate the dot product between this and other Vector
      * 
      * @param other The other Vector to calculate the dot product
      */
-    public dot(other: Vector3): number {
-        return this._x * other._x + this._y * other._y + this._z * other._z;
+    public dotVector(other: Vector3): number {
+        return this.dot(other._x, other._y, other._z);
     }
 
     /**
