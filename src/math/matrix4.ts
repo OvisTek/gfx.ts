@@ -139,6 +139,57 @@ export class Matrix4 {
 		return this;
 	}
 
+	public setToPosition(position: Vector3): Matrix4 {
+		return this;
+	}
+
+	public setToRoation(rotation: Quaternion): Matrix4 {
+		return this;
+	}
+
+	public setToPositionRotation(position: Vector3, rotation: Quaternion): Matrix4 {
+		return this;
+	}
+
+	/**
+	 * Composes PRS (Position, Rotation, Scale) 4x4 Matrix given a position, rotation and scale factors
+	 * 
+	 * @param position The position (Vector3)
+	 * @param rotation The rotation (Quaternion)
+	 * @param scale The scale (Vector3)
+	 */
+	public compose(position: Vector3, rotation: Quaternion, scale: Vector3): Matrix4 {
+		const xs: number = rotation.x * 2.0, ys = rotation.y * 2.0, zs = rotation.z * 2.0;
+		const wx: number = rotation.w * xs, wy = rotation.w * ys, wz = rotation.w * zs;
+		const xx: number = rotation.x * xs, xy = rotation.x * ys, xz = rotation.x * zs;
+		const yy: number = rotation.y * ys, yz = rotation.y * zs, zz = rotation.z * zs;
+
+		const m: number[] = this.val;
+
+		m[0] = scale.x * (1.0 - (yy + zz));
+		m[4] = scale.y * (xy - wz);
+		m[8] = scale.z * (xz + wy);
+		m[12] = position.x;
+
+		m[1] = scale.x * (xy + wz);
+		m[5] = scale.y * (1.0 - (xx + zz));
+		m[9] = scale.z * (yz - wx);
+		m[13] = position.y;
+
+		m[2] = scale.x * (xz - wy);
+		m[6] = scale.y * (yz + wx);
+		m[10] = scale.z * (1.0 - (xx + yy));
+		m[14] = position.z;
+
+		m[3] = 0;
+		m[7] = 0;
+		m[11] = 0;
+		m[15] = 1;
+
+		return this;
+	}
+
+
 	/**
 	 * Sets the current matrix with the provided values
 	 * 
@@ -351,7 +402,7 @@ export class Matrix4 {
 	/**
 	 * Access the array reference for this matrix
 	 */
-	public get elements(): number[] {
+	public get values(): number[] {
 		return this.val;
 	}
 }
