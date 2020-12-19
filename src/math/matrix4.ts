@@ -255,6 +255,47 @@ export class Matrix4 {
 	}
 
 	/**
+	 * Scales this matrix with the provided scale factor.
+	 * 
+	 * Optionally stores result in result Matrix. If a result matrix is not provided, 
+	 * this matrix will be modified
+	 * 
+	 * @param scale The scale factor
+	 * @param optresult (optional) The result to store in
+	 */
+	public scale(scale: number, optresult: Matrix4 | undefined): Matrix4 {
+		const result: Matrix4 = optresult || this;
+
+		const m: number[] = result.val;
+
+		// first
+		m[0] = m[0] * scale;
+		m[1] = m[1] * scale;
+		m[2] = m[2] * scale;
+		m[3] = m[3] * scale;
+
+		// second
+		m[4] = m[4] * scale;
+		m[5] = m[5] * scale;
+		m[6] = m[6] * scale;
+		m[7] = m[7] * scale;
+
+		// third
+		m[8] = m[8] * scale;
+		m[9] = m[9] * scale;
+		m[10] = m[10] * scale;
+		m[11] = m[11] * scale;
+
+		// fourth
+		m[12] = m[12] * scale;
+		m[13] = m[13] * scale;
+		m[14] = m[14] * scale;
+		m[15] = m[15] * scale;
+
+		return result;
+	}
+
+	/**
 	 * Multiplies this matrix with the provided matrix and optionally stores result
 	 * in result Matrix. If a result matrix is not provided, this matrix will be modified
 	 * 
