@@ -280,4 +280,51 @@ export class Vector3 {
 
         return this.multiplyScalar(Math.sqrt(lenSq));
     }
+
+    /**
+     * Calculate the dot product between this and other Vector
+     * 
+     * @param other The other Vector to calculate the dot product
+     */
+    public dot(other: Vector3): number {
+        return this._x * other._x + this._y * other._y + this._z * other._z;
+    }
+
+    /**
+     * Calculates and returns the cross product between Vectors
+     * 
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     * 
+     * @param x The X component of the Vector
+     * @param y The Y component of the Vector
+     * @param z The Z component of the Vector
+     * @param optres (optional) The result to store in
+     */
+    public cross(x: number, y: number, z: number, optres: Vector3 | undefined = undefined): Vector3 {
+        const result: Vector3 = optres || this;
+
+        const dx: number = this._x;
+        const dy: number = this._y;
+        const dz: number = this._z;
+
+        result.x = dy * z - dz * y;
+        result.y = dz * x - dx * z;
+        result.z = dx * y - dy * x;
+
+        return result;
+    }
+
+    /**
+     * Calculates and returns the cross product between Vectors
+     *
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     * 
+     * @param other The Vector to cross with this Vector
+     * @param optres (optional) The result to store in
+     */
+    public crossVector(other: Vector3, optres: Vector3 | undefined = undefined): Vector3 {
+        return this.cross(other._x, other._y, other._z, optres);
+    }
 }
