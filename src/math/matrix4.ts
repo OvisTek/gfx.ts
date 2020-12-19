@@ -35,6 +35,7 @@ export interface JsonMatrix4 {
  * 16 value column-major 4x4 Matrix
  */
 export class Matrix4 {
+	// this is a 16 value array that stores the 4x4 matrix
 	private readonly val: number[];
 
 	/**
