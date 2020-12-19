@@ -5,7 +5,7 @@ import { Quaternion } from "./quaternion";
  * Interface for serialising and deserialising Matrix4 structure
  * for storage/database purposes
  */
-export interface JsonMatrix4 {
+export interface Matrix4Json {
 	// first
 	readonly m00: number;
 	readonly m10: number;
@@ -55,7 +55,7 @@ export class Matrix4 {
 	 * Serialise this Matrix for storage/database purposes
 	 * See JsonMatrix4 Interface for details
 	 */
-	public serialise(): JsonMatrix4 {
+	public serialise(): Matrix4Json {
 		const m: number[] = this.val;
 
 		return {
@@ -87,7 +87,7 @@ export class Matrix4 {
 	 * 
 	 * @param values The serialised Matrix to deserialise
 	 */
-	public static deserialise(values: JsonMatrix4): Matrix4 {
+	public static deserialise(values: Matrix4Json): Matrix4 {
 		return new Matrix4().deserialise(values);
 	}
 
@@ -96,7 +96,7 @@ export class Matrix4 {
 	 *
 	 * @param values The serialised Matrix to deserialise
 	 */
-	public deserialise(values: JsonMatrix4): Matrix4 {
+	public deserialise(values: Matrix4Json): Matrix4 {
 		return this.set(
 			values.m00, values.m01, values.m02, values.m03,
 			values.m10, values.m11, values.m12, values.m13,
