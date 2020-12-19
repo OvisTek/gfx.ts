@@ -139,15 +139,80 @@ export class Matrix4 {
 		return this;
 	}
 
-	public setToPosition(position: Vector3): Matrix4 {
+	/**
+	 * Compose a 4x4 Position Matrix from a given position
+	 * 
+	 * @param position The position (Vector3)
+	 */
+	public composePos(position: Vector3): Matrix4 {
+		const m: number[] = this.val;
+
+		m[0] = 1;
+		m[4] = 0;
+		m[8] = 0;
+		m[12] = position.x;
+
+		m[1] = 0;
+		m[5] = 1;
+		m[9] = 0;
+		m[13] = position.y;
+
+		m[2] = 0;
+		m[6] = 0;
+		m[10] = 1;
+		m[14] = position.z;
+
+		m[3] = 0;
+		m[7] = 0;
+		m[11] = 0;
+		m[15] = 1;
+
 		return this;
 	}
 
-	public setToRoation(rotation: Quaternion): Matrix4 {
-		return this;
+	/**
+	 * Compose a 4x4 Rotation Matrix from a given rotation
+	 * 
+	 * @param rotation The rotation (Quaternion)
+	 */
+	public composeRot(rotation: Quaternion): Matrix4 {
+		return this.composePosRot(Vector3.Zero, rotation);
 	}
 
-	public setToPositionRotation(position: Vector3, rotation: Quaternion): Matrix4 {
+	/**
+	 * Compose PR (Position, Rotation) 4x4 Matrix given a position and rotation factors
+	 * 
+	 * @param position The position (Vector3)
+	 * @param rotation The rotation (Quaternion)
+	 */
+	public composePosRot(position: Vector3, rotation: Quaternion): Matrix4 {
+		const xs: number = rotation.x * 2.0, ys = rotation.y * 2.0, zs = rotation.z * 2.0;
+		const wx: number = rotation.w * xs, wy = rotation.w * ys, wz = rotation.w * zs;
+		const xx: number = rotation.x * xs, xy = rotation.x * ys, xz = rotation.x * zs;
+		const yy: number = rotation.y * ys, yz = rotation.y * zs, zz = rotation.z * zs;
+
+		const m: number[] = this.val;
+
+		m[0] = 1.0 - (yy + zz);
+		m[4] = xy - wz;
+		m[8] = xz + wy;
+		m[12] = position.x;
+
+		m[1] = xy + wz;
+		m[5] = 1.0 - (xx + zz);
+		m[9] = yz - wx;
+		m[13] = position.y;
+
+		m[2] = xz - wy;
+		m[6] = yz + wx;
+		m[10] = 1.0 - (xx + yy);
+		m[14] = position.z;
+
+		m[3] = 0;
+		m[7] = 0;
+		m[11] = 0;
+		m[15] = 1;
+
 		return this;
 	}
 
@@ -158,7 +223,7 @@ export class Matrix4 {
 	 * @param rotation The rotation (Quaternion)
 	 * @param scale The scale (Vector3)
 	 */
-	public compose(position: Vector3, rotation: Quaternion, scale: Vector3): Matrix4 {
+	public composePosRotSca(position: Vector3, rotation: Quaternion, scale: Vector3): Matrix4 {
 		const xs: number = rotation.x * 2.0, ys = rotation.y * 2.0, zs = rotation.z * 2.0;
 		const wx: number = rotation.w * xs, wy = rotation.w * ys, wz = rotation.w * zs;
 		const xx: number = rotation.x * xs, xy = rotation.x * ys, xz = rotation.x * zs;
