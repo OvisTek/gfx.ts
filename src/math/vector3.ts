@@ -137,4 +137,51 @@ export class Vector3 {
     public addScalar(other: number, optres: Vector3 | undefined): Vector3 {
         return this.add(other, other, other, optres);
     }
+
+    /**
+     * Provided x, y, z components, subtract it from this Vector and return the results.
+     * 
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     * 
+     * @param x Subtract from this Vector.x
+     * @param y Subtract from this Vector.y
+     * @param z Subtract from this Vector.z
+     * @param optres (optional) The result to store in
+     */
+    public sub(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
+        const result: Vector3 = optres || this;
+
+        result.x -= x;
+        result.y -= y;
+        result.z -= z;
+
+        return result;
+    }
+
+    /**
+     * Provided another Vector, subtract it from this Vector and return the results.
+     * 
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     * 
+     * @param other The Vector to subtract from this Vector
+     * @param optres (optional) The result to store in
+     */
+    public subVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
+        return this.sub(other._x, other._y, other._z, optres);
+    }
+
+    /**
+     * Provided another Scalar value, subtract it from this Vector and return the results.
+     *
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     *
+     * @param other The Scalar value to subtract from each component of this Vector
+     * @param optres (optional) The result to store in
+     */
+    public subScalar(other: number, optres: Vector3 | undefined): Vector3 {
+        return this.sub(other, other, other, optres);
+    }
 }
