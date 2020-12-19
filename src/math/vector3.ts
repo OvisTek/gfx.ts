@@ -149,7 +149,7 @@ export class Vector3 {
      * @param z Subtract from this Vector.z
      * @param optres (optional) The result to store in
      */
-    public sub(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
+    public subtract(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
         const result: Vector3 = optres || this;
 
         result.x -= x;
@@ -168,8 +168,8 @@ export class Vector3 {
      * @param other The Vector to subtract from this Vector
      * @param optres (optional) The result to store in
      */
-    public subVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
-        return this.sub(other._x, other._y, other._z, optres);
+    public subtractVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
+        return this.subtract(other._x, other._y, other._z, optres);
     }
 
     /**
@@ -181,7 +181,54 @@ export class Vector3 {
      * @param other The Scalar value to subtract from each component of this Vector
      * @param optres (optional) The result to store in
      */
-    public subScalar(other: number, optres: Vector3 | undefined): Vector3 {
-        return this.sub(other, other, other, optres);
+    public subtractScalar(other: number, optres: Vector3 | undefined): Vector3 {
+        return this.subtract(other, other, other, optres);
+    }
+
+    /**
+     * Provided x, y, z components, multiply it with this Vector and return the results.
+     * 
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     * 
+     * @param x Multiply with this Vector.x
+     * @param y Multiply with this Vector.y
+     * @param z Multiply with this Vector.z
+     * @param optres (optional) The result to store in
+     */
+    public multiply(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
+        const result: Vector3 = optres || this;
+
+        result.x *= x;
+        result.y *= y;
+        result.z *= z;
+
+        return result;
+    }
+
+    /**
+     * Provided another Vector, multiply it with this Vector and return the results.
+     * 
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     * 
+     * @param other The Vector to multiply with this Vector
+     * @param optres (optional) The result to store in
+     */
+    public multiplyVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
+        return this.multiply(other._x, other._y, other._z, optres);
+    }
+
+    /**
+     * Provided another Scalar value, multiply it with this Vector and return the results.
+     *
+     * Optionally stores result in result Vector. If a result vector is not provided,
+     * this vector will be modified
+     *
+     * @param other The Scalar value to multiply it with each component of this Vector
+     * @param optres (optional) The result to store in
+     */
+    public multiplyScalar(other: number, optres: Vector3 | undefined): Vector3 {
+        return this.multiply(other, other, other, optres);
     }
 }
