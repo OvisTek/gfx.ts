@@ -2,6 +2,36 @@ import { Vector3 } from "./vector3";
 import { Quaternion } from "./quaternion";
 
 /**
+ * Interface for serialising and deserialising Matrix4 structure
+ * for storage/database purposes
+ */
+export interface JsonMatrix4 {
+	// first
+	readonly m00: number;
+	readonly m10: number;
+	readonly m20: number;
+	readonly m30: number;
+
+	// second
+	readonly m01: number;
+	readonly m11: number;
+	readonly m21: number;
+	readonly m31: number;
+
+	// third
+	readonly m02: number;
+	readonly m12: number;
+	readonly m22: number;
+	readonly m32: number;
+
+	// fourth
+	readonly m03: number;
+	readonly m13: number;
+	readonly m23: number;
+	readonly m33: number;
+}
+
+/**
  * 16 value column-major 4x4 Matrix
  */
 export class Matrix4 {
@@ -18,6 +48,60 @@ export class Matrix4 {
 			0, 0, 1, 0,
 			0, 0, 0, 1
 		];
+	}
+
+	/**
+	 * Serialise this Matrix for storage/database purposes
+	 * See JsonMatrix4 Interface for details
+	 */
+	public serialise(): JsonMatrix4 {
+		const m: number[] = this.val;
+
+		return {
+			// first
+			m00: m[0],
+			m10: m[1],
+			m20: m[2],
+			m30: m[3],
+			// second
+			m01: m[4],
+			m11: m[5],
+			m21: m[6],
+			m31: m[7],
+			// third
+			m02: m[8],
+			m12: m[9],
+			m22: m[10],
+			m32: m[11],
+			// fourth
+			m03: m[12],
+			m13: m[13],
+			m23: m[14],
+			m33: m[15],
+		}
+	}
+
+	/**
+	 * Deserialise a previously serialised version of a Matrix
+	 * 
+	 * @param values The serialised Matrix to deserialise
+	 */
+	public static deserialise(values: JsonMatrix4): Matrix4 {
+		return new Matrix4().deserialise(values);
+	}
+
+	/**
+	 * Deserialise a previously serialised version of a Matrix
+	 *
+	 * @param values The serialised Matrix to deserialise
+	 */
+	public deserialise(values: JsonMatrix4): Matrix4 {
+		return this.set(
+			values.m00, values.m01, values.m02, values.m03,
+			values.m10, values.m11, values.m12, values.m13,
+			values.m20, values.m21, values.m22, values.m23,
+			values.m30, values.m31, values.m32, values.m33
+		);
 	}
 
 	/**
