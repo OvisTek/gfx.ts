@@ -264,7 +264,7 @@ export class Matrix4 {
 	 * @param scale The scale factor
 	 * @param optresult (optional) The result to store in
 	 */
-	public scale(scale: number, optresult: Matrix4 | undefined): Matrix4 {
+	public scale(scale: number, optresult: Matrix4 | undefined = undefined): Matrix4 {
 		const result: Matrix4 = optresult || this;
 
 		const m: number[] = result.val;
@@ -303,7 +303,7 @@ export class Matrix4 {
 	 * @param matrix The matrix to multiply this Matrix with
 	 * @param result (optional) The result to store in
 	 */
-	public multiply(matrix: Matrix4, optresult: Matrix4 | undefined): Matrix4 {
+	public multiply(matrix: Matrix4, optresult: Matrix4 | undefined = undefined): Matrix4 {
 		const result: Matrix4 = optresult || this;
 
 		return Matrix4.multiply(this, matrix, result);
@@ -316,7 +316,7 @@ export class Matrix4 {
 	 * @param matrix The matrix to pre-multiply this Matrix with
 	 * @param optresult (optional) The result to store in
 	 */
-	public preMultiply(matrix: Matrix4, optresult: Matrix4 | undefined): Matrix4 {
+	public preMultiply(matrix: Matrix4, optresult: Matrix4 | undefined = undefined): Matrix4 {
 		const result: Matrix4 = optresult || this;
 
 		return Matrix4.multiply(matrix, this, result);

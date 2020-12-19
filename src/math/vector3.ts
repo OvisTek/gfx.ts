@@ -102,7 +102,7 @@ export class Vector3 {
      * @param z Add to this Vector.z
      * @param optres (optional) The result to store in
      */
-    public add(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
+    public add(x: number, y: number, z: number, optres: Vector3 | undefined = undefined): Vector3 {
         const result: Vector3 = optres || this;
 
         result.x += x;
@@ -121,7 +121,7 @@ export class Vector3 {
      * @param other The Vector to add to this Vector
      * @param optres (optional) The result to store in
      */
-    public addVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
+    public addVector(other: Vector3, optres: Vector3 | undefined = undefined): Vector3 {
         return this.add(other._x, other._y, other._z, optres);
     }
 
@@ -134,7 +134,7 @@ export class Vector3 {
      * @param other The Scalar value to add to each component of this Vector
      * @param optres (optional) The result to store in
      */
-    public addScalar(other: number, optres: Vector3 | undefined): Vector3 {
+    public addScalar(other: number, optres: Vector3 | undefined = undefined): Vector3 {
         return this.add(other, other, other, optres);
     }
 
@@ -149,7 +149,7 @@ export class Vector3 {
      * @param z Subtract from this Vector.z
      * @param optres (optional) The result to store in
      */
-    public subtract(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
+    public subtract(x: number, y: number, z: number, optres: Vector3 | undefined = undefined): Vector3 {
         const result: Vector3 = optres || this;
 
         result.x -= x;
@@ -168,7 +168,7 @@ export class Vector3 {
      * @param other The Vector to subtract from this Vector
      * @param optres (optional) The result to store in
      */
-    public subtractVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
+    public subtractVector(other: Vector3, optres: Vector3 | undefined = undefined): Vector3 {
         return this.subtract(other._x, other._y, other._z, optres);
     }
 
@@ -181,7 +181,7 @@ export class Vector3 {
      * @param other The Scalar value to subtract from each component of this Vector
      * @param optres (optional) The result to store in
      */
-    public subtractScalar(other: number, optres: Vector3 | undefined): Vector3 {
+    public subtractScalar(other: number, optres: Vector3 | undefined = undefined): Vector3 {
         return this.subtract(other, other, other, optres);
     }
 
@@ -196,7 +196,7 @@ export class Vector3 {
      * @param z Multiply with this Vector.z
      * @param optres (optional) The result to store in
      */
-    public multiply(x: number, y: number, z: number, optres: Vector3 | undefined): Vector3 {
+    public multiply(x: number, y: number, z: number, optres: Vector3 | undefined = undefined): Vector3 {
         const result: Vector3 = optres || this;
 
         result.x *= x;
@@ -215,7 +215,7 @@ export class Vector3 {
      * @param other The Vector to multiply with this Vector
      * @param optres (optional) The result to store in
      */
-    public multiplyVector(other: Vector3, optres: Vector3 | undefined): Vector3 {
+    public multiplyVector(other: Vector3, optres: Vector3 | undefined = undefined): Vector3 {
         return this.multiply(other._x, other._y, other._z, optres);
     }
 
@@ -228,7 +228,56 @@ export class Vector3 {
      * @param other The Scalar value to multiply it with each component of this Vector
      * @param optres (optional) The result to store in
      */
-    public multiplyScalar(other: number, optres: Vector3 | undefined): Vector3 {
+    public multiplyScalar(other: number, optres: Vector3 | undefined = undefined): Vector3 {
         return this.multiply(other, other, other, optres);
+    }
+
+    /**
+     * Calculate the euclidean length of this Vector
+     */
+    public get length(): number {
+        return Math.sqrt(this.lengthSq);
+    }
+
+    /**
+     * Calculate the squared euclidean length of this Vector
+     * 
+     * this operation is cheaper than .length() as it omits a Math.sqrt()
+     */
+    public get lengthSq(): number {
+        return this._x * this._x + this._y * this._y + this._z * this._z;
+    }
+
+    /**
+     * Calculates the squared euclidean distance to the provided components
+     * 
+     * this operation is cheaper than .distanceTo() as it omits a Math.sqrt()
+     */
+    public distanceToSq(other: Vector3): number {
+        const dx: number = other._x - this._x;
+        const dy: number = other._y - this._y;
+        const dz: number = other._z - this._z;
+
+        return dx * dx + dy * dy + dz * dz;
+    }
+
+    /**
+     * Calculates the euclidean distance to the provided components
+     */
+    public distanceTo(other: Vector3): number {
+        return Math.sqrt(this.distanceToSq(other));
+    }
+
+    /**
+     * Normalise this vector so its length == 1
+     */
+    public normalise(): Vector3 {
+        const lenSq: number = this.lengthSq;
+
+        if (lenSq == 0 || lenSq == 1) {
+            return this;
+        }
+
+        return this.multiplyScalar(Math.sqrt(lenSq));
     }
 }
