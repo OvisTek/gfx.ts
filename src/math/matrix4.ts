@@ -36,14 +36,14 @@ export interface Matrix4Json {
  */
 export class Matrix4 {
 	// this is a 16 value array that stores the 4x4 matrix
-	private readonly val: number[];
+	private readonly _val: number[];
 
 	/**
 	 * Initialise a new Matrix as the default Identity Matrix
 	 */
 	constructor() {
 		// init to identity matrix
-		this.val = [
+		this._val = [
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 1, 0,
@@ -56,7 +56,7 @@ export class Matrix4 {
 	 * See JsonMatrix4 Interface for details
 	 */
 	public serialise(): Matrix4Json {
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		return {
 			// first
@@ -118,7 +118,7 @@ export class Matrix4 {
 		const a1: number = (far + near) / (near - far);
 		const a2: number = (2.0 * far * near) / (near - far);
 
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		m[0] = fd / aspect;
 		m[1] = 0;
@@ -146,7 +146,7 @@ export class Matrix4 {
 	 * @param position The position (Vector3)
 	 */
 	public composePos(position: Vector3): Matrix4 {
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		m[0] = 1;
 		m[4] = 0;
@@ -192,7 +192,7 @@ export class Matrix4 {
 		const xx: number = rotation.x * xs, xy = rotation.x * ys, xz = rotation.x * zs;
 		const yy: number = rotation.y * ys, yz = rotation.y * zs, zz = rotation.z * zs;
 
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		m[0] = 1.0 - (yy + zz);
 		m[4] = xy - wz;
@@ -230,7 +230,7 @@ export class Matrix4 {
 		const xx: number = rotation.x * xs, xy = rotation.x * ys, xz = rotation.x * zs;
 		const yy: number = rotation.y * ys, yz = rotation.y * zs, zz = rotation.z * zs;
 
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		m[0] = scale.x * (1.0 - (yy + zz));
 		m[4] = scale.y * (xy - wz);
@@ -267,7 +267,7 @@ export class Matrix4 {
 	public scale(scale: number, optresult: Matrix4 | undefined = undefined): Matrix4 {
 		const result: Matrix4 = optresult || this;
 
-		const m: number[] = result.val;
+		const m: number[] = result._val;
 
 		// first
 		m[0] = m[0] * scale;
@@ -331,9 +331,9 @@ export class Matrix4 {
 	 */
 	public static multiply(a: Matrix4, b: Matrix4, result: Matrix4): Matrix4 {
 		// NOTE: This could at some point move into a WASM module if SIMD becomes available
-		const av: number[] = a.val;
-		const bv: number[] = b.val;
-		const r: number[] = result.val;
+		const av: number[] = a._val;
+		const bv: number[] = b._val;
+		const r: number[] = result._val;
 
 		const a11 = av[0], a12 = av[4], a13 = av[8], a14 = av[12];
 		const a21 = av[1], a22 = av[5], a23 = av[9], a24 = av[13];
@@ -382,7 +382,7 @@ export class Matrix4 {
 		m20: number, m21: number, m22: number, m23: number,
 		m30: number, m31: number, m32: number, m33: number): Matrix4 {
 
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		// first
 		m[0] = m00;
@@ -421,7 +421,7 @@ export class Matrix4 {
 			throw new Error("Matrix4.fromArray(number[]) - provided argument length must be >= 16");
 		}
 
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		// first
 		m[0] = values[0];
@@ -456,14 +456,14 @@ export class Matrix4 {
 	 * @param matrix The Matrix to copy
 	 */
 	public copy(matrix: Matrix4): Matrix4 {
-		return this.fromArray(matrix.val);
+		return this.fromArray(matrix._val);
 	}
 
 	/**
 	 * Clones the current matrix and returns a new instance
 	 */
 	public clone(): Matrix4 {
-		return new Matrix4().fromArray(this.val);
+		return new Matrix4().fromArray(this._val);
 	}
 
 	/**
@@ -490,7 +490,7 @@ export class Matrix4 {
 			throw new Error("Matrix4.invert() - cannot invert Matrix as determinant is 0");
 		}
 
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		const m00: number = m[9] * m[14] * m[7] - m[13] * m[10] * m[7] + m[13] * m[6] * m[11] - m[5] * m[14] * m[11] - m[9] * m[6] * m[15] + m[5] * m[10] * m[15];
 		const m01: number = m[12] * m[10] * m[7] - m[8] * m[14] * m[7] - m[12] * m[6] * m[11] + m[4] * m[14] * m[11] + m[8] * m[6] * m[15] - m[4] * m[10] * m[15];
@@ -535,7 +535,7 @@ export class Matrix4 {
 	 * Calculate and return the transpose of this Matrix
 	 */
 	public transpose(): Matrix4 {
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		const m01: number = m[4];
 		const m02: number = m[8];
@@ -564,7 +564,7 @@ export class Matrix4 {
 	 * Calculate and return the determinant of this Matrix
 	 */
 	public get determinant(): number {
-		const m: number[] = this.val;
+		const m: number[] = this._val;
 
 		return m[3] * m[6] * m[9] * m[12] - m[2] * m[7] * m[9] * m[12] - m[3] * m[5]
 			* m[10] * m[12] + m[1] * m[7] * m[10] * m[12] + m[2] * m[5] * m[11] * m[12] - m[1]
@@ -581,6 +581,6 @@ export class Matrix4 {
 	 * Access the array reference for this matrix
 	 */
 	public get values(): number[] {
-		return this.val;
+		return this._val;
 	}
 }
