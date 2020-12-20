@@ -21,11 +21,11 @@ export class Quaternion {
     private _z: number;
     private _w: number;
 
-    constructor() {
-        this._x = 0;
-        this._y = 0;
-        this._z = 0;
-        this._w = 1;
+    constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 1) {
+        this._x = x;
+        this._y = y;
+        this._z = z;
+        this._w = w;
     }
 
     /**
