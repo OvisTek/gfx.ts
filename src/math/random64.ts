@@ -7,7 +7,7 @@
  */
 export class Random64 {
     // statically available version of Random64 for quick access
-    public static readonly instance: Random64 = new Random64();
+    public static readonly INSTANCE: Random64 = new Random64();
 
     private _seed: number;
 

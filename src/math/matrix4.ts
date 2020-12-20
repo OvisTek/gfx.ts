@@ -177,7 +177,7 @@ export class Matrix4 {
 	 * @param rotation The rotation (Quaternion)
 	 */
 	public composeRot(rotation: Quaternion): Matrix4 {
-		return this.composePosRot(Vector3.Zero, rotation);
+		return this.composePosRot(Vector3.ZERO, rotation);
 	}
 
 	/**

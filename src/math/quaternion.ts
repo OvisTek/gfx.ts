@@ -1,3 +1,5 @@
+import { QuaternionRO } from "./quaternion-ro";
+
 /**
  * Interface for serialising and deserialising Quaternion structure
  * for storage/database purposes
@@ -16,6 +18,10 @@ export interface QuaternionJson {
  * much nicer to interpolate
  */
 export class Quaternion {
+    // static members - read-only and cannot be modified
+    public static readonly IDENTITY: Quaternion = new QuaternionRO(0, 0, 0, 1);
+    public static readonly ZERO: Quaternion = new QuaternionRO(0, 0, 0, 0);
+
     private _x: number;
     private _y: number;
     private _z: number;

@@ -1,4 +1,4 @@
-import { Vector3RO } from "./vector3ro";
+import { Vector3RO } from "./vector3-ro";
 
 /**
  * Interface for serialising and deserialising Vector3 structure
@@ -15,7 +15,7 @@ export interface Vector3Json {
  */
 export class Vector3 {
     // static members - read-only and cannot be modified
-    public static readonly Zero: Vector3 = new Vector3RO(0, 0, 0);
+    public static readonly ZERO: Vector3 = new Vector3RO(0, 0, 0);
     public static readonly X: Vector3 = new Vector3RO(1, 0, 0);
     public static readonly Y: Vector3 = new Vector3RO(0, 1, 0);
     public static readonly Z: Vector3 = new Vector3RO(0, 0, 1);
