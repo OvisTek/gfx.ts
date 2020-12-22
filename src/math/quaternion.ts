@@ -1,5 +1,6 @@
 import { MathUtil } from "./math-util";
 import { QuaternionRO } from "./quaternion-ro";
+import { Matrix4 } from "./matrix4";
 
 /**
  * Interface for serialising and deserialising Quaternion structure
@@ -427,6 +428,53 @@ export class Quaternion {
         result.y = (scale0 * this._y) + (scale1 * end.y);
         result.z = (scale0 * this._z) + (scale1 * end.z);
         result.w = (scale0 * this._w) + (scale1 * end.w);
+
+        return result;
+    }
+
+    /**
+     * Converts this Quaternion rotation into a Matrix4 rotation matrix.
+     * 
+     * Optionally stores result in result Matrix4. If a result Matrix4 is not provided,
+     * a new instance will be created
+     * 
+     * @param matrix (optional) The result to store in. If missing, new instance will be created
+     */
+    public matrix(matrix: Matrix4 | undefined = undefined): Matrix4 {
+        const result: Matrix4 = matrix || new Matrix4();
+        const val = result.values;
+
+        const qx: number = this._x;
+        const qy: number = this._y;
+        const qz: number = this._z;
+        const qw: number = this._w;
+
+        const xx: number = qx * qx;
+        const xy: number = qx * qy;
+        const xz: number = qx * qz;
+        const xw: number = qx * qw;
+        const yy: number = qy * qy;
+        const yz: number = qy * qz;
+        const yw: number = qy * qw;
+        const zz: number = qz * qz;
+        const zw: number = qz * qw;
+
+        val[0] = 1 - 2 * (yy + zz);
+        val[4] = 2 * (xy - zw);
+        val[8] = 2 * (xz + yw);
+        val[12] = 0;
+        val[1] = 2 * (xy + zw);
+        val[5] = 1 - 2 * (xx + zz);
+        val[9] = 2 * (yz - xw);
+        val[13] = 0;
+        val[2] = 2 * (xz - yw);
+        val[6] = 2 * (yz + xw);
+        val[10] = 1 - 2 * (xx + yy);
+        val[14] = 0;
+        val[3] = 0;
+        val[7] = 0;
+        val[11] = 0;
+        val[15] = 1;
 
         return result;
     }
