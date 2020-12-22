@@ -263,10 +263,58 @@ export class Quaternion {
     }
 
     /**
+     * Get the pitch euler angle in radians, which is the rotation around the x axis between -PI/2 and +PI/2
+     * Requires that this Quaternion is normalised
+     */
+    public get pitchRad(): number {
+        const pole: number = this.gimbalPole;
+        const qx: number = this._x;
+        const qy: number = this._y;
+        const qz: number = this._z;
+        const qw: number = this._w;
+
+        return pole == 0 ?
+            Math.asin(MathUtil.clamp(2.0 * (qw * qx - qz * qy), -1.0, 1.0)) :
+            pole * Math.PI * 0.5;
+    }
+
+    /**
+     * Get the yaw euler angle in radians, which is the rotation around the y axis between -PI and +PI
+     * Requires that this Quaternion is normalised
+     */
+    public get yawRad(): number {
+        const pole: number = this.gimbalPole;
+        const qx: number = this._x;
+        const qy: number = this._y;
+        const qz: number = this._z;
+        const qw: number = this._w;
+
+        return pole == 0 ?
+            Math.atan2(2.0 * (qy * qw + qx * qz), 1.0 - 2.0 * (qy * qy + qx * qx)) :
+            0.0;
+    }
+
+    /**
      * Get the roll euler angle in degrees, which is the rotation around the z axis between -180 and +180
      * Requires that this Quaternion is normalised
      */
     public get roll(): number {
         return this.rollRad * MathUtil.RADTDEG;
+    }
+
+    /**
+     * Get the pitch euler angle in degrees, which is the rotation around the x axis between -90 and +90
+     * Requires that this Quaternion is normalised
+     */
+    public get pitch(): number {
+        return this.pitchRad * MathUtil.RADTDEG;
+    }
+
+    /**
+     * Get the yaw euler angle in degrees, which is the rotation around the y axis between -180 and +180
+     * Requires that this Quaternion is normalised
+     */
+    public get yaw(): number {
+        return this.yawRad * MathUtil.RADTDEG;
     }
 }
