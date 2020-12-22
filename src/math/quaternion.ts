@@ -317,4 +317,45 @@ export class Quaternion {
     public get yaw(): number {
         return this.yawRad * MathUtil.RADTDEG;
     }
+
+    /**
+     * Provided x, y, z, w components, multiply it with this Quaternion and return the results.
+     * 
+     * Optionally stores result in result Quaternion. If a result Quaternion is not provided,
+     * this Quaternion will be modified
+     * 
+     * @param x Multiply with this Quaternion.x
+     * @param y Multiply with this Quaternion.y
+     * @param z Multiply with this Quaternion.z
+     * @param w Multiply with this Quaternion.w
+     * @param optres (optional) The result to store in
+     */
+    public multiply(x: number, y: number, z: number, w: number, optres: Quaternion | undefined = undefined): Quaternion {
+        const result: Quaternion = optres || this;
+
+        const qx: number = this._x;
+        const qy: number = this._y;
+        const qz: number = this._z;
+        const qw: number = this._w;
+
+        result.x = qw * x + qx * w + qy * z - qz * y;
+        result.y = qw * y + qy * w + qz * x - qx * z;
+        result.z = qw * z + qz * w + qx * y - qy * x;
+        result.w = qw * w - qx * x - qy * y - qz * z;
+
+        return result;
+    }
+
+    /**
+     * Provided a Quaternion, multiply it with this Quaternion and return the results.
+     * 
+     * Optionally stores result in result Quaternion. If a result Quaternion is not provided,
+     * this Quaternion will be modified
+     * 
+     * @param quat The Quaternion to multiply with this Quaternion
+     * @param optres (optional) The result to store in
+     */
+    public multiplyQuaternion(quat: Quaternion, optres: Quaternion | undefined = undefined): Quaternion {
+        return this.multiply(quat._x, quat._y, quat._z, quat._w, optres);
+    }
 }
