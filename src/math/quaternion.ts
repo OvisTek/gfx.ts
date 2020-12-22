@@ -16,7 +16,9 @@ export interface QuaternionJson {
  * Quaternions are used to represent rotations in 3D space
  * 
  * Unlike Eular Angles, Quaternions do not suffer from gimbal lock problems and are
- * much nicer to interpolate
+ * much nicer to interpolate.
+ * 
+ * Some functions implemented/ported from https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Quaternion.java
  */
 export class Quaternion {
     // static members - read-only and cannot be modified
@@ -379,5 +381,53 @@ export class Quaternion {
         return this.multiply(quat._x, quat._y, quat._z, quat._w, optres);
     }
 
+    /**
+     * Spherical Linear Interpolation between this Quaternion and End based on Alpha value between [0, 1]
+     * 
+     * Optionally stores result in result Quaternion. If a result Quaternion is not provided,
+     * this Quaternion will be modified
+     * 
+     * @param end The Quaternion to interpolate towards
+     * @param alpha The alpha value between [0, 1]
+     * @param optres (optional) The result to store in
+     */
+    public slerp(end: Quaternion, alpha: number = 1.0, optres: Quaternion | undefined = undefined): Quaternion {
+        const result: Quaternion = optres || this;
 
+        // ensure alpha is clamped between 0 and 1
+        alpha = MathUtil.clamp(alpha, 0, 1);
+
+        const d: number = this._x * end._x + this._y * end._y + this._z * end._z + this._w * end._w;
+        const absDot: number = d < 0.0 ? -d : d;
+
+        // Set the first and second scale for the interpolation
+        let scale0: number = 1.0 - alpha;
+        let scale1: number = alpha;
+
+        // Check if the angle between the 2 quaternions was big enough to
+        // warrant such calculations
+        if ((1.0 - absDot) > 0.1) {// Get the angle between the 2 quaternions,
+            // and then store the sin() of that angle
+            const angle: number = Math.acos(absDot);
+            const invSinTheta: number = 1.0 / Math.sin(angle);
+
+            // Calculate the scale for q1 and q2, according to the angle and
+            // it's sine value
+            scale0 = Math.sin((1.0 - alpha) * angle) * invSinTheta;
+            scale1 = Math.sin((alpha * angle)) * invSinTheta;
+        }
+
+        if (d < 0.0) {
+            scale1 = -scale1;
+        }
+
+        // Calculate the x, y, z and w values for the quaternion by using a
+        // special form of linear interpolation for quaternions.
+        result.x = (scale0 * this._x) + (scale1 * end.x);
+        result.y = (scale0 * this._y) + (scale1 * end.y);
+        result.z = (scale0 * this._z) + (scale1 * end.z);
+        result.w = (scale0 * this._w) + (scale1 * end.w);
+
+        return result;
+    }
 }
