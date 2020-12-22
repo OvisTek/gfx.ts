@@ -347,6 +347,26 @@ export class Quaternion {
     }
 
     /**
+     * Provided a scalar component, multiply it with this Quaternion and return the results.
+     * 
+     * Optionally stores result in result Quaternion. If a result Quaternion is not provided,
+     * this Quaternion will be modified
+     * 
+     * @param scalar Multiply with this Quaternion x, y, z and w components
+     * @param optres (optional) The result to store in
+     */
+    public multiplyScalar(scalar: number, optres: Quaternion | undefined = undefined): Quaternion {
+        const result: Quaternion = optres || this;
+
+        result.x = this._x * scalar;
+        result.y = this._y * scalar;
+        result.z = this._z * scalar;
+        result.w = this._w * scalar;
+
+        return result;
+    }
+
+    /**
      * Provided a Quaternion, multiply it with this Quaternion and return the results.
      * 
      * Optionally stores result in result Quaternion. If a result Quaternion is not provided,
@@ -358,4 +378,6 @@ export class Quaternion {
     public multiplyQuaternion(quat: Quaternion, optres: Quaternion | undefined = undefined): Quaternion {
         return this.multiply(quat._x, quat._y, quat._z, quat._w, optres);
     }
+
+
 }
