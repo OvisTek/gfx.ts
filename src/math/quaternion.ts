@@ -407,7 +407,8 @@ export class Quaternion {
 
         // Check if the angle between the 2 quaternions was big enough to
         // warrant such calculations
-        if ((1.0 - absDot) > 0.1) {// Get the angle between the 2 quaternions,
+        if ((1.0 - absDot) > 0.1) {
+            // Get the angle between the 2 quaternions,
             // and then store the sin() of that angle
             const angle: number = Math.acos(absDot);
             const invSinTheta: number = 1.0 / Math.sin(angle);
@@ -424,10 +425,10 @@ export class Quaternion {
 
         // Calculate the x, y, z and w values for the quaternion by using a
         // special form of linear interpolation for quaternions.
-        result.x = (scale0 * this._x) + (scale1 * end.x);
-        result.y = (scale0 * this._y) + (scale1 * end.y);
-        result.z = (scale0 * this._z) + (scale1 * end.z);
-        result.w = (scale0 * this._w) + (scale1 * end.w);
+        result.x = (scale0 * this._x) + (scale1 * end._x);
+        result.y = (scale0 * this._y) + (scale1 * end._y);
+        result.z = (scale0 * this._z) + (scale1 * end._z);
+        result.w = (scale0 * this._w) + (scale1 * end._w);
 
         return result;
     }
