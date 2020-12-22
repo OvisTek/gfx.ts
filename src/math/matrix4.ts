@@ -335,15 +335,15 @@ export class Matrix4 {
 		const bv: number[] = b._val;
 		const r: number[] = result._val;
 
-		const a11 = av[0], a12 = av[4], a13 = av[8], a14 = av[12];
-		const a21 = av[1], a22 = av[5], a23 = av[9], a24 = av[13];
-		const a31 = av[2], a32 = av[6], a33 = av[10], a34 = av[14];
-		const a41 = av[3], a42 = av[7], a43 = av[11], a44 = av[15];
+		const a11: number = av[0], a12 = av[4], a13 = av[8], a14 = av[12];
+		const a21: number = av[1], a22 = av[5], a23 = av[9], a24 = av[13];
+		const a31: number = av[2], a32 = av[6], a33 = av[10], a34 = av[14];
+		const a41: number = av[3], a42 = av[7], a43 = av[11], a44 = av[15];
 
-		const b11 = bv[0], b12 = bv[4], b13 = bv[8], b14 = bv[12];
-		const b21 = bv[1], b22 = bv[5], b23 = bv[9], b24 = bv[13];
-		const b31 = bv[2], b32 = bv[6], b33 = bv[10], b34 = bv[14];
-		const b41 = bv[3], b42 = bv[7], b43 = bv[11], b44 = bv[15];
+		const b11: number = bv[0], b12 = bv[4], b13 = bv[8], b14 = bv[12];
+		const b21: number = bv[1], b22 = bv[5], b23 = bv[9], b24 = bv[13];
+		const b31: number = bv[2], b32 = bv[6], b33 = bv[10], b34 = bv[14];
+		const b41: number = bv[3], b42 = bv[7], b43 = bv[11], b44 = bv[15];
 
 		r[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
 		r[4] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;

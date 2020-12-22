@@ -1,6 +1,7 @@
 import { MathUtil } from "./math-util";
 import { QuaternionRO } from "./quaternion-ro";
 import { Matrix4 } from "./matrix4";
+import { Euler } from "./euler";
 
 /**
  * Interface for serialising and deserialising Quaternion structure
@@ -152,16 +153,25 @@ export class Quaternion {
     }
 
     /**
+     * Sets the Quaternion to the given euler angles
+     * 
+     * @param euler The Euler angles to set
+     */
+    public setEuler(euler: Euler): Quaternion {
+        return this.setEulerAnglesRad(euler.yaw, euler.pitch, euler.roll);
+    }
+
+    /**
      * Sets the Quaternion to the given euler angles in degrees.
      *
      * @param yaw the rotation around the y axis in degrees
      * @param pitch the rotation around the x axis in degrees
      * @param roll the rotation around the z axis in degrees
      */
-    public setEuler(yawDeg: number, pitchDeg: number, rollDeg: number): Quaternion {
+    public setEulerAngles(yawDeg: number, pitchDeg: number, rollDeg: number): Quaternion {
         const dr: number = MathUtil.DEGTRAD;
 
-        return this.setEulerRad(yawDeg * dr, pitchDeg * dr, rollDeg * dr);
+        return this.setEulerAnglesRad(yawDeg * dr, pitchDeg * dr, rollDeg * dr);
     }
 
     /** 
@@ -171,7 +181,7 @@ export class Quaternion {
      * @param pitch the rotation around the x axis in radians
      * @param roll the rotation around the z axis in radians
      */
-    public setEulerRad(yawRad: number, pitchRad: number, rollRad: number): Quaternion {
+    public setEulerAnglesRad(yawRad: number, pitchRad: number, rollRad: number): Quaternion {
         const hr: number = rollRad * 0.5;
         const shr: number = Math.sin(hr);
         const chr: number = Math.cos(hr);
@@ -476,6 +486,39 @@ export class Quaternion {
         val[7] = 0;
         val[11] = 0;
         val[15] = 1;
+
+        return result;
+    }
+
+    /**
+     * Converts this Quaternion rotation into a Euler rotation.
+     * 
+     * Optionally stores result in result Euler. If a result Euler is not provided,
+     * a new instance will be created
+     *
+     * @param euler (optional) The result to store in. If missing, new instance will be created
+     */
+    public euler(euler: Euler | undefined = undefined): Euler {
+        const result: Euler = euler || new Euler();
+
+        // reusable quaternion variables
+        const pole: number = this.gimbalPole;
+        const qx: number = this._x;
+        const qy: number = this._y;
+        const qz: number = this._z;
+        const qw: number = this._w;
+
+        // calculate the rotation angles
+        if (pole == 0) {
+            result.roll = Math.atan2(2.0 * (qw * qz + qy * qx), 1.0 - 2.0 * (qx * qx + qz * qz));
+            result.pitch = Math.asin(MathUtil.clamp(2.0 * (qw * qx - qz * qy), -1.0, 1.0));
+            result.yaw = Math.atan2(2.0 * (qy * qw + qx * qz), 1.0 - 2.0 * (qy * qy + qx * qx));
+        }
+        else {
+            result.roll = pole * 2.0 * Math.atan2(qy, qw);
+            result.pitch = pole * Math.PI * 0.5;
+            result.yaw = 0;
+        }
 
         return result;
     }
