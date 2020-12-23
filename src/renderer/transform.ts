@@ -98,7 +98,7 @@ export class Transform {
      * Generates a hash-code of this Transform. The hash can be used to check if
      * the transform has actually updated or requires some form of update
      */
-    public hashCode(): number {
+    public get hashCode(): number {
         const prime: number = 31;
         let result: number = 1;
 
@@ -128,25 +128,38 @@ export class Transform {
      * @param parent The parent transform that should be used to update this transform
      */
     public apply(parent: Transform): void {
-        const computedHash: number = this.hashCode();
-
-        // this means the transform has changed since the last update, we need to re-update
-        // the local matrix
-        if (computedHash != this._hash) {
-            this._localMatrix.composePosRotSca(this._position, this._rotation, this._scale);
-        }
+        // update the local matrix from position, rotation and scale
+        const isUpdated: boolean = this.updateLocalMatrix();
 
         const parentHash = parent.hash;
 
         // we update the world matrix only if either the local transform has changed
         // or the parent transform has changed
-        if (computedHash != this._hash || parentHash != this._parentHash) {
+        if (isUpdated || parentHash != this._parentHash) {
             // update the world matrix of this transform from parent
             Matrix4.multiply(this._localMatrix, parent.worldMatrix, this._worldMatrix);
         }
 
         // update hash codes for the next apply() call
-        this._hash = computedHash
         this._parentHash = parentHash;
+    }
+
+    /**
+     * Updates/Composes local matrix if needed from position, rotation and scale components
+     */
+    private updateLocalMatrix(): boolean {
+        const computedHash: number = this.hashCode;
+
+        // this means the transform has changed since the last update, we need to re-update
+        // the local matrix
+        if (computedHash != this._hash) {
+            this._localMatrix.composePosRotSca(this._position, this._rotation, this._scale);
+
+            return true;
+        }
+
+        this._hash = computedHash
+
+        return false;
     }
 }

@@ -1,4 +1,5 @@
 import { Vector3RO } from "./vector3-ro";
+import { MathUtil } from "./math-util";
 
 /**
  * Interface for serialising and deserialising Vector3 structure
@@ -373,5 +374,20 @@ export class Vector3 {
      */
     public crossVector(other: Vector3, optres: Vector3 | undefined = undefined): Vector3 {
         return this.cross(other._x, other._y, other._z, optres);
+    }
+
+    /**
+     * Calculates a unique 32 bit hash for this Vector3
+     */
+    public get hashCode(): number {
+        const prime: number = 31;
+        let result: number = 1;
+
+        // hash the position
+        result = prime * result + MathUtil.floatToIntBits(this._x);
+        result = prime * result + MathUtil.floatToIntBits(this._y);
+        result = prime * result + MathUtil.floatToIntBits(this._z);
+
+        return result;
     }
 }

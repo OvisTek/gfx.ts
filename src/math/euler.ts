@@ -199,4 +199,19 @@ export class Euler {
 
         return result;
     }
+
+    /**
+     * Calculates a unique 32 bit hash for this Euler
+     */
+    public get hashCode(): number {
+        const prime: number = 31;
+        let result: number = 1;
+
+        // hash the position
+        result = prime * result + MathUtil.floatToIntBits(this._yaw);
+        result = prime * result + MathUtil.floatToIntBits(this._pitch);
+        result = prime * result + MathUtil.floatToIntBits(this._roll);
+
+        return result;
+    }
 }

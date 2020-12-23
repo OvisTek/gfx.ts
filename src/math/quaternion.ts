@@ -522,4 +522,20 @@ export class Quaternion {
 
         return result;
     }
+
+    /**
+     * Calculates a unique 32 bit hash for this Quaternion
+     */
+    public get hashCode(): number {
+        const prime: number = 31;
+        let result: number = 1;
+
+        // hash the position
+        result = prime * result + MathUtil.floatToIntBits(this._x);
+        result = prime * result + MathUtil.floatToIntBits(this._y);
+        result = prime * result + MathUtil.floatToIntBits(this._z);
+        result = prime * result + MathUtil.floatToIntBits(this._w);
+
+        return result;
+    }
 }
