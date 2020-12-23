@@ -31,6 +31,7 @@ export abstract class StageObject {
         if (!this._stage) {
             throw new Error("StageObject.stage() - object was not setup correctly, context unavailable");
         }
+
         return this._stage;
     }
 
@@ -125,7 +126,7 @@ export abstract class StageObject {
     /**
      * Safe execution of the onPause() function. This should not be called from user-space
      */
-    public _exec_onPause(): Error | undefined {
+    public _exec_OnPause(): Error | undefined {
         try {
             this.onPause();
         }
@@ -139,7 +140,7 @@ export abstract class StageObject {
     /**
      * Safe execution of the onResume() function. This should not be called from user-space
      */
-    public _exec_onResume(): Error | undefined {
+    public _exec_OnResume(): Error | undefined {
         try {
             this.onResume();
         }
@@ -153,7 +154,7 @@ export abstract class StageObject {
     /**
      * Safe execution of the onDestroy() function. This should not be called from user-space
      */
-    public _exec_onDestroy(): Error | undefined {
+    public _exec_OnDestroy(): Error | undefined {
         try {
             this.onDestroy();
         }
