@@ -5,13 +5,36 @@ import { Transform } from "../transform";
  * Everything extends the StageObject as a base class. Contains a number of 
  */
 export abstract class StageObject {
+    private static _idCounter: number = 0;
+
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
     private _stage?: Stage;
+    private _parent?: StageObject;
+    private readonly _id: number;
 
     constructor() {
         this._transform = new Transform();
         this._stage = undefined;
+        this._parent = undefined;
+        this._id = StageObject._idCounter++;
+    }
+
+    /**
+     * Adds a new child to the provided StageObject. Returns a Promise that
+     * will resolve when the child object is loaded and will be executed.
+     * 
+     * @param instance The instance of the new object to add to this hierarchy
+     */
+    public add<T extends StageObject>(instance: T): Promise<T> {
+        return null;
+    }
+
+    /**
+     * Returns the internally generated ID of this object
+     */
+    public get id(): number {
+        return this._id;
     }
 
     /**
@@ -33,6 +56,13 @@ export abstract class StageObject {
         }
 
         return this._stage;
+    }
+
+    /**
+     * Returns the current parent object of this object
+     */
+    protected get parent(): StageObject | undefined {
+        return this._parent;
     }
 
     /**
@@ -84,9 +114,10 @@ export abstract class StageObject {
      * 
      * @param stage The Stage reference
      */
-    public _exec_Create(stage: Stage): Promise<void> {
+    public _exec_Create(stage: Stage, parent: StageObject): Promise<void> {
         // sets the stage reference
         this._stage = stage;
+        this._parent = parent;
 
         return this.create();
     }
