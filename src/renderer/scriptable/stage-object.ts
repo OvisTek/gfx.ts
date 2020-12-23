@@ -27,7 +27,7 @@ export abstract class StageObject {
      * @param instance The instance of the new object to add to this hierarchy
      */
     public add<T extends StageObject>(instance: T): Promise<T> {
-        return null;
+        return this.stage.add(instance, this);
     }
 
     /**
