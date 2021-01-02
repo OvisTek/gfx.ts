@@ -1,23 +1,23 @@
-import { Stage } from "../stage";
+import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
+import { EntityLinker } from "./entity-linker";
 
 /**
  * Everything extends the StageObject as a base class. Contains a number of 
+ * callbacks from the main renderer
  */
-export abstract class StageObject {
-    private static _idCounter: number = 0;
-
+export abstract class Entity extends EntityLinker<Entity> {
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
-    private _stage?: Stage;
-    private _parent?: StageObject;
-    private readonly _id: number;
 
-    constructor() {
+    private _stage?: Stage;
+    private _visibility: boolean;
+
+    constructor(isInitiallyVisible: boolean = true) {
+        super();
         this._transform = new Transform();
         this._stage = undefined;
-        this._parent = undefined;
-        this._id = StageObject._idCounter++;
+        this._visibility = isInitiallyVisible;
     }
 
     /**
@@ -26,15 +26,8 @@ export abstract class StageObject {
      * 
      * @param instance The instance of the new object to add to this hierarchy
      */
-    public add<T extends StageObject>(instance: T): Promise<T> {
+    public add<T extends Entity>(instance: T): Promise<T> {
         return this.stage.add(instance, this);
-    }
-
-    /**
-     * Returns the internally generated ID of this object
-     */
-    public get id(): number {
-        return this._id;
     }
 
     /**
@@ -56,13 +49,6 @@ export abstract class StageObject {
         }
 
         return this._stage;
-    }
-
-    /**
-     * Returns the current parent object of this object
-     */
-    protected get parent(): StageObject | undefined {
-        return this._parent;
     }
 
     /**
@@ -114,7 +100,8 @@ export abstract class StageObject {
      * 
      * @param stage The Stage reference
      */
-    public _exec_Create(stage: Stage, parent: StageObject): Promise<void> {
+    public _exec_Create(stage: Stage, parent: Entity): Promise<void> {
+        // TODO FIX
         // sets the stage reference
         this._stage = stage;
         this._parent = parent;
