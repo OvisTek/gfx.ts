@@ -55,5 +55,11 @@ export class Stage {
                 newObject = this._queue.pop();
             }
         }
+
+        const root: StageRoot = this._root;
+
+        // execute root that will recursively execute all child objects
+        root._exec_Update(deltaTime);
+        root._exec_LateUpdate(deltaTime);
     }
 }

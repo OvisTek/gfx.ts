@@ -158,7 +158,7 @@ export abstract class Entity {
     /**
      * Returns the Stage that this object is attached to
      */
-    protected get stage(): Stage {
+    public get stage(): Stage {
         if (!this._stage) {
             throw new Error("Entity.stage() - object was not setup correctly, context unavailable");
         }
@@ -169,7 +169,7 @@ export abstract class Entity {
     /**
      * Returns the Transform that allows moving, rotating or scaling this object
      */
-    protected get transform(): Transform {
+    public get transform(): Transform {
         return this._transform;
     }
 
@@ -342,7 +342,7 @@ export abstract class Entity {
      * @param newWidth The new width of the Renderer/Canvas
      * @param newHeight The new height of the Renderer/Canvas
      */
-    protected _exec_OnResize(newWidth: number, newHeight: number): Error | undefined {
+    public _exec_OnResize(newWidth: number, newHeight: number): Error | undefined {
         try {
             this.onResize(newWidth, newHeight);
         }
