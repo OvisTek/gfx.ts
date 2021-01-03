@@ -1,29 +1,35 @@
 import { Entity } from "../scriptable/entity";
+import { StageRoot } from "./stage-root";
 
 /**
- * This is the root object of the stage. 
- * Its just an empty container that holds all root objects.
+ * The Stage represents a collection of objects as a hierarchy to be executed
+ * by the Renderer. A Stage can be thought of as a single Level. 
+ * 
+ * Only one Stage can be active at any one time.
  */
-export class RootObject extends Entity { }
-
 export class Stage {
-    private readonly _root: StageObject;
+    private readonly _root: StageRoot;
 
     constructor() {
-        this._root = new RootObject();
+        this._root = new StageRoot();
     }
 
     /**
-     * Adds a new StageObject to this Stage for execution
-     * 
-     * @param instance The new instance of the object to add
-     * @param parent (optional) The parent of the object. If absent, this object will be added to the root
+     * Returns the root object of the stage.
+     * There is only a single root object
      */
-    public add<T extends Entity>(instance: T, parent: Entity | undefined = undefined): Promise<T> {
-        const root: Entity = parent || this._root;
+    public get root(): StageRoot {
+        return this._root;
+    }
 
+    /**
+     * Queue a new object instance for creation
+     * 
+     * @param instance The object instance to be created
+     */
+    public queue<T extends Entity>(instance: T): Promise<T> {
         return new Promise<T>((accept, reject) => {
-            instance._exec_Create(this, root).then(() => {
+            instance._exec_Create(this).then(() => {
                 accept(instance);
             }).catch(reject);
         });

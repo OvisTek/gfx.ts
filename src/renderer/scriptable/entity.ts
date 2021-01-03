@@ -1,5 +1,6 @@
 import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
+import { Renderer } from "../renderer";
 
 /**
  * Used for generating a unique ID for objects
@@ -26,6 +27,7 @@ export abstract class Entity {
 
     private _stage?: Stage;
     private _visibility: boolean;
+    private _isCreated: boolean;
 
     // the parent of this object (if any)
     // if undefined, then this object is not part of the scene-graph
@@ -36,9 +38,13 @@ export abstract class Entity {
         this._parent = undefined;
 
         this._transform = new Transform();
-        this._visibility = isInitiallyVisible;
         this._children = new Array<Entity>();
         this._id = ID.generate();
+
+        this._visibility = isInitiallyVisible;
+        this._isCreated = false;
+
+        Renderer.instance.stage.queue(this);
     }
 
     /**
@@ -69,6 +75,14 @@ export abstract class Entity {
      */
     public get visibility(): boolean {
         return this._visibility;
+    }
+
+    /**
+     * Query if this object was successfully created, AKA the create() function
+     * executed properly.
+     */
+    public get created(): boolean {
+        return this._isCreated;
     }
 
     /**
@@ -142,26 +156,6 @@ export abstract class Entity {
     }
 
     /**
-     * Adds a new child to the provided Entity. Returns a Promise that
-     * will resolve when the child object is loaded and will be executed.
-     * 
-     * @param instance The instance of the new object to add to this hierarchy
-     */
-    public add<T extends Entity>(instance: T): Promise<T> {
-        return this.stage.add(instance, this);
-    }
-
-    /**
-     * Called by the Rendering Engine to construct this object asynchronously. Object
-     * will not be executed/rendered until the promise is resolved
-     */
-    protected create(): Promise<void> {
-        return new Promise((accept, reject) => {
-            return accept();
-        });
-    }
-
-    /**
      * Returns the Stage that this object is attached to
      */
     protected get stage(): Stage {
@@ -178,6 +172,22 @@ export abstract class Entity {
     protected get transform(): Transform {
         return this._transform;
     }
+
+    /**
+     * Called by the Rendering Engine to construct this object asynchronously. Object
+     * will not be executed/rendered until the promise is resolved
+     */
+    protected create(): Promise<void> {
+        return new Promise((accept, reject) => {
+            return accept();
+        });
+    }
+
+    /**
+     * Called by the Rendering Engine first time object is executed. This happens at the
+     * start of a new frame for all new objects
+     */
+    protected start() { }
 
     /**
      * Called by the Rendering Engine just before a rendering is about to be done
@@ -221,13 +231,35 @@ export abstract class Entity {
      * 
      * @param stage The Stage reference
      */
-    public _exec_Create(stage: Stage, parent: Entity): Promise<void> {
-        // TODO FIX
+    public _exec_Create(stage: Stage): Promise<void> {
         // sets the stage reference
         this._stage = stage;
-        this._parent = parent;
+
+        // a newly constructed object must always have a parent
+        if (!this._parent) {
+            this.parent = stage.root;
+        }
 
         return this.create();
+    }
+
+    /**
+     * Safe execution of the create() function. This should not be called from user-space
+     * 
+     * @param stage The Stage reference
+     */
+    public _exec_Start(): Error | undefined {
+        // sets the tag that this object has been created properly
+        this._isCreated = true;
+
+        try {
+            this.start();
+        }
+        catch (error) {
+            return error;
+        }
+
+        return undefined;
     }
 
     /**
