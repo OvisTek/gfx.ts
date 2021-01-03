@@ -9,9 +9,11 @@ import { StageRoot } from "./stage-root";
  */
 export class Stage {
     private readonly _root: StageRoot;
+    private readonly _queue: Array<Entity>;
 
     constructor() {
         this._root = new StageRoot();
+        this._queue = new Array<Entity>();
     }
 
     /**
@@ -30,8 +32,28 @@ export class Stage {
     public queue<T extends Entity>(instance: T): Promise<T> {
         return new Promise<T>((accept, reject) => {
             instance._exec_Create(this).then(() => {
+                this._queue.push(instance);
                 accept(instance);
             }).catch(reject);
         });
+    }
+
+    /**
+     * Called automatically every frame by the Renderer
+     * 
+     * @param deltaTime The time difference between last and current frame in seconds
+     */
+    public _update(deltaTime: number) {
+        // check the current queue for any new objects that need to be started
+        if (this._queue.length > 0) {
+            let newObject: Entity | undefined = this._queue.pop();
+
+            // loop until the queue is completely empty
+            while (newObject) {
+                newObject._exec_Start();
+
+                newObject = this._queue.pop();
+            }
+        }
     }
 }
