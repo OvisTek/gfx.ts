@@ -1,27 +1,148 @@
 import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
-import { EntityLinker } from "./entity-linker";
 
 /**
- * Everything extends the StageObject as a base class. Contains a number of 
+ * Used for generating a unique ID for objects
+ */
+class ID {
+    private static _counter: number = 0;
+
+    public static generate() {
+        return this._counter++;
+    }
+}
+
+/**
+ * Everything extends the Entity as a base class. Contains a number of 
  * callbacks from the main renderer
  */
-export abstract class Entity extends EntityLinker<Entity> {
+export abstract class Entity {
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
+    private readonly _id: number;
+
+    // all the child objects of this entity
+    private readonly _children: Array<Entity>;
 
     private _stage?: Stage;
     private _visibility: boolean;
 
+    // the parent of this object (if any)
+    // if undefined, then this object is not part of the scene-graph
+    private _parent?: Entity;
+
     constructor(isInitiallyVisible: boolean = true) {
-        super();
-        this._transform = new Transform();
         this._stage = undefined;
+        this._parent = undefined;
+
+        this._transform = new Transform();
         this._visibility = isInitiallyVisible;
+        this._children = new Array<Entity>();
+        this._id = ID.generate();
     }
 
     /**
-     * Adds a new child to the provided StageObject. Returns a Promise that
+     * Returns the current parent of this object
+     */
+    public get parent(): Entity | undefined {
+        return this._parent;
+    }
+
+    /**
+     * Returns all the children of this object
+     */
+    public get children(): Array<Entity> {
+        return this._children;
+    }
+
+    /**
+     * Returns a Unique ID of this object
+     */
+    public get id(): number {
+        return this._id;
+    }
+
+    /**
+     * Returns the current local visibility of this object
+     * NOTE: This may return true however object may be invisible due to parent.
+     * To see if the object is globally visible, query the globalVisible object
+     */
+    public get visibility(): boolean {
+        return this._visibility;
+    }
+
+    /**
+     * Checks the global visibility of the object.
+     */
+    public get globalVisibility(): boolean {
+        const localVisibility: boolean = this.visibility;
+
+        if (!this._parent) {
+            return localVisibility;
+        }
+
+        // if local visibility is false, then no way children are being rendered
+        if (localVisibility == false) {
+            return localVisibility;
+        }
+
+        // query the parent visibility to ensure propagation to the root
+        return this._parent.globalVisibility;
+    }
+
+    /**
+     * Sets the local visibility of this object.
+     * NOTE: This may be set to true however object may be invisible due to parent.
+     * To see if the object is globally visible, query the globalVisible object
+     */
+    public set visibility(isVisible: boolean) {
+        this._visibility = isVisible;
+    }
+
+    /**
+     * Sets a new parent for this object. If this object has a previous parent, it will
+     * be removed from the existing hierarchy and placed onto the new one
+     */
+    public set parent(newParent: Entity | undefined) {
+        // remove ourselves from the existing parent
+        this.pop();
+
+        this._parent = newParent;
+
+        // add ourselves as a child of the new parent
+        if (this._parent) {
+            this._parent._children.push(this);
+        }
+    }
+
+    /**
+     * Internal private function to remove ourselves from the parent
+     */
+    private pop(): boolean {
+        // pops this object from the parent
+        if (this._parent) {
+            // remove itself from the parent
+            const children: Array<Entity> = this._parent._children;
+
+            // NOTE - This can be vastly improved to remove 
+            // the O(n) to O(1) via trickery
+            const index: number = children.indexOf(this);
+
+            // resets the parent
+            this._parent = undefined;
+
+            if (index >= 0) {
+                children.splice(index, 1);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Adds a new child to the provided Entity. Returns a Promise that
      * will resolve when the child object is loaded and will be executed.
      * 
      * @param instance The instance of the new object to add to this hierarchy
@@ -45,7 +166,7 @@ export abstract class Entity extends EntityLinker<Entity> {
      */
     protected get stage(): Stage {
         if (!this._stage) {
-            throw new Error("StageObject.stage() - object was not setup correctly, context unavailable");
+            throw new Error("Entity.stage() - object was not setup correctly, context unavailable");
         }
 
         return this._stage;
