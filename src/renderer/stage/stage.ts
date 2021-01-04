@@ -1,3 +1,5 @@
+import { Camera } from "../camera/camera";
+import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Entity } from "../scriptable/entity";
 import { StageRoot } from "./stage-root";
 
@@ -9,11 +11,15 @@ import { StageRoot } from "./stage-root";
  */
 export class Stage {
     private readonly _root: StageRoot;
+    private readonly _camera: Camera;
     private readonly _queue: Array<Entity>;
 
     constructor() {
         this._root = new StageRoot();
+        this._camera = new PerspectiveCamera();
         this._queue = new Array<Entity>();
+
+        this._camera.parent = this._root;
     }
 
     /**
@@ -22,6 +28,13 @@ export class Stage {
      */
     public get root(): StageRoot {
         return this._root;
+    }
+
+    /**
+     * Returns the current camera/view of the Stage
+     */
+    public get camera(): Camera {
+        return this._camera;
     }
 
     /**

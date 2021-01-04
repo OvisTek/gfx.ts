@@ -481,16 +481,22 @@ export class Matrix4 {
 	}
 
 	/**
-	 * Calculate and return the inverse of this Matrix
+	 * Calculate and return the inverse of this Matrix and optionally stores result
+	 * in result Matrix. If a result matrix is not provided, this matrix will be modified
+	 * 
+	 * @param optresult (optional) The result to store in
 	 */
-	public invert(): Matrix4 {
+	public invert(optresult: Matrix4 | undefined = undefined): Matrix4 {
 		const det: number = this.determinant;
 
 		if (det == 0) {
 			throw new Error("Matrix4.invert() - cannot invert Matrix as determinant is 0");
 		}
 
+		const result: Matrix4 = optresult || this;
+
 		const m: number[] = this._val;
+		const r: number[] = result._val;
 
 		const m00: number = m[9] * m[14] * m[7] - m[13] * m[10] * m[7] + m[13] * m[6] * m[11] - m[5] * m[14] * m[11] - m[9] * m[6] * m[15] + m[5] * m[10] * m[15];
 		const m01: number = m[12] * m[10] * m[7] - m[8] * m[14] * m[7] - m[12] * m[6] * m[11] + m[4] * m[14] * m[11] + m[8] * m[6] * m[15] - m[4] * m[10] * m[15];
@@ -511,22 +517,22 @@ export class Matrix4 {
 
 		const idet: number = 1.0 / det;
 
-		m[0] = m00 * idet;
-		m[1] = m10 * idet;
-		m[2] = m20 * idet;
-		m[3] = m30 * idet;
-		m[4] = m01 * idet;
-		m[5] = m11 * idet;
-		m[6] = m21 * idet;
-		m[7] = m31 * idet;
-		m[8] = m02 * idet;
-		m[9] = m12 * idet;
-		m[10] = m22 * idet;
-		m[11] = m32 * idet;
-		m[12] = m03 * idet;
-		m[13] = m13 * idet;
-		m[14] = m23 * idet;
-		m[15] = m33 * idet;
+		r[0] = m00 * idet;
+		r[1] = m10 * idet;
+		r[2] = m20 * idet;
+		r[3] = m30 * idet;
+		r[4] = m01 * idet;
+		r[5] = m11 * idet;
+		r[6] = m21 * idet;
+		r[7] = m31 * idet;
+		r[8] = m02 * idet;
+		r[9] = m12 * idet;
+		r[10] = m22 * idet;
+		r[11] = m32 * idet;
+		r[12] = m03 * idet;
+		r[13] = m13 * idet;
+		r[14] = m23 * idet;
+		r[15] = m33 * idet;
 
 		return this;
 	}
