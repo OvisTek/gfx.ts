@@ -6,6 +6,14 @@ import { Transform } from "../transform";
  * have StageRoot as a parent
  */
 export class StageRoot extends Entity {
+
+    constructor() {
+        super({
+            visibility: true,
+            autoCreate: false
+        });
+    }
+
     protected update(dt: number) {
         if (this.visibility) {
             const childObjects: Array<Entity> = this.children;

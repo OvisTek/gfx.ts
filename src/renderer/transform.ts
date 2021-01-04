@@ -137,7 +137,7 @@ export class Transform {
         // or the parent transform has changed
         if (isUpdated || parentHash != this._parentHash) {
             // update the world matrix of this transform from parent
-            Matrix4.multiply(this._localMatrix, parent.worldMatrix, this._worldMatrix);
+            Matrix4.multiply(parent.worldMatrix, this._localMatrix, this._worldMatrix);
         }
 
         // update hash codes for the next apply() call

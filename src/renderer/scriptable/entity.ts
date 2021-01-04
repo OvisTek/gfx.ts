@@ -14,10 +14,21 @@ class ID {
 }
 
 /**
+ * Construction options for the Entity
+ */
+export interface EntityOptions {
+    readonly visibility: boolean;
+    readonly autoCreate: boolean;
+}
+
+/**
  * Everything extends the Entity as a base class. Contains a number of 
  * callbacks from the main renderer
  */
 export abstract class Entity {
+    // default options
+    private static readonly _optDefault = { visibility: true, autoCreate: true };
+
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
     private readonly _id: number;
@@ -33,7 +44,9 @@ export abstract class Entity {
     // if undefined, then this object is not part of the scene-graph
     private _parent?: Entity;
 
-    constructor(isInitiallyVisible: boolean = true) {
+    constructor(opt: EntityOptions | undefined = undefined) {
+        const options: EntityOptions = opt || Entity._optDefault;
+
         this._stage = undefined;
         this._parent = undefined;
 
@@ -41,10 +54,12 @@ export abstract class Entity {
         this._children = new Array<Entity>();
         this._id = ID.generate();
 
-        this._visibility = isInitiallyVisible;
         this._isCreated = false;
+        this._visibility = options.visibility;
 
-        Renderer.instance.stage.queue(this);
+        if (options.autoCreate) {
+            Renderer.instance.stage.queue(this);
+        }
     }
 
     /**
