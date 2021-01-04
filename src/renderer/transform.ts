@@ -21,6 +21,12 @@ export class Transform {
     private readonly _localMatrix: Matrix4;
     private readonly _worldMatrix: Matrix4;
 
+    // these components are updated on-demand
+    private _requiresLocalInverseUpdate: boolean;
+    private _requiresWorldInverseUpdate: boolean;
+    private readonly _localMatrixInverse: Matrix4;
+    private readonly _worldMatrixInverse: Matrix4;
+
     // the previously computed hash of this Transform
     private _hash: number = 0;
     private _parentHash: number = 0;
@@ -29,8 +35,16 @@ export class Transform {
         this._position = new Vector3();
         this._rotation = new Quaternion();
         this._scale = new Vector3(1, 1, 1);
+
         this._localMatrix = new Matrix4();
         this._worldMatrix = new Matrix4();
+
+        this._localMatrixInverse = new Matrix4();
+        this._worldMatrixInverse = new Matrix4();
+
+        // inverse of the identity matrix is also the identity matrix
+        this._requiresLocalInverseUpdate = false;
+        this._requiresWorldInverseUpdate = false;
     }
 
     public get position(): Vector3 {
@@ -69,11 +83,23 @@ export class Transform {
 
     /**
      * Returns the 4x4 Matrix reference that represents this Transform in local/object space
-     * 
-     * NOTE: Unless manual update is enabled, the contents of this matrix will override each frame
      */
     public get localMatrix(): Matrix4 {
         return this._localMatrix;
+    }
+
+    /**
+     * Returns the 4x4 Matrix reference that is the inverse of localMatrix
+     */
+    public get localMatrixInverse(): Matrix4 {
+        // update on-demand if needed
+        if (this._requiresLocalInverseUpdate) {
+            this._localMatrix.invert(this._localMatrixInverse);
+
+            this._requiresLocalInverseUpdate = false;
+        }
+
+        return this._localMatrixInverse;
     }
 
     /**
@@ -84,6 +110,20 @@ export class Transform {
      */
     public get worldMatrix(): Matrix4 {
         return this._worldMatrix;
+    }
+
+    /**
+     * Returns the 4x4 Matrix reference that is the inverse of worldMatrix
+     */
+    public get worldMatrixInverse(): Matrix4 {
+        // update on-demand if needed
+        if (this._requiresWorldInverseUpdate) {
+            this._worldMatrix.invert(this._worldMatrixInverse);
+
+            this._requiresWorldInverseUpdate = false;
+        }
+
+        return this._worldMatrixInverse;
     }
 
     /**
@@ -138,6 +178,8 @@ export class Transform {
         if (isUpdated || parentHash != this._parentHash) {
             // update the world matrix of this transform from parent
             Matrix4.multiply(parent.worldMatrix, this._localMatrix, this._worldMatrix);
+
+            this._requiresWorldInverseUpdate = true;
         }
 
         // update hash codes for the next apply() call
@@ -154,6 +196,8 @@ export class Transform {
         // the local matrix
         if (computedHash != this._hash) {
             this._localMatrix.composePosRotSca(this._position, this._rotation, this._scale);
+
+            this._requiresLocalInverseUpdate = true;
 
             return true;
         }

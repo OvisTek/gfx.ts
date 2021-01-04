@@ -13,13 +13,11 @@ export class PerspectiveCamera extends Camera {
     private _requiresUpdate: boolean;
 
     private readonly _cameraMatrix: Matrix4;
-    private readonly _cameraMatrixInverse: Matrix4;
 
     constructor(fov: number = 50, width: number = 1024, height: number = 1024, near: number = 0.1, far: number = 5000) {
         super();
 
         this._cameraMatrix = new Matrix4();
-        this._cameraMatrixInverse = new Matrix4();
 
         this._fov = fov;
         this._width = width;
@@ -29,7 +27,6 @@ export class PerspectiveCamera extends Camera {
 
         // sets the camera matrix to the projection matrix
         this._cameraMatrix.setToProjection(this.near, this.far, this.fov, this.aspect);
-        this._cameraMatrix.invert(this._cameraMatrixInverse);
 
         // no need to update until the variables change
         this._requiresUpdate = false;
@@ -104,7 +101,6 @@ export class PerspectiveCamera extends Camera {
         if (this._requiresUpdate) {
             // resets the projection matrix to the new values
             this._cameraMatrix.setToProjection(this.near, this.far, this.fov, this.aspect);
-            this._cameraMatrix.invert(this._cameraMatrixInverse);
 
             this._requiresUpdate = false;
         }
