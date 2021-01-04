@@ -123,6 +123,6 @@ export class StageRoot extends Entity {
      * Make sure engine does not accidentally break, root cannot have a parent
      */
     public set parent(newParent: Entity | undefined) {
-        throw new Error("StageRoot.parent - cannot set parent for root object");
+        throw new Error("set StageRoot.parent - cannot modify property for root object");
     }
 }
