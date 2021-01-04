@@ -15,7 +15,6 @@ export abstract class Camera extends Entity {
     }
 
     public abstract get cameraMatrix(): Matrix4;
-    public abstract get cameraMatrixInverse(): Matrix4;
     public abstract get isPerspective(): boolean;
     public abstract get isOrthographic(): boolean;
 }

@@ -93,10 +93,6 @@ export class PerspectiveCamera extends Camera {
         return this._cameraMatrix;
     }
 
-    public get cameraMatrixInverse(): Matrix4 {
-        return this.cameraMatrixInverse;
-    }
-
     protected update(dt: number) {
         if (this._requiresUpdate) {
             // resets the projection matrix to the new values
