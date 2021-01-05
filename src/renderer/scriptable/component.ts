@@ -44,4 +44,36 @@ export abstract class Component {
     public static create<T extends Component>(type: new (owner: Entity) => T, owner: Entity): T {
         return new type(owner);
     }
+
+    /**
+     * Performs a safe-cast from Component to the provided type. Returns undefined if the component
+     * is not the provided type of object
+     * 
+     * @param type The object type to cast this component into
+     */
+    public cast<T extends Component>(type: new (owner: Entity) => T): T | undefined {
+        if (this instanceof type) {
+            return <T>this;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Performs a safe-cast from Component to the provided type. Returns a Promise that is resolved
+     * or rejected. Use Component.cast() for the non-promise based version
+     * 
+     * @param type The object type to cast this component into
+     */
+    public safeCast<T extends Component>(type: new (owner: Entity) => T): Promise<T> {
+        return new Promise((accept, reject) => {
+            const object: T | undefined = this.cast(type);
+
+            if (object) {
+                return accept(object);
+            }
+
+            return reject(new Error("Component.safeCast(type) - component is not an instance of type"));
+        });
+    }
 }
