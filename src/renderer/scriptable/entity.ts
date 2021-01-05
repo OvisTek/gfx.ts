@@ -63,6 +63,38 @@ export abstract class Entity {
     }
 
     /**
+     * Performs a safe-cast from Entity to the provided type. Returns undefined if the entity
+     * is not the provided type of object
+     * 
+     * @param type The object type to cast this entity into
+     */
+    public cast<T extends Entity>(type: new (...params: any[]) => T): T | undefined {
+        if (this instanceof type) {
+            return <T>this;
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Performs a safe-cast from Entity to the provided type. Returns a Promise that is resolved
+     * or rejected. Use Entity.cast() for the non-promise based version
+     * 
+     * @param type The object type to cast this entity into
+     */
+    public safeCast<T extends Entity>(type: new (...params: any[]) => T): Promise<T> {
+        return new Promise((accept, reject) => {
+            const object: T | undefined = this.cast(type);
+
+            if (object) {
+                return accept(object);
+            }
+
+            return reject(new Error("Entity.safeCast(type) - entity is not an instance of type"));
+        });
+    }
+
+    /**
      * Returns the current parent of this object
      */
     public get parent(): Entity | undefined {
@@ -74,6 +106,60 @@ export abstract class Entity {
      */
     public get children(): Array<Entity> {
         return this._children;
+    }
+
+    /**
+     * Searches the children of this object that matches a particular type
+     * 
+     * @param type The type of object to search
+     * @param optresult (optional) array to append the results into
+     */
+    public findChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T>): Array<T> {
+        const result: Array<T> = optresult || new Array<T>();
+        const children: Array<Entity> = this._children;
+        const len: number = children.length;
+
+        if (len > 0) {
+            for (let i = 0; i < len; i++) {
+                const child: Entity = children[i];
+
+                if (child && child instanceof type) {
+                    result.push(child);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Searches the children of this object that matches a particular type. Also searches the children of
+     * children recursively.
+     * 
+     * @param type The type of object to search
+     * @param optresult (optional) array to append the results into
+     */
+    public findAllChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T>): Array<T> {
+        const result: Array<T> = optresult || new Array<T>();
+        const children: Array<Entity> = this._children;
+        const len: number = children.length;
+
+        if (len > 0) {
+            for (let i = 0; i < len; i++) {
+                const child: Entity = children[i];
+
+                if (child) {
+                    if (child instanceof type) {
+                        result.push(child);
+                    }
+
+                    // recurse deeper on the child
+                    child.findAllChildrenOfType(type, result);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
