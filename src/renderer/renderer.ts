@@ -13,12 +13,70 @@ export class Renderer {
     // users to create multiple stages or levels to be loaded/unloaded
     private readonly _stage: Stage;
 
+    // GL Contexts
+    private _canvas?: HTMLCanvasElement;
+    private _gl?: WebGL2RenderingContext;
+
     private constructor() {
         this._stage = new Stage();
     }
 
     public get stage(): Stage {
         return this._stage;
+    }
+
+    /**
+     * Returns the Canvas element being used by this Renderer
+     */
+    public get canvas(): HTMLCanvasElement {
+        if (!this._canvas) {
+            throw new Error("Renderer.canvas - property not set, suggest calling Renderer.init()");
+        }
+
+        return this._canvas;
+    }
+
+    /**
+     * Returns the GL element being used by this Renderer
+     */
+    public get gl(): WebGL2RenderingContext {
+        if (!this._gl) {
+            throw new Error("Renderer.gl - property not set, suggest calling Renderer.init()");
+        }
+
+        return this._gl;
+    }
+
+    /**
+     * Initialise the Renderer provided a Canvas
+     * 
+     * @param canvas - The HTML Canvas to load
+     */
+    public init(canvas: HTMLCanvasElement): void {
+        const gl: WebGL2RenderingContext = canvas.getContext('webgl2');
+
+        if (!gl) {
+            throw new Error("Renderer.init(HTMLCanvasElement) - webgl2 is not supported");
+        }
+
+        this._gl = gl;
+        this._canvas = canvas;
+    }
+
+    /**
+     * Initialise the Renderer provided a Canvas ID. Ensure that the Canvas element is loaded
+     * before calling this function
+     * 
+     * @param canvasID - The HTML Canvas id to load
+     */
+    public initWithID(canvasID: string): void {
+        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById(canvasID);
+
+        if (!canvas) {
+            throw new Error("Renderer.initWithID(String) - canvas with ID of " + canvasID + " could not be found");
+        }
+
+        this.init(canvas);
     }
 
     /**
