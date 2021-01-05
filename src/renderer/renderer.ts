@@ -16,9 +16,11 @@ export class Renderer {
     // GL Contexts
     private _canvas?: HTMLCanvasElement;
     private _gl?: WebGL2RenderingContext;
+    private _devMode: boolean;
 
     private constructor() {
         this._stage = new Stage();
+        this._devMode = false;
     }
 
     public get stage(): Stage {
@@ -34,6 +36,14 @@ export class Renderer {
         }
 
         return true;
+    }
+
+    public get devMode(): boolean {
+        return this._devMode;
+    }
+
+    public set devMode(value: boolean) {
+        this._devMode = value;
     }
 
     /**
