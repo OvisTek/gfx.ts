@@ -1,3 +1,4 @@
+import { Component } from "../scriptable/component";
 import { Entity } from "../scriptable/entity";
 import { Transform } from "../transform";
 
@@ -41,6 +42,14 @@ export class StageRoot extends Entity {
                 }
 
                 // update all components
+                for (let i = 0; i < len; i++) {
+                    const entity: Entity = childObjects[i];
+
+                    if (entity && entity.visibility) {
+                        // recursively update all children object components
+                        this.recurseUpdateComponents(entity, dt);
+                    }
+                }
             }
         }
     }
@@ -116,6 +125,38 @@ export class StageRoot extends Entity {
                 if (entity && entity.visibility) {
                     // recursively update all children transforms
                     this.recurseUpdateTransforms(entity, child.transform);
+                }
+            }
+        }
+    }
+
+    private recurseUpdateComponents(child: Entity, dt: number) {
+        const components: Array<Component> = child.components;
+        const len: number = components.length;
+
+        if (len > 0) {
+            // normal loop so we don't get concurrent modification problems
+            for (let i = 0; i < len; i++) {
+                const component: Component = components[i];
+
+                if (component) {
+                    // recursively update all children transforms
+                    component.update(dt);
+                }
+            }
+        }
+
+        const childObjects: Array<Entity> = child.children;
+        const clen: number = childObjects.length;
+
+        if (clen > 0) {
+            // normal loop so we don't get concurrent modification problems
+            for (let i = 0; i < clen; i++) {
+                const entity: Entity = childObjects[i];
+
+                if (entity && entity.visibility) {
+                    // recursively update all children components
+                    this.recurseUpdateComponents(entity, dt);
                 }
             }
         }

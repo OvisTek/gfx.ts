@@ -128,7 +128,7 @@ export abstract class Entity {
 
         this._components.push(newComponent);
 
-        newComponent.start();
+        newComponent.create();
 
         return newComponent;
     }

@@ -6,10 +6,13 @@ import { Entity } from "./entity";
 export abstract class Component {
     private readonly _owner: Entity;
 
-    private constructor(owner: Entity) {
+    protected constructor(owner: Entity) {
         this._owner = owner;
     }
 
+    /**
+     * Get the read-only owner of this component
+     */
     public get owner(): Entity {
         return this._owner;
     }
@@ -18,7 +21,7 @@ export abstract class Component {
      * Called when the component is created. Since components do not have
      * a public constructor, this can be used to initialise internal state
      */
-    public abstract start();
+    public abstract create();
 
     /**
      * Called by the Rendering Engine just before a rendering is about to be done
