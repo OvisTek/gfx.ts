@@ -26,6 +26,17 @@ export class Renderer {
     }
 
     /**
+     * Checks if the Renderer is setup properly
+     */
+    public get valid(): boolean {
+        if (!this._canvas || !this._gl) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Returns the Canvas element being used by this Renderer
      */
     public get canvas(): HTMLCanvasElement {
@@ -59,8 +70,8 @@ export class Renderer {
             throw new Error("Renderer.init(HTMLCanvasElement) - webgl2 is not supported");
         }
 
-        this._gl = gl;
         this._canvas = canvas;
+        this._gl = gl;
     }
 
     /**
