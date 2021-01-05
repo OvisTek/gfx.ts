@@ -39,6 +39,8 @@ export class StageRoot extends Entity {
                         this.recurseUpdateTransforms(entity, this.transform);
                     }
                 }
+
+                // update all components
             }
         }
     }

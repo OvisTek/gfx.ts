@@ -1,6 +1,7 @@
 import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
 import { Renderer } from "../renderer";
+import { Component } from "./component";
 
 /**
  * Used for generating a unique ID for objects
@@ -35,6 +36,7 @@ export abstract class Entity {
 
     // all the child objects of this entity
     private readonly _children: Array<Entity>;
+    private readonly _components: Array<Component>;
 
     private _stage?: Stage;
     private _visibility: boolean;
@@ -52,6 +54,7 @@ export abstract class Entity {
 
         this._transform = new Transform();
         this._children = new Array<Entity>();
+        this._components = new Array<Component>();
         this._id = ID.generate();
 
         this._isCreated = false;
@@ -106,6 +109,55 @@ export abstract class Entity {
      */
     public get children(): Array<Entity> {
         return this._children;
+    }
+
+    /**
+     * Returns all the components of this object
+     */
+    public get components(): Array<Component> {
+        return this._components;
+    }
+
+    /**
+     * Adds a new Component of provided type and returns a new instance
+     * 
+     * @param type The type of Component to instantiate
+     */
+    public addComponent<T extends Component>(type: new (owner: Entity) => T): T {
+        const newComponent: T = Component.create(type, this);
+
+        this._components.push(newComponent);
+
+        newComponent.start();
+
+        return newComponent;
+    }
+
+    /**
+     * Removes an eisting component instance. This will also dispose the component
+     * 
+     * @param existing The existing component to remove from this entity
+     */
+    public removeComponent(existing: Component): boolean {
+        const components: Array<Component> = this._components;
+
+        // NOTE - This can be vastly improved to remove 
+        // the O(n) to O(1) via trickery
+        const index: number = components.indexOf(existing);
+
+        if (index >= 0) {
+            const removed: Array<Component> = components.splice(index, 1);
+            const len: number = removed.length;
+
+            // destroy/cleanup all removed elements
+            for (let i = 0; i < len; i++) {
+                removed[i].destroy();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
