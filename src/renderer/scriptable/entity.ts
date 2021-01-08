@@ -28,7 +28,7 @@ export interface EntityOptions {
  */
 export abstract class Entity {
     // default options
-    private static readonly _optDefault = { visibility: true, autoCreate: true };
+    private static readonly _optDefault: EntityOptions = { visibility: true, autoCreate: true };
 
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
