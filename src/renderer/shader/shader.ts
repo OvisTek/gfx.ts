@@ -151,11 +151,20 @@ export class Shader {
      * @param key - The attribute to return
      */
     public attribute(key: string): number {
-        if (!this._attributes.has(key)) {
+        if (!this.hasAttribute(key)) {
             throw new Error("Shader.attribute(key) - attribute \"" + key + "\" not found");
         }
 
         return this._attributes.get(key);
+    }
+
+    /**
+     * Checks if the provided attribute is available
+     * 
+     * @param key - The attribute to check
+     */
+    public hasAttribute(key: string): boolean {
+        return this._attributes.has(key);
     }
 
     /**
@@ -165,11 +174,20 @@ export class Shader {
      * @param key - The uniform to return
      */
     public uniform(key: string): WebGLUniformLocation {
-        if (!this._uniforms.has(key)) {
+        if (!this.hasUniform(key)) {
             throw new Error("Shader.uniform(key) - uniform \"" + key + "\" not found");
         }
 
         return this._uniforms.get(key);
+    }
+
+    /**
+     * Checks if the provided uniform is available
+     * 
+     * @param key - The uniform to check
+     */
+    public hasUniform(key: string): boolean {
+        return this._uniforms.has(key);
     }
 
     /**
