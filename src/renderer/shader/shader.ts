@@ -5,6 +5,10 @@ import { Renderer } from "../renderer";
  * and linking shaders
  */
 export class Shader {
+    // attributes
+    private readonly _attributes: Map<string, number>;
+    // uniforms
+    private readonly _uniforms: Map<string, WebGLUniformLocation>;
 
     // Our WebGL Shader Programs
     private _vShader?: WebGLShader;
@@ -19,6 +23,9 @@ export class Shader {
         this._fShader = undefined;
         this._program = undefined;
         this._isValid = false;
+
+        this._attributes = new Map<string, number>();
+        this._uniforms = new Map<string, WebGLUniformLocation>();
     }
 
     /**
@@ -96,6 +103,73 @@ export class Shader {
         this._fShader = fShader;
         this._program = sProgram;
         this._isValid = true;
+
+        this.calculateAttributes();
+        this.calculateUniforms();
+    }
+
+    /**
+     * Calculate and fill the local key-value with the attributes in the Shader
+     */
+    private calculateAttributes() {
+        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const program: WebGLProgram = this._program;
+
+        const attribCount: number = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
+
+        for (let i = 0; i < attribCount; i++) {
+            const info: WebGLActiveInfo = gl.getActiveAttrib(program, i);
+            const name: string = info.name;
+            const index: number = gl.getAttribLocation(program, name);
+
+            this._attributes[name] = index;
+        }
+    }
+
+    /**
+     * Calclate and fill the local key-value with the uniforms in the Shader
+     */
+    private calculateUniforms() {
+        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const program: WebGLProgram = this._program;
+
+        const uniformCount: number = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+
+        for (let i = 0; i < uniformCount; i++) {
+            const info: WebGLActiveInfo = gl.getActiveUniform(program, i);
+            const name: string = info.name;
+            const location: WebGLUniformLocation = gl.getUniformLocation(program, name);
+
+            this._uniforms[name] = location;
+        }
+    }
+
+    /**
+     * Returns the location of the provided attribute for this Shader. Throws an error
+     * if the attribute cannot be found.
+     * 
+     * @param key - The attribute to return
+     */
+    public attribute(key: string): number {
+        if (!this._attributes.has(key)) {
+            throw new Error("Shader.attribute(key) - attribute \"" + key + "\" not found");
+        }
+
+        return this._attributes.get(key);
+    }
+
+    /**
+     * Returns the location of the provided uniform for this Shader. Throws an error
+     * if the unuform cannot be found.
+     * 
+     * @param key - The uniform to return
+     */
+    public uniform(key: string): WebGLUniformLocation {
+        if (!this._uniforms.has(key)) {
+            throw new Error("Shader.uniform(key) - uniform \"" + key + "\" not found");
+        }
+
+        return this._uniforms.get(key);
     }
 
     /**
