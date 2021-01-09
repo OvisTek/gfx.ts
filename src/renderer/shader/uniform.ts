@@ -14,7 +14,7 @@ export class Uniform {
         return this._name;
     }
 
-    public get value(): WebGLUniformLocation {
+    public get location(): WebGLUniformLocation {
         return this._value;
     }
 }

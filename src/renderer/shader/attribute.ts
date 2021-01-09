@@ -14,7 +14,7 @@ export class Attribute {
         return this._name;
     }
 
-    public get value(): number {
+    public get location(): number {
         return this._value;
     }
 }
