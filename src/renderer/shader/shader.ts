@@ -1,4 +1,6 @@
 import { Renderer } from "../renderer";
+import { Attribute } from "./attribute";
+import { Uniform } from "./uniform";
 
 /**
  * Represents a WebGL Shader Program. Contains helper methods for compiling
@@ -6,9 +8,9 @@ import { Renderer } from "../renderer";
  */
 export class Shader {
     // attributes
-    private readonly _attributes: Map<string, number>;
+    private readonly _attributes: Map<string, Attribute>;
     // uniforms
-    private readonly _uniforms: Map<string, WebGLUniformLocation>;
+    private readonly _uniforms: Map<string, Uniform>;
 
     // Our WebGL Shader Programs
     private _vShader?: WebGLShader;
@@ -24,8 +26,8 @@ export class Shader {
         this._program = undefined;
         this._isValid = false;
 
-        this._attributes = new Map<string, number>();
-        this._uniforms = new Map<string, WebGLUniformLocation>();
+        this._attributes = new Map<string, Attribute>();
+        this._uniforms = new Map<string, Uniform>();
     }
 
     /**
@@ -122,7 +124,7 @@ export class Shader {
             const name: string = info.name;
             const index: number = gl.getAttribLocation(program, name);
 
-            this._attributes[name] = index;
+            this._attributes[name] = new Attribute(name, index);
         }
     }
 
@@ -140,7 +142,7 @@ export class Shader {
             const name: string = info.name;
             const location: WebGLUniformLocation = gl.getUniformLocation(program, name);
 
-            this._uniforms[name] = location;
+            this._uniforms[name] = new Uniform(name, location);
         }
     }
 
@@ -150,7 +152,7 @@ export class Shader {
      * 
      * @param key - The attribute to return
      */
-    public attribute(key: string): number {
+    public attribute(key: string): Attribute {
         if (!this.hasAttribute(key)) {
             throw new Error("Shader.attribute(key) - attribute \"" + key + "\" not found");
         }
@@ -173,7 +175,7 @@ export class Shader {
      * 
      * @param key - The uniform to return
      */
-    public uniform(key: string): WebGLUniformLocation {
+    public uniform(key: string): Uniform {
         if (!this.hasUniform(key)) {
             throw new Error("Shader.uniform(key) - uniform \"" + key + "\" not found");
         }
