@@ -166,7 +166,7 @@ export abstract class Entity {
      * @param type The type of object to search
      * @param optresult (optional) array to append the results into
      */
-    public findChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T>): Array<T> {
+    public findChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T> | undefined = undefined): Array<T> {
         const result: Array<T> = optresult || new Array<T>();
         const children: Array<Entity> = this._children;
         const len: number = children.length;
@@ -191,7 +191,7 @@ export abstract class Entity {
      * @param type The type of object to search
      * @param optresult (optional) array to append the results into
      */
-    public findAllChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T>): Array<T> {
+    public findAllChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T> | undefined = undefined): Array<T> {
         const result: Array<T> = optresult || new Array<T>();
         const children: Array<Entity> = this._children;
         const len: number = children.length;
