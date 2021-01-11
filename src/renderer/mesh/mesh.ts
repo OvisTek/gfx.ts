@@ -8,7 +8,7 @@ import { Renderer } from "../renderer";
  * Represents a single MeshComponent. This is an internal class managed
  * by the Mesh system
  */
-class MeshComponent {
+export class MeshAttribute {
     private _data?: Array<number>;
     private _buffer?: WebGLBuffer;
 
@@ -22,16 +22,6 @@ class MeshComponent {
     }
 
     public get data(): Array<number> | undefined {
-        return this._data;
-    }
-
-    public get cleanData(): Array<number> {
-        if (this._data == undefined) {
-            this._data = new Array<number>();
-        }
-
-        this._data.length = 0;
-
         return this._data;
     }
 
@@ -51,6 +41,16 @@ class MeshComponent {
         this._buffer = newBuffer;
     }
 
+    public clean(): Array<number> {
+        if (this._data == undefined) {
+            this._data = new Array<number>();
+        }
+
+        this._data.length = 0;
+
+        return this._data;
+    }
+
     public destroy(gl: WebGL2RenderingContext) {
         if (this._buffer != undefined) {
             gl.deleteBuffer(this._buffer);
@@ -67,118 +67,58 @@ class MeshComponent {
 export class Mesh {
     private static readonly _EMPTY: Array<number> = new Array<number>();
 
-    private readonly _vertices: MeshComponent;
-    private readonly _indices: MeshComponent;
-    private readonly _normals: MeshComponent;
-    private readonly _colors: MeshComponent;
-    private readonly _uv: MeshComponent;
+    private readonly _vertices: MeshAttribute;
+    private readonly _indices: MeshAttribute;
+    private readonly _normals: MeshAttribute;
+    private readonly _colors: MeshAttribute;
+    private readonly _uv: MeshAttribute;
 
     constructor() {
-        this._vertices = new MeshComponent();
-        this._indices = new MeshComponent();
-        this._normals = new MeshComponent();
-        this._colors = new MeshComponent();
-        this._uv = new MeshComponent();
+        this._vertices = new MeshAttribute();
+        this._indices = new MeshAttribute();
+        this._normals = new MeshAttribute();
+        this._colors = new MeshAttribute();
+        this._uv = new MeshAttribute();
     }
 
-    public get hasVertices(): boolean {
-        return this._vertices.valid;
+    public get vertices(): MeshAttribute {
+        return this._vertices;
     }
 
-    public get hasIndices(): boolean {
-        return this._indices.valid;
+    public get indices(): MeshAttribute {
+        return this._indices;
     }
 
-    public get hasNormals(): boolean {
-        return this._normals.valid;
+    public get normals(): MeshAttribute {
+        return this._normals;
     }
 
-    public get hasColors(): boolean {
-        return this._colors.valid;
+    public get colors(): MeshAttribute {
+        return this._colors;
     }
 
-    public get hasUV(): boolean {
-        return this._uv.valid;
+    public get uv(): MeshAttribute {
+        return this._uv;
     }
 
-    public get vertices(): Array<number> | undefined {
-        return this._vertices.data;
+    private get vertexData(): Float32Array {
+        return new Float32Array(this._vertices.valid ? this._vertices.data : Mesh._EMPTY);
     }
 
-    public set vertices(newVertices: Array<number> | undefined) {
-        this._vertices.data = newVertices;
+    private get indexData(): Uint32Array {
+        return new Uint32Array(this._indices.valid ? this._indices.data : Mesh._EMPTY);
     }
 
-    public get indices(): Array<number> | undefined {
-        return this._indices.data;
+    private get normalData(): Float32Array {
+        return new Float32Array(this._normals.valid ? this._normals.data : Mesh._EMPTY);
     }
 
-    public set indices(newIndices: Array<number> | undefined) {
-        this._indices.data = newIndices;
+    private get colorData(): Float32Array {
+        return new Float32Array(this._colors.valid ? this._colors.data : Mesh._EMPTY);
     }
 
-    public get normals(): Array<number> | undefined {
-        return this._normals.data;
-    }
-
-    public set normals(newNormals: Array<number> | undefined) {
-        this._normals.data = newNormals;
-    }
-
-    public get colors(): Array<number> | undefined {
-        return this._colors.data;
-    }
-
-    public set colors(newColors: Array<number> | undefined) {
-        this._colors.data = newColors;
-    }
-
-    public get uv(): Array<number> | undefined {
-        return this._uv.data;
-    }
-
-    public set uv(newUV: Array<number> | undefined) {
-        this._uv.data = newUV;
-    }
-
-    public get verticesLength(): number {
-        return this._vertices.length;
-    }
-
-    public get indicesLength(): number {
-        return this._indices.length;
-    }
-
-    public get normalsLength(): number {
-        return this._normals.length;
-    }
-
-    public get colorsLength(): number {
-        return this._colors.length;
-    }
-
-    public get uvLength(): number {
-        return this._uv.length;
-    }
-
-    public get vertexData(): Float32Array {
-        return new Float32Array(this.hasVertices ? this._vertices.data : Mesh._EMPTY);
-    }
-
-    public get indexData(): Uint32Array {
-        return new Uint32Array(this.hasIndices ? this._indices.data : Mesh._EMPTY);
-    }
-
-    public get normalData(): Float32Array {
-        return new Float32Array(this.hasNormals ? this._normals.data : Mesh._EMPTY);
-    }
-
-    public get colorData(): Float32Array {
-        return new Float32Array(this.hasColors ? this._colors.data : Mesh._EMPTY);
-    }
-
-    public get uvData(): Float32Array {
-        return new Float32Array(this.hasUV ? this._uv.data : Mesh._EMPTY);
+    private get uvData(): Float32Array {
+        return new Float32Array(this._uv.valid ? this._uv.data : Mesh._EMPTY);
     }
 
     /**
@@ -190,7 +130,7 @@ export class Mesh {
      */
     public setVertices(verts: Array<Vector3>): Mesh {
         const length: number = verts.length;
-        const buff: Array<number> = this._vertices.cleanData;
+        const buff: Array<number> = this._vertices.clean();
 
         for (let i = 0; i < length; i++) {
             const vec: Vector3 = verts[i];
@@ -200,7 +140,7 @@ export class Mesh {
             buff.push(vec.z);
         }
 
-        this.vertices = buff;
+        this.vertices.data = buff;
 
         return this;
     }
@@ -214,13 +154,13 @@ export class Mesh {
      */
     public setIndices(indices: Array<number>): Mesh {
         const length: number = indices.length;
-        const buff: Array<number> = this._indices.cleanData;
+        const buff: Array<number> = this._indices.clean();
 
         for (let i = 0; i < length; i++) {
             buff.push(indices[i]);
         }
 
-        this.indices = buff;
+        this.indices.data = buff;
 
         return this;
     }
@@ -234,7 +174,7 @@ export class Mesh {
      */
     public setColors(colors: Array<Color>): Mesh {
         const length: number = colors.length;
-        const buff: Array<number> = this._colors.cleanData;
+        const buff: Array<number> = this._colors.clean();
 
         for (let i = 0; i < length; i++) {
             const color: Color = colors[i];
@@ -245,7 +185,7 @@ export class Mesh {
             buff.push(color.a);
         }
 
-        this.colors = buff;
+        this.colors.data = buff;
 
         return this;
     }
@@ -267,7 +207,7 @@ export class Mesh {
 
     private uploadVertices(gl: WebGL2RenderingContext) {
         // do nothing if no vertices are available
-        if (!this.hasVertices || !this.hasIndices) {
+        if (!this._vertices.valid || !this._indices.valid) {
             return;
         }
 
@@ -288,7 +228,7 @@ export class Mesh {
 
     private uploadColors(gl: WebGL2RenderingContext) {
         // do nothing if no colors are available
-        if (!this.hasColors) {
+        if (!this._colors.valid) {
             return;
         }
 
@@ -302,7 +242,7 @@ export class Mesh {
 
     private uploadNormals(gl: WebGL2RenderingContext) {
         // do nothing if no normals are available
-        if (!this.hasNormals) {
+        if (!this._normals.valid) {
             return;
         }
 
@@ -316,7 +256,7 @@ export class Mesh {
 
     private uploadUV(gl: WebGL2RenderingContext) {
         // do nothing if no uv are available
-        if (!this.hasUV) {
+        if (!this._uv.valid) {
             return;
         }
 
