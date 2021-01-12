@@ -198,11 +198,10 @@ export class Transform {
             this._localMatrix.composePosRotSca(this._position, this._rotation, this._scale);
 
             this._requiresLocalInverseUpdate = true;
+            this._hash = computedHash
 
             return true;
         }
-
-        this._hash = computedHash
 
         return false;
     }

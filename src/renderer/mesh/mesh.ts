@@ -1,6 +1,7 @@
 import { Vector3 } from "../../math/vector3";
 import { Color } from "../../math/color";
 import { Material } from "../shader/material";
+import { Shader } from "../shader/shader";
 import { Attribute } from "../shader/attribute";
 import { Renderer } from "../renderer";
 
@@ -73,12 +74,16 @@ export class Mesh {
     private readonly _colors: MeshAttribute;
     private readonly _uv: MeshAttribute;
 
+    private _vao?: WebGLVertexArrayObject;
+
     constructor() {
         this._vertices = new MeshAttribute();
         this._indices = new MeshAttribute();
         this._normals = new MeshAttribute();
         this._colors = new MeshAttribute();
         this._uv = new MeshAttribute();
+
+        this._vao = undefined;
     }
 
     public get vertices(): MeshAttribute {
@@ -105,8 +110,8 @@ export class Mesh {
         return new Float32Array(this._vertices.valid ? this._vertices.data : Mesh._EMPTY);
     }
 
-    private get indexData(): Uint32Array {
-        return new Uint32Array(this._indices.valid ? this._indices.data : Mesh._EMPTY);
+    private get indexData(): Uint16Array {
+        return new Uint16Array(this._indices.valid ? this._indices.data : Mesh._EMPTY);
     }
 
     private get normalData(): Float32Array {
@@ -190,27 +195,58 @@ export class Mesh {
         return this;
     }
 
-    public _upload() {
-        const renderer: Renderer = Renderer.instance;
+    public upload(gl: WebGL2RenderingContext, material: Material) {
+        const shader: Shader = material.shader;
 
-        if (!renderer.valid) {
-            throw new Error("Mesh._uploadVertices() - unable to upload data to gpu as Renderer instance is not valid");
+        if (this._vertices.valid && this._indices.valid) {
+            this.uploadVertices(gl);
         }
 
-        const gl: WebGL2RenderingContext = renderer.gl;
+        if (this._normals.valid) {
+            this.uploadNormals(gl);
+        }
 
-        this.uploadVertices(gl);
-        this.uploadNormals(gl);
-        this.uploadColors(gl);
-        this.uploadUV(gl);
+        if (this._colors.valid) {
+            this.uploadColors(gl);
+        }
+
+        if (this._uv.valid) {
+            this.uploadUV(gl);
+        }
+
+        this._vao = this._vao || gl.createVertexArray();
+        const vao: WebGLVertexArrayObject = this._vao;
+
+        const verticesAttrib: string = "a_vertex";
+        const normalsAttrib: string = "a_normal";
+        const colorsAttrib: string = "a_color";
+        const uvAttrib: string = "a_uv";
+
+        // record all uploaded operations into a single VAO, this way we only need to
+        // bind the VAO for rendering reducing cpu-based bound operations
+        gl.bindVertexArray(vao);
+
+        if (this._vertices.valid && this._indices.valid && shader.hasAttribute(verticesAttrib)) {
+            this.recordVertices(gl, shader.attribute(verticesAttrib));
+        }
+
+        if (this._normals.valid && shader.hasAttribute(normalsAttrib)) {
+            this.recordNormals(gl, shader.attribute(normalsAttrib));
+        }
+
+        if (this._colors.valid && shader.hasAttribute(colorsAttrib)) {
+            this.recordColors(gl, shader.attribute(colorsAttrib));
+        }
+
+        if (this._uv.valid && shader.hasAttribute(uvAttrib)) {
+            this.recordUV(gl, shader.attribute(uvAttrib));
+        }
+
+        gl.bindVertexArray(null);
     }
 
     private uploadVertices(gl: WebGL2RenderingContext) {
-        // do nothing if no vertices are available
-        if (!this._vertices.valid || !this._indices.valid) {
-            return;
-        }
-
+        // send vertices to GPU
         const vbuffer: WebGLBuffer = this._vertices.buffer || gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
@@ -218,6 +254,7 @@ export class Mesh {
 
         this._vertices.buffer = vbuffer;
 
+        // send indices to GPU
         const ibuffer: WebGLBuffer = gl.createBuffer();
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
@@ -227,11 +264,6 @@ export class Mesh {
     }
 
     private uploadColors(gl: WebGL2RenderingContext) {
-        // do nothing if no colors are available
-        if (!this._colors.valid) {
-            return;
-        }
-
         const buffer: WebGLBuffer = this._colors.buffer || gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -241,11 +273,6 @@ export class Mesh {
     }
 
     private uploadNormals(gl: WebGL2RenderingContext) {
-        // do nothing if no normals are available
-        if (!this._normals.valid) {
-            return;
-        }
-
         const buffer: WebGLBuffer = this._normals.buffer || gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -255,17 +282,47 @@ export class Mesh {
     }
 
     private uploadUV(gl: WebGL2RenderingContext) {
-        // do nothing if no uv are available
-        if (!this._uv.valid) {
-            return;
-        }
-
         const buffer: WebGLBuffer = this._uv.buffer || gl.createBuffer();
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.uvData, gl.STATIC_DRAW);
 
         this._uv.buffer = buffer;
+    }
+
+    private recordVertices(gl: WebGL2RenderingContext, attribute: Attribute) {
+        const vbuffer: WebGLBuffer = this._vertices.buffer;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+        gl.vertexAttribPointer(attribute.location, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribute.location);
+
+        const ibuffer: WebGLBuffer = this._indices.buffer;
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
+    }
+
+    private recordColors(gl: WebGL2RenderingContext, attribute: Attribute) {
+        const buffer: WebGLBuffer = this._colors.buffer;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.vertexAttribPointer(attribute.location, 4, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribute.location);
+    }
+
+    private recordNormals(gl: WebGL2RenderingContext, attribute: Attribute) {
+        const buffer: WebGLBuffer = this._normals.buffer;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.vertexAttribPointer(attribute.location, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribute.location);
+    }
+
+    private recordUV(gl: WebGL2RenderingContext, attribute: Attribute) {
+        const buffer: WebGLBuffer = this._uv.buffer;
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.vertexAttribPointer(attribute.location, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(attribute.location);
     }
 
     /**
@@ -280,10 +337,31 @@ export class Mesh {
 
         const gl: WebGL2RenderingContext = renderer.gl;
 
+        // delete buffers if any
         this._vertices.destroy(gl);
         this._indices.destroy(gl);
         this._colors.destroy(gl);
         this._uv.destroy(gl);
         this._normals.destroy(gl);
+
+        // delete VAO if any
+        if (this._vao != undefined) {
+            gl.deleteVertexArray(this._vao);
+        }
+
+        this._vao = undefined;
+    }
+
+    /**
+     * Bind and use this Mesh for drawing
+     */
+    public bind() {
+        if (this._vao == undefined) {
+            return;
+        }
+
+        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+
+        gl.bindVertexArray(this._vao);
     }
 }
