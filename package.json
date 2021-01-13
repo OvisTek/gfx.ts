@@ -1,0 +1,24 @@
+{
+  "name": "gfx.ts",
+  "version": "1.0.0",
+  "description": "Light-weight WebGL Renderer written in TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidArayan/gfx.ts.git"
+  },
+  "keywords": [],
+  "author": "David Arayan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DavidArayan/gfx.ts/issues"
+  },
+  "homepage": "https://github.com/DavidArayan/gfx.ts#readme",
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  }
+}

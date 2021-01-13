@@ -17,14 +17,10 @@ export class Shader {
     private _fShader?: WebGLShader;
     private _program?: WebGLProgram;
 
-    // Quick check to ensure this Shader is valid
-    private _isValid: boolean;
-
     constructor() {
         this._vShader = undefined;
         this._fShader = undefined;
         this._program = undefined;
-        this._isValid = false;
 
         this._attributes = new Map<string, Attribute>();
         this._uniforms = new Map<string, Uniform>();
@@ -46,8 +42,19 @@ export class Shader {
         const gl: WebGL2RenderingContext = renderer.gl;
 
         // create shaders
-        const vShader: WebGLShader = gl.createShader(gl.VERTEX_SHADER);
-        const fShader: WebGLShader = gl.createShader(gl.FRAGMENT_SHADER);
+        const vShader: WebGLShader | null = gl.createShader(gl.VERTEX_SHADER);
+
+        if (vShader == null) {
+            throw new Error("Shader.load(String, String) - gl.createShader(VERTEX_SHADER) failed");
+        }
+
+        const fShader: WebGLShader | null = gl.createShader(gl.FRAGMENT_SHADER);
+
+        if (fShader == null) {
+            gl.deleteShader(vShader);
+
+            throw new Error("Shader.load(String, String) - gl.createShader(FRAGMENT_SHADER) failed");
+        }
 
         // attach the sources
         gl.shaderSource(vShader, vShaderSource);
@@ -61,7 +68,7 @@ export class Shader {
         if (renderer.devMode) {
             // check for compile errors - vertex shader
             if (!gl.getShaderParameter(vShader, gl.COMPILE_STATUS)) {
-                const error: string = gl.getShaderInfoLog(vShader);
+                const error: string | null = gl.getShaderInfoLog(vShader);
 
                 gl.deleteShader(vShader);
                 gl.deleteShader(fShader);
@@ -71,7 +78,7 @@ export class Shader {
 
             // check for compile errors - fragment shader
             if (!gl.getShaderParameter(fShader, gl.COMPILE_STATUS)) {
-                const error: string = gl.getShaderInfoLog(fShader);
+                const error: string | null = gl.getShaderInfoLog(fShader);
 
                 gl.deleteShader(vShader);
                 gl.deleteShader(fShader);
@@ -80,7 +87,14 @@ export class Shader {
             }
         }
 
-        const sProgram: WebGLProgram = gl.createProgram();
+        const sProgram: WebGLProgram | null = gl.createProgram();
+
+        if (sProgram == null) {
+            gl.deleteShader(vShader);
+            gl.deleteShader(fShader);
+
+            throw new Error("Shader.load(String, String) - gl.createProgram() failed");
+        }
 
         gl.attachShader(sProgram, vShader);
         gl.attachShader(sProgram, fShader);
@@ -90,7 +104,7 @@ export class Shader {
         if (renderer.devMode) {
             // check for linking errors - program
             if (!gl.getProgramParameter(sProgram, gl.LINK_STATUS)) {
-                const error: string = gl.getProgramInfoLog(sProgram);
+                const error: string | null = gl.getProgramInfoLog(sProgram);
 
                 gl.deleteShader(vShader);
                 gl.deleteShader(fShader);
@@ -104,45 +118,50 @@ export class Shader {
         this._vShader = vShader;
         this._fShader = fShader;
         this._program = sProgram;
-        this._isValid = true;
 
-        this.calculateAttributes();
-        this.calculateUniforms();
+        this.calculateAttributes(sProgram);
+        this.calculateUniforms(sProgram);
     }
 
     /**
      * Calculate and fill the local key-value with the attributes in the Shader
      */
-    private calculateAttributes() {
+    private calculateAttributes(program: WebGLProgram) {
         const gl: WebGL2RenderingContext = Renderer.instance.gl;
-        const program: WebGLProgram = this._program;
 
         const attribCount: number = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 
         for (let i = 0; i < attribCount; i++) {
-            const info: WebGLActiveInfo = gl.getActiveAttrib(program, i);
-            const name: string = info.name;
-            const index: number = gl.getAttribLocation(program, name);
+            const info: WebGLActiveInfo | null = gl.getActiveAttrib(program, i);
 
-            this._attributes[name] = new Attribute(name, index);
+            if (info != null) {
+                const name: string = info.name;
+                const index: number = gl.getAttribLocation(program, name);
+
+                this._attributes.set(name, new Attribute(name, index));
+            }
         }
     }
 
     /**
      * Calclate and fill the local key-value with the uniforms in the Shader
      */
-    private calculateUniforms() {
+    private calculateUniforms(program: WebGLProgram) {
         const gl: WebGL2RenderingContext = Renderer.instance.gl;
-        const program: WebGLProgram = this._program;
 
         const uniformCount: number = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
         for (let i = 0; i < uniformCount; i++) {
-            const info: WebGLActiveInfo = gl.getActiveUniform(program, i);
-            const name: string = info.name;
-            const location: WebGLUniformLocation = gl.getUniformLocation(program, name);
+            const info: WebGLActiveInfo | null = gl.getActiveUniform(program, i);
 
-            this._uniforms[name] = new Uniform(name, location);
+            if (info != null) {
+                const name: string = info.name;
+                const location: WebGLUniformLocation | null = gl.getUniformLocation(program, name);
+
+                if (location != null) {
+                    this._uniforms.set(name, new Uniform(name, location));
+                }
+            }
         }
     }
 
@@ -157,7 +176,13 @@ export class Shader {
             throw new Error("Shader.attribute(key) - attribute \"" + key + "\" not found");
         }
 
-        return this._attributes.get(key);
+        const attrib: Attribute | undefined = this._attributes.get(key);
+
+        if (attrib == undefined) {
+            throw new Error("Shader.attribute(key) - attribute \"" + key + "\" was undefined");
+        }
+
+        return attrib;
     }
 
     /**
@@ -180,7 +205,13 @@ export class Shader {
             throw new Error("Shader.uniform(key) - uniform \"" + key + "\" not found");
         }
 
-        return this._uniforms.get(key);
+        const uniform: Uniform | undefined = this._uniforms.get(key);
+
+        if (uniform == undefined) {
+            throw new Error("Shader.uniform(key) - uniform \"" + key + "\" was undefined");
+        }
+
+        return uniform;
     }
 
     /**
@@ -204,29 +235,28 @@ export class Shader {
 
         const gl: WebGL2RenderingContext = renderer.gl;
 
-        if (this._vShader) {
+        if (this._vShader != undefined) {
             gl.deleteShader(this._vShader);
         }
 
-        if (this._fShader) {
+        if (this._fShader != undefined) {
             gl.deleteShader(this._fShader);
         }
 
-        if (this._program) {
+        if (this._program != undefined) {
             gl.deleteProgram(this._program);
         }
 
         this._vShader = undefined;
         this._fShader = undefined;
         this._program = undefined;
-        this._isValid = false;
     }
 
     /**
      * Bind and use this Shader Program for drawing
      */
     public bind() {
-        if (!this._isValid) {
+        if (this._program == undefined) {
             return;
         }
 
@@ -240,6 +270,6 @@ export class Shader {
      * successfully for this to return true
      */
     public get valid(): boolean {
-        return this._isValid;
+        return this._program != undefined;
     }
 }

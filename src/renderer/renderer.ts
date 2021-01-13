@@ -81,6 +81,10 @@ export class Renderer {
             return;
         }
 
+        if (!this.valid) {
+            throw new Error("Renderer.start() - cannot start as Renderer state is invalid, suggest calling Renderer.init()");
+        }
+
         this._isStarted = true;
 
         // start the main looper
@@ -115,7 +119,7 @@ export class Renderer {
      * @param canvas - The HTML Canvas to load
      */
     public init(canvas: HTMLCanvasElement): void {
-        const gl: WebGL2RenderingContext = canvas.getContext('webgl2');
+        const gl: WebGL2RenderingContext | null = canvas.getContext('webgl2');
 
         if (!gl) {
             throw new Error("Renderer.init(HTMLCanvasElement) - webgl2 is not supported");

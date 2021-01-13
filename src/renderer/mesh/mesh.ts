@@ -19,7 +19,7 @@ export class MeshAttribute {
     }
 
     public get valid(): boolean {
-        return this._data && this._data.length > 0;
+        return this._data != undefined && this._data.length > 0;
     }
 
     public get data(): Array<number> | undefined {
@@ -31,14 +31,18 @@ export class MeshAttribute {
     }
 
     public get length(): number {
-        return this.valid ? this._data.length : 0;
+        return this._data != undefined ? this._data.length : 0;
     }
 
-    public get buffer(): WebGLBuffer | undefined {
+    public get buffer(): WebGLBuffer {
+        if (this._buffer == undefined) {
+            throw new Error("MeshAttribute.buffer - attempted to access an undefined buffer");
+        }
+
         return this._buffer;
     }
 
-    public set buffer(newBuffer: WebGLBuffer | undefined) {
+    public set buffer(newBuffer: WebGLBuffer) {
         this._buffer = newBuffer;
     }
 
@@ -107,23 +111,33 @@ export class Mesh {
     }
 
     private get vertexData(): Float32Array {
-        return new Float32Array(this._vertices.valid ? this._vertices.data : Mesh._EMPTY);
+        const data: Array<number> | undefined = this._vertices.data;
+
+        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
     }
 
     private get indexData(): Uint16Array {
-        return new Uint16Array(this._indices.valid ? this._indices.data : Mesh._EMPTY);
+        const data: Array<number> | undefined = this._indices.data;
+
+        return new Uint16Array(data != undefined ? data : Mesh._EMPTY);
     }
 
     private get normalData(): Float32Array {
-        return new Float32Array(this._normals.valid ? this._normals.data : Mesh._EMPTY);
+        const data: Array<number> | undefined = this._normals.data;
+
+        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
     }
 
     private get colorData(): Float32Array {
-        return new Float32Array(this._colors.valid ? this._colors.data : Mesh._EMPTY);
+        const data: Array<number> | undefined = this._colors.data;
+
+        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
     }
 
     private get uvData(): Float32Array {
-        return new Float32Array(this._uv.valid ? this._uv.data : Mesh._EMPTY);
+        const data: Array<number> | undefined = this._uv.data;
+
+        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
     }
 
     /**
@@ -214,8 +228,13 @@ export class Mesh {
             this.uploadUV(gl);
         }
 
-        this._vao = this._vao || gl.createVertexArray();
-        const vao: WebGLVertexArrayObject = this._vao;
+        const vao: WebGLVertexArrayObject | null = this._vao || gl.createVertexArray();
+
+        if (vao == null) {
+            throw new Error("Mesh.upload() - gl.createVertexArray() failed to create VAO");
+        }
+
+        this._vao = vao;
 
         const verticesAttrib: string = "a_vertex";
         const normalsAttrib: string = "a_normal";
@@ -247,7 +266,11 @@ export class Mesh {
 
     private uploadVertices(gl: WebGL2RenderingContext) {
         // send vertices to GPU
-        const vbuffer: WebGLBuffer = this._vertices.buffer || gl.createBuffer();
+        const vbuffer: WebGLBuffer | null = this._vertices.buffer || gl.createBuffer();
+
+        if (vbuffer == null) {
+            throw new Error("Mesh.uploadVertices() - gl.createBuffer() failed for vertices buffer");
+        }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.vertexData, gl.STATIC_DRAW);
@@ -255,7 +278,11 @@ export class Mesh {
         this._vertices.buffer = vbuffer;
 
         // send indices to GPU
-        const ibuffer: WebGLBuffer = gl.createBuffer();
+        const ibuffer: WebGLBuffer | null = this._indices.buffer || gl.createBuffer();
+
+        if (ibuffer == null) {
+            throw new Error("Mesh.uploadVertices() - gl.createBuffer() failed for indices buffer");
+        }
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indexData, gl.STATIC_DRAW);
@@ -264,7 +291,11 @@ export class Mesh {
     }
 
     private uploadColors(gl: WebGL2RenderingContext) {
-        const buffer: WebGLBuffer = this._colors.buffer || gl.createBuffer();
+        const buffer: WebGLBuffer | null = this._colors.buffer || gl.createBuffer();
+
+        if (buffer == null) {
+            throw new Error("Mesh.uploadColors() - gl.createBuffer() failed for colors buffer");
+        }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.colorData, gl.STATIC_DRAW);
@@ -273,7 +304,11 @@ export class Mesh {
     }
 
     private uploadNormals(gl: WebGL2RenderingContext) {
-        const buffer: WebGLBuffer = this._normals.buffer || gl.createBuffer();
+        const buffer: WebGLBuffer | null = this._normals.buffer || gl.createBuffer();
+
+        if (buffer == null) {
+            throw new Error("Mesh.uploadNormals() - gl.createBuffer() failed for normals buffer");
+        }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.normalData, gl.STATIC_DRAW);
@@ -282,7 +317,11 @@ export class Mesh {
     }
 
     private uploadUV(gl: WebGL2RenderingContext) {
-        const buffer: WebGLBuffer = this._uv.buffer || gl.createBuffer();
+        const buffer: WebGLBuffer | null = this._uv.buffer || gl.createBuffer();
+
+        if (buffer == null) {
+            throw new Error("Mesh.uploadUV() - gl.createBuffer() failed for uv buffer");
+        }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.uvData, gl.STATIC_DRAW);

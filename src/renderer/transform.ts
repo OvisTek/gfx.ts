@@ -35,6 +35,7 @@ export class Transform {
         this._position = new Vector3();
         this._rotation = new Quaternion();
         this._scale = new Vector3(1, 1, 1);
+        this._euler = this._rotation.euler();
 
         this._localMatrix = new Matrix4();
         this._worldMatrix = new Matrix4();

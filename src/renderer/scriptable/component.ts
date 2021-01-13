@@ -21,19 +21,19 @@ export abstract class Component {
      * Called when the component is created. Since components do not have
      * a public constructor, this can be used to initialise internal state
      */
-    public abstract create();
+    public abstract create(): void;
 
     /**
      * Called by the Rendering Engine just before a rendering is about to be done
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    public abstract update(deltaTime: number);
+    public abstract update(deltaTime: number): void;
 
     /**
      * Called when the component is removed and should be destroyed/cleaned up
      */
-    public abstract destroy();
+    public abstract destroy(): void;
 
     /**
      * Instantiate a new component with a component owner

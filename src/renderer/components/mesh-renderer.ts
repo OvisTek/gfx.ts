@@ -27,7 +27,7 @@ export class MeshRenderer extends Component {
         this._material = newMaterial;
     }
 
-    public create() {
+    public create(): void {
         const gl: WebGL2RenderingContext = Renderer.instance.gl;
 
         if (this._mesh && this._material && this._material.valid) {
@@ -36,8 +36,8 @@ export class MeshRenderer extends Component {
         }
     }
 
-    public update(deltaTime: number) {
-        if (this.valid) {
+    public update(deltaTime: number): void {
+        if (this._material != undefined && this._mesh != undefined) {
             this._material.shader.bind();
             this._mesh.bind();
 
@@ -49,9 +49,14 @@ export class MeshRenderer extends Component {
         }
     }
 
-    public destroy() {
-        this._material.destroy();
-        this._mesh.destroy();
+    public destroy(): void {
+        if (this._material != undefined) {
+            this._material.destroy();
+        }
+
+        if (this._mesh != undefined) {
+            this._mesh.destroy();
+        }
     }
 
     public get valid(): boolean {
