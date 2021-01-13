@@ -1,6 +1,6 @@
-import { Material } from "../../index";
-import vShader from "./shaders/vert-shader.glsl";
-import fShader from "./shaders/frag-shader.glsl";
+import { Material } from "../index";
+import vShader from "../shaders/vert-shader.glsl";
+import fShader from "../shaders/frag-shader.glsl";
 
 export class BasicMaterial extends Material {
 

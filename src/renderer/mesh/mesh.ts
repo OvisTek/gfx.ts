@@ -236,10 +236,10 @@ export class Mesh {
 
         this._vao = vao;
 
-        const verticesAttrib: string = "a_vertex";
-        const normalsAttrib: string = "a_normal";
-        const colorsAttrib: string = "a_color";
-        const uvAttrib: string = "a_uv";
+        const verticesAttrib: string = "gfx_Position";
+        const normalsAttrib: string = "gfx_Normal";
+        const colorsAttrib: string = "gfx_Color";
+        const uvAttrib: string = "gfx_UV";
 
         // record all uploaded operations into a single VAO, this way we only need to
         // bind the VAO for rendering reducing cpu-based bound operations
