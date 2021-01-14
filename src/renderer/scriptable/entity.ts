@@ -38,6 +38,7 @@ export abstract class Entity {
     // all the child objects of this entity
     private readonly _children: Array<Entity>;
     private readonly _components: Array<Component>;
+    private readonly _componentsQueue: Array<Component>;
 
     private _stage?: Stage;
     private _visibility: boolean;
@@ -56,6 +57,7 @@ export abstract class Entity {
         this._transform = new Transform();
         this._children = new Array<Entity>();
         this._components = new Array<Component>();
+        this._componentsQueue = new Array<Component>();
         this._id = ID.generate();
 
         this._isCreated = false;
@@ -67,17 +69,22 @@ export abstract class Entity {
     }
 
     /**
+     * Checks if this Entity is a type of provided Object
+     * 
+     * @param type The object type to check
+     */
+    public isType<T extends Entity>(type: new (...params: any[]) => T): boolean {
+        return (this instanceof type) == true;
+    }
+
+    /**
      * Performs a safe-cast from Entity to the provided type. Returns undefined if the entity
      * is not the provided type of object
      * 
      * @param type The object type to cast this entity into
      */
     public cast<T extends Entity>(type: new (...params: any[]) => T): T | undefined {
-        if (this instanceof type) {
-            return <T>this;
-        }
-
-        return undefined;
+        return (this instanceof type) ? <T>this : undefined;
     }
 
     /**
@@ -90,7 +97,7 @@ export abstract class Entity {
         return new Promise((accept, reject) => {
             const object: T | undefined = this.cast(type);
 
-            if (object) {
+            if (object != undefined) {
                 return accept(object);
             }
 
@@ -132,9 +139,9 @@ export abstract class Entity {
     public addComponent<T extends Component>(type: new (owner: Entity) => T): T {
         const newComponent: T = Component.create(type, this);
 
-        this._components.push(newComponent);
-
-        newComponent.create();
+        // queue the new component for execution in the next frame
+        // or at the start of this object
+        this._componentsQueue.push(newComponent);
 
         return newComponent;
     }
@@ -142,9 +149,10 @@ export abstract class Entity {
     /**
      * Removes an eisting component instance. This will also dispose the component
      * 
-     * @param existing The existing component to remove from this entity
+     * @param existing - The existing component to remove from this entity
+     * @param shouldDestroy - Default (true) should the component be destroyed and freed from memory
      */
-    public removeComponent(existing: Component): boolean {
+    public removeComponent(existing: Component, shouldDestroy: boolean = true): boolean {
         const components: Array<Component> = this._components;
 
         // NOTE - This can be vastly improved to remove 
@@ -156,8 +164,10 @@ export abstract class Entity {
             const len: number = removed.length;
 
             // destroy/cleanup all removed elements
-            for (let i = 0; i < len; i++) {
-                removed[i].destroy();
+            if (shouldDestroy == true) {
+                for (let i = 0; i < len; i++) {
+                    removed[i].destroy();
+                }
             }
 
             return true;
@@ -167,7 +177,111 @@ export abstract class Entity {
     }
 
     /**
+     * Searches the components of this object that matches a particular type and returns the first
+     * encountered
+     * 
+     * This is an O(n) search so the results should ideally be cached locally
+     * 
+     * @param type - The type of object to search
+     */
+    public getComponentOfType<T extends Component>(type: new (owner: Entity) => T): T | undefined {
+        const components: Array<Component> = this._components;
+        const len: number = components.length;
+
+        if (len > 0) {
+            for (let i = 0; i < len; i++) {
+                const comp: Component = components[i];
+
+                if (comp && comp.isType(type)) {
+                    return <T>comp;
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    /**
+     * Searches the components of this object that matches a particular type
+     * 
+     * This is an O(n) search so the results should ideally be cached locally
+     * 
+     * @param type - The type of object to search
+     */
+    public getComponentsOfType<T extends Component>(type: new (owner: Entity) => T, optresult: Array<T> | undefined = undefined): Array<T> {
+        const result: Array<T> = optresult || new Array<T>();
+        const components: Array<Component> = this._components;
+        const len: number = components.length;
+
+        if (len > 0) {
+            for (let i = 0; i < len; i++) {
+                const comp: Component = components[i];
+
+                if (comp && comp.isType(type)) {
+                    result.push(<T>comp);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Searches the children of this object that matches a particular type and returns the first
+     * encountered
+     * 
+     * This is an O(n) search so the results should ideally be cached locally
+     * 
+     * @param type - The type of object to search
+     */
+    public getChildOfType<T extends Entity>(type: new (...params: [any]) => T): T | undefined {
+        const children: Array<Entity> = this._children;
+        const len: number = children.length;
+
+        if (len > 0) {
+            for (let i = 0; i < len; i++) {
+                const child: Entity = children[i];
+
+                if (child && child.isType(type)) {
+                    return <T>child;
+                }
+            }
+        }
+
+        return undefined;
+    }
+
+    /**
      * Searches the children of this object that matches a particular type
+     * 
+     * This is an O(n) search so the results should ideally be cached locally
+     * 
+     * @param type The type of object to search
+     * @param optresult (optional) array to append the results into
+     */
+    public getChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T> | undefined = undefined): Array<T> {
+        const result: Array<T> = optresult || new Array<T>();
+        const children: Array<Entity> = this._children;
+        const len: number = children.length;
+
+        if (len > 0) {
+            for (let i = 0; i < len; i++) {
+                const child: Entity = children[i];
+
+                if (child && child.isType(type)) {
+                    result.push(<T>child);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Searches the children of this object that matches a particular type. Also searches the children of
+     * children recursively
+     * 
+     * This is an O(n) search so the results should ideally be cached locally
      * 
      * @param type The type of object to search
      * @param optresult (optional) array to append the results into
@@ -181,8 +295,13 @@ export abstract class Entity {
             for (let i = 0; i < len; i++) {
                 const child: Entity = children[i];
 
-                if (child && child instanceof type) {
-                    result.push(child);
+                if (child) {
+                    if (child.isType(type)) {
+                        result.push(<T>child);
+                    }
+
+                    // recurse deeper on the child
+                    child.findChildrenOfType(type, result);
                 }
             }
         }
@@ -191,33 +310,43 @@ export abstract class Entity {
     }
 
     /**
-     * Searches the children of this object that matches a particular type. Also searches the children of
-     * children recursively.
+     * Searches the children of this object that matches a particular type and returns the first
+     * encountered. Also searches the children of children recursively.
      * 
-     * @param type The type of object to search
-     * @param optresult (optional) array to append the results into
+     * This is an O(n) search so the results should ideally be cached locally
+     * 
+     * @param type - The type of object to search
      */
-    public findAllChildrenOfType<T extends Entity>(type: new (...params: any[]) => T, optresult: Array<T> | undefined = undefined): Array<T> {
-        const result: Array<T> = optresult || new Array<T>();
+    public findChildOfType<T extends Entity>(type: new (...params: [any]) => T): T | undefined {
         const children: Array<Entity> = this._children;
         const len: number = children.length;
 
         if (len > 0) {
+            // first pass, the children of this Entity
+            for (let i = 0; i < len; i++) {
+                const child: Entity = children[i];
+
+                if (child && child.isType(type)) {
+                    return <T>child;
+                }
+            }
+
+            // second pass, start going to the children of children
             for (let i = 0; i < len; i++) {
                 const child: Entity = children[i];
 
                 if (child) {
-                    if (child instanceof type) {
-                        result.push(child);
-                    }
+                    const subChild: T | undefined = child.findChildOfType(type);
 
-                    // recurse deeper on the child
-                    child.findAllChildrenOfType(type, result);
+                    // return first valid encounter (if any)
+                    if (subChild != undefined) {
+                        return subChild;
+                    }
                 }
             }
         }
 
-        return result;
+        return undefined;
     }
 
     /**
@@ -346,36 +475,36 @@ export abstract class Entity {
      * Called by the Rendering Engine first time object is executed. This happens at the
      * start of a new frame for all new objects
      */
-    protected start() { }
+    protected start(): void { }
 
     /**
      * Called by the Rendering Engine just before a rendering is about to be done
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    protected update(deltaTime: number) { }
+    protected update(deltaTime: number): void { }
 
     /**
      * Called by the Rendering Engine just after a rendering was done
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    protected lateUpdate(deltaTime: number) { }
+    protected lateUpdate(deltaTime: number): void { }
 
     /**
      * Called by the Rendering Engine when it was paused by a user or a script
      */
-    protected onPause() { }
+    protected onPause(): void { }
 
     /**
      * Called by the Rendering Engine when it was resumed from a previously paused state
      */
-    protected onResume() { }
+    protected onResume(): void { }
 
     /**
      * Called by the Rendering Engine when this object was removed from the Stage
      */
-    protected onDestroy() { }
+    protected onDestroy(): void { }
 
     /**
      * Called by the Rendering Engine when the Canvas/Renderer was resized to a new size
@@ -383,7 +512,7 @@ export abstract class Entity {
      * @param newWidth The new width of the Renderer/Canvas
      * @param newHeight The new height of the Renderer/Canvas
      */
-    protected onResize(newWidth: number, newHeight: number) { }
+    protected onResize(newWidth: number, newHeight: number): void { }
 
     /**
      * Safe execution of the create() function. This should not be called from user-space
@@ -412,6 +541,8 @@ export abstract class Entity {
         this._isCreated = true;
 
         try {
+            this._clearComponentQueue();
+
             this.start();
         }
         catch (error) {
@@ -428,6 +559,8 @@ export abstract class Entity {
      */
     public _exec_Update(deltaTime: number): Error | undefined {
         try {
+            this._clearComponentQueue();
+
             this.update(deltaTime);
         }
         catch (error) {
@@ -510,5 +643,25 @@ export abstract class Entity {
         }
 
         return undefined;
+    }
+
+    /**
+     * Clears any created component queues.
+     * NOTE: This is executed by the Engine
+     */
+    private _clearComponentQueue(): void {
+        if (this._componentsQueue.length > 0) {
+            let newObject: Component | undefined = this._componentsQueue.pop();
+
+            // loop until the queue is completely empty
+            while (newObject) {
+                newObject.create();
+
+                // add to components list
+                this._components.push(newObject);
+
+                newObject = this._componentsQueue.pop();
+            }
+        }
     }
 }

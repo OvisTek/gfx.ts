@@ -18,6 +18,15 @@ export abstract class Component {
     }
 
     /**
+     * Removes this component from the owner and optionally destroys it
+     * 
+     * @param shouldDestroy - Should this Component be destroyed/removed from memory (default true)
+     */
+    public remove(shouldDestroy: boolean = true) {
+        this._owner.removeComponent(this, shouldDestroy);
+    }
+
+    /**
      * Called when the component is created. Since components do not have
      * a public constructor, this can be used to initialise internal state
      */
@@ -46,17 +55,22 @@ export abstract class Component {
     }
 
     /**
+     * Checks if this Component is a type of provided Object
+     * 
+     * @param type The object type to check
+     */
+    public isType<T extends Component>(type: new (owner: Entity) => T): boolean {
+        return (this instanceof type) == true;
+    }
+
+    /**
      * Performs a safe-cast from Component to the provided type. Returns undefined if the component
      * is not the provided type of object
      * 
      * @param type The object type to cast this component into
      */
     public cast<T extends Component>(type: new (owner: Entity) => T): T | undefined {
-        if (this instanceof type) {
-            return <T>this;
-        }
-
-        return undefined;
+        return (this instanceof type) ? <T>this : undefined;
     }
 
     /**

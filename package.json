@@ -6,8 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist node_modules",
-    "build": "rm -rf dist && tsc --noEmitOnError",
-    "build-glsl": "webpack-glsl-minify shaders/**/*.glsl --preserveAll --outDir dist --output source --esModule --nomangle"
+    "build-ts": "rm -rf dist && tsc --noEmitOnError",
+    "build-glsl": "tgt -r src -o dist -j false -m true -e glsl",
+    "build": "npm run build-ts && npm run build-glsl"
   },
   "repository": {
     "type": "git",
@@ -31,7 +32,7 @@
   },
   "homepage": "https://github.com/DavidArayan/gfx.ts#readme",
   "devDependencies": {
-    "typescript": "^4.1.3",
-    "webpack-glsl-minify": "^1.4.2"
+    "threeify-glsl-transpiler": "^1.1.13",
+    "typescript": "^4.1.3"
   }
 }

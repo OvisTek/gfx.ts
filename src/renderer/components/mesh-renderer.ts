@@ -84,6 +84,9 @@ export class MeshRenderer extends Component {
         if (this._mesh != undefined) {
             this._mesh.destroy();
         }
+
+        this._material = undefined;
+        this._mesh = undefined;
     }
 
     public get valid(): boolean {
