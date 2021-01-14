@@ -7,7 +7,7 @@
   "scripts": {
     "clean": "rm -rf dist node_modules",
     "build-ts": "rm -rf dist && tsc --noEmitOnError",
-    "build-glsl": "tgt -r src -o dist -j false -m true -e glsl",
+    "build-glsl": "node glsl-process.js",
     "build": "npm run build-ts && npm run build-glsl"
   },
   "repository": {
@@ -32,7 +32,9 @@
   },
   "homepage": "https://github.com/DavidArayan/gfx.ts#readme",
   "devDependencies": {
-    "threeify-glsl-transpiler": "^1.1.13",
+    "fs-extra": "^9.0.1",
+    "glob": "^7.1.6",
+    "glslify": "^7.1.1",
     "typescript": "^4.1.3"
   }
 }
