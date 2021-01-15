@@ -1,10 +1,21 @@
-import { Box, Renderer } from "../../dist/index";
+import { Box, Euler, Renderer } from "../../dist/index";
 
 const renderer = Renderer.instance;
 renderer.devMode = true;
 renderer.initWithID("render_canvas");
 renderer.start();
 
-const box = new Box();
+class MyBox extends Box {
+    update(dt) {
+        box.transform.position.z = -6;
+        const euler = box.transform.euler;
 
-renderer.stage.camera.transform.position.z = -20;
+        euler.pitchDeg += 25 * dt;
+        euler.rollDeg += 25 * dt;
+        euler.yawDeg += 25 * dt;
+
+        box.transform.euler = euler;
+    }
+}
+
+const box = new MyBox();
