@@ -10,6 +10,6 @@ uniform mat4 gfx_ViewMatrix;
 out highp vec4 vColor;
 
 void main(void) {
-    gl_Position = gfx_ProjectionMatrix * gfx_ModelMatrix * gfx_ViewMatrix * gfx_Position;
+    gl_Position = gfx_ProjectionMatrix * gfx_ViewMatrix * gfx_ModelMatrix * gfx_Position;
     vColor = gfx_Color;
 }

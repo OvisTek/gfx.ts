@@ -5,16 +5,19 @@ renderer.devMode = true;
 renderer.initWithID("render_canvas");
 renderer.start();
 
-class MyBox extends Box {
-    update(dt) {
-        box.transform.position.z = -6;
-        const euler = box.transform.euler;
+const euler = new Euler();
 
-        euler.pitchDeg += 25 * dt;
+class MyBox extends Box {
+
+    update(dt) {
+        this.transform.position.z = 0;
         euler.rollDeg += 25 * dt;
+        euler.pitchDeg += 25 * dt;
         euler.yawDeg += 25 * dt;
 
-        box.transform.euler = euler;
+        this.transform.euler = euler;
+
+        this.stage.camera.transform.position.z = 6;
     }
 }
 
