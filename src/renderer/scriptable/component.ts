@@ -4,16 +4,20 @@ import { Entity } from "./entity";
  * Base class for creating component systems executed by the Renderer
  */
 export abstract class Component {
-    private readonly _owner: Entity;
+    private _owner?: Entity;
 
-    protected constructor(owner: Entity) {
-        this._owner = owner;
+    constructor() {
+        this._owner = undefined;
     }
 
     /**
      * Get the read-only owner of this component
      */
     public get owner(): Entity {
+        if (this._owner == undefined) {
+            throw new Error("Component.owner - invalid access, component was not setup properly");
+        }
+
         return this._owner;
     }
 
@@ -23,7 +27,8 @@ export abstract class Component {
      * @param shouldDestroy - Should this Component be destroyed/removed from memory (default true)
      */
     public remove(shouldDestroy: boolean = true) {
-        this._owner.removeComponent(this, shouldDestroy);
+        this._owner?.removeComponent(this, shouldDestroy);
+        this._owner = undefined;
     }
 
     /**
@@ -50,8 +55,10 @@ export abstract class Component {
      * @param type The type of Component to instantiate
      * @param owner The owner of the Component
      */
-    public static create<T extends Component>(type: new (owner: Entity) => T, owner: Entity): T {
-        return new type(owner);
+    public static create<T extends Component>(instance: T, owner: Entity): T {
+        instance._owner = owner;
+
+        return instance;
     }
 
     /**
@@ -59,7 +66,7 @@ export abstract class Component {
      * 
      * @param type The object type to check
      */
-    public isType<T extends Component>(type: new (owner: Entity) => T): boolean {
+    public isType<T extends Component>(type: new (...args: [any]) => T): boolean {
         return (this instanceof type) == true;
     }
 
@@ -69,7 +76,7 @@ export abstract class Component {
      * 
      * @param type The object type to cast this component into
      */
-    public cast<T extends Component>(type: new (owner: Entity) => T): T | undefined {
+    public cast<T extends Component>(type: new (...args: [any]) => T): T | undefined {
         return (this instanceof type) ? <T>this : undefined;
     }
 
@@ -79,7 +86,7 @@ export abstract class Component {
      * 
      * @param type The object type to cast this component into
      */
-    public safeCast<T extends Component>(type: new (owner: Entity) => T): Promise<T> {
+    public safeCast<T extends Component>(type: new (...args: [any]) => T): Promise<T> {
         return new Promise((accept, reject) => {
             const object: T | undefined = this.cast(type);
 

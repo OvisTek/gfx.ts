@@ -136,8 +136,8 @@ export abstract class Entity {
      * 
      * @param type The type of Component to instantiate
      */
-    public addComponent<T extends Component>(type: new (owner: Entity) => T): T {
-        const newComponent: T = Component.create(type, this);
+    public addComponent<T extends Component>(instance: T): T {
+        const newComponent: T = Component.create(instance, this);
 
         // queue the new component for execution in the next frame
         // or at the start of this object
