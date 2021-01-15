@@ -37,8 +37,10 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set fov(value: number) {
-        this._fov = value;
-        this._requiresUpdate = true;
+        if (this._fov != value) {
+            this._fov = value;
+            this._requiresUpdate = true;
+        }
     }
 
     public get width(): number {
@@ -46,8 +48,10 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set width(value: number) {
-        this._width = value;
-        this._requiresUpdate = true;
+        if (this._width != value) {
+            this._width = value;
+            this._requiresUpdate = true;
+        }
     }
 
     public get height(): number {
@@ -55,8 +59,10 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set height(value: number) {
-        this._height = value;
-        this._requiresUpdate = true;
+        if (this._height != value) {
+            this._height = value;
+            this._requiresUpdate = true;
+        }
     }
 
     public get near(): number {
@@ -64,8 +70,10 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set near(value: number) {
-        this._near = value;
-        this._requiresUpdate = true;
+        if (this._near != value) {
+            this._near = value;
+            this._requiresUpdate = true;
+        }
     }
 
     public get far(): number {
@@ -73,8 +81,10 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set far(value: number) {
-        this._far = value;
-        this._requiresUpdate = true;
+        if (this._far != value) {
+            this._far = value;
+            this._requiresUpdate = true;
+        }
     }
 
     public get aspect(): number {

@@ -73,6 +73,8 @@ export class MeshRenderer extends Component {
             const gl: WebGL2RenderingContext = Renderer.instance.gl;
 
             gl.drawElements(gl.TRIANGLES, length, gl.UNSIGNED_SHORT, 0);
+
+            this._mesh.unbind();
         }
     }
 

@@ -20,11 +20,17 @@ export class Renderer {
     private _isPaused: boolean;
     private _isStarted: boolean;
 
+    // Window Sizes
+    private _width: number;
+    private _height: number;
+
     private constructor() {
         this._stage = new Stage();
         this._devMode = false;
         this._isPaused = false;
         this._isStarted = false;
+        this._width = 1024;
+        this._height = 1024;
     }
 
     public get stage(): Stage {
@@ -127,6 +133,24 @@ export class Renderer {
 
         this._canvas = canvas;
         this._gl = gl;
+
+        const oldWidth: number = this._width;
+        const oldHeight: number = this._height;
+
+        this._width = canvas.width;
+        this._height = canvas.height;
+
+        if (this._width != oldWidth || this._height != oldHeight) {
+            this.stage._resize(this._width, this._height);
+        }
+    }
+
+    public get width(): number {
+        return this.width;
+    }
+
+    public get height(): number {
+        return this._height;
     }
 
     /**
@@ -176,7 +200,7 @@ export class Renderer {
 
         if (!this._isPaused) {
             // update the current active stage
-            this.stage._update(deltaTime);
+            this.stage._update(deltaTime, this);
         }
     }
 }

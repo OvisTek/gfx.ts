@@ -42,6 +42,10 @@ export class MeshAttribute {
         return this._buffer;
     }
 
+    public get bufferInstance(): WebGLBuffer | undefined {
+        return this._buffer;
+    }
+
     public set buffer(newBuffer: WebGLBuffer) {
         this._buffer = newBuffer;
     }
@@ -266,7 +270,7 @@ export class Mesh {
 
     private uploadVertices(gl: WebGL2RenderingContext) {
         // send vertices to GPU
-        const vbuffer: WebGLBuffer | null = this._vertices.buffer || gl.createBuffer();
+        const vbuffer: WebGLBuffer | null = this._vertices.bufferInstance || gl.createBuffer();
 
         if (vbuffer == null) {
             throw new Error("Mesh.uploadVertices() - gl.createBuffer() failed for vertices buffer");
@@ -278,7 +282,7 @@ export class Mesh {
         this._vertices.buffer = vbuffer;
 
         // send indices to GPU
-        const ibuffer: WebGLBuffer | null = this._indices.buffer || gl.createBuffer();
+        const ibuffer: WebGLBuffer | null = this._indices.bufferInstance || gl.createBuffer();
 
         if (ibuffer == null) {
             throw new Error("Mesh.uploadVertices() - gl.createBuffer() failed for indices buffer");
@@ -291,7 +295,7 @@ export class Mesh {
     }
 
     private uploadColors(gl: WebGL2RenderingContext) {
-        const buffer: WebGLBuffer | null = this._colors.buffer || gl.createBuffer();
+        const buffer: WebGLBuffer | null = this._colors.bufferInstance || gl.createBuffer();
 
         if (buffer == null) {
             throw new Error("Mesh.uploadColors() - gl.createBuffer() failed for colors buffer");
@@ -304,7 +308,7 @@ export class Mesh {
     }
 
     private uploadNormals(gl: WebGL2RenderingContext) {
-        const buffer: WebGLBuffer | null = this._normals.buffer || gl.createBuffer();
+        const buffer: WebGLBuffer | null = this._normals.bufferInstance || gl.createBuffer();
 
         if (buffer == null) {
             throw new Error("Mesh.uploadNormals() - gl.createBuffer() failed for normals buffer");
@@ -317,7 +321,7 @@ export class Mesh {
     }
 
     private uploadUV(gl: WebGL2RenderingContext) {
-        const buffer: WebGLBuffer | null = this._uv.buffer || gl.createBuffer();
+        const buffer: WebGLBuffer | null = this._uv.bufferInstance || gl.createBuffer();
 
         if (buffer == null) {
             throw new Error("Mesh.uploadUV() - gl.createBuffer() failed for uv buffer");
@@ -402,5 +406,11 @@ export class Mesh {
         const gl: WebGL2RenderingContext = Renderer.instance.gl;
 
         gl.bindVertexArray(this._vao);
+    }
+
+    public unbind() {
+        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+
+        gl.bindVertexArray(null);
     }
 }

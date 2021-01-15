@@ -1,5 +1,6 @@
 import { Camera } from "../camera/camera";
 import { PerspectiveCamera } from "../camera/perspective-camera";
+import { Renderer } from "../renderer";
 import { Entity } from "../scriptable/entity";
 import { StageRoot } from "./stage-root";
 
@@ -11,7 +12,7 @@ import { StageRoot } from "./stage-root";
  */
 export class Stage {
     private readonly _root: StageRoot;
-    private readonly _camera: Camera;
+    private readonly _camera: PerspectiveCamera;
     private readonly _queue: Array<Entity>;
 
     constructor() {
@@ -52,27 +53,70 @@ export class Stage {
     }
 
     /**
+     * Called automatically by the renderer when viewport size is changed
+     * 
+     * @param newWidth - The new width of the renderer
+     * @param newHeight - The new height of the renderer
+     */
+    public _resize(newWidth: number, newHeight: number) {
+        this._camera.width = newWidth;
+        this._camera.height = newHeight;
+    }
+
+    /**
      * Called automatically every frame by the Renderer
      * 
      * @param deltaTime The time difference between last and current frame in seconds
      */
-    public _update(deltaTime: number) {
+    public _update(deltaTime: number, renderer: Renderer) {
         // check the current queue for any new objects that need to be started
         if (this._queue.length > 0) {
             let newObject: Entity | undefined = this._queue.pop();
 
             // loop until the queue is completely empty
             while (newObject) {
-                newObject._exec_Start();
+                const startResult: Error | undefined = newObject._exec_Start();
+
+                if (startResult != undefined) {
+                    console.error(startResult);
+
+                    renderer.pause();
+
+                    return;
+                }
 
                 newObject = this._queue.pop();
             }
         }
 
+        const gl: WebGL2RenderingContext = renderer.gl;
         const root: StageRoot = this._root;
 
+        // start a new GL frame render
+        gl.clearColor(0.5, 0.5, 0.5, 1.0);
+        gl.clearDepth(1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LEQUAL);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
         // execute root that will recursively execute all child objects
-        root._exec_Update(deltaTime);
-        root._exec_LateUpdate(deltaTime);
+        const updateResult: Error | undefined = root._exec_Update(deltaTime);
+
+        if (updateResult != undefined) {
+            console.error(updateResult);
+
+            renderer.pause();
+
+            return;
+        }
+
+        const lateUpdateResult: Error | undefined = root._exec_LateUpdate(deltaTime);
+
+        if (lateUpdateResult != undefined) {
+            console.error(updateResult);
+
+            renderer.pause();
+        }
     }
 }
