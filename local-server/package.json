@@ -1,0 +1,14 @@
+{
+	"name": "gfx.ts-examples",
+	"version": "1.0.0",
+	"author": "David Arayan",
+	"description": "Launch local development server for viewing gfx.ts examples",
+	"private": true,
+	"scripts": {
+		"server": "node node-server.js"
+	},
+	"dependencies": {
+		"express": "4.17.x",
+		"https-localhost": "4.6.x"
+	}
+}

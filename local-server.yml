@@ -1,0 +1,14 @@
+version: "3.8"
+
+# uses nodeJS to host exmaples folder through https for rapid prototyping
+services:
+  web:
+    build: ./local-server
+    image: gfx_ts:latest
+    container_name: gfx_ts
+    volumes:
+      - ./examples/:/usr/local/www/html/examples/
+      - ./dist/:/usr/local/www/html/dist/
+    ports:
+      - "80:80"
+      - "443:443"
