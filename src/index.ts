@@ -33,3 +33,9 @@ export * from "./renderer/shader/uniform";
 
 // export stage
 export * from "./renderer/stage/stage";
+
+// export extras materials
+export * from "./extras/materials/basic-material/basic-material";
+
+// export extras primitives
+export * from "./extras/primitives/box";
