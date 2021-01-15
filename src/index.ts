@@ -22,9 +22,6 @@ export * from "./renderer/components/mesh-renderer";
 // export mesh
 export * from "./renderer/mesh/mesh";
 
-// export scriptable
-export * from "./renderer/scriptable/entity";
-
 // export shader
 export * from "./renderer/shader/shader";
 export * from "./renderer/shader/material";
@@ -32,7 +29,11 @@ export * from "./renderer/shader/attribute";
 export * from "./renderer/shader/uniform";
 
 // export stage
+export * from "./renderer/stage/stage-root";
 export * from "./renderer/stage/stage";
+
+// export scriptable
+export * from "./renderer/scriptable/entity";
 
 // export extras materials
 export * from "./extras/materials/basic-material/basic-material";

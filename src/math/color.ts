@@ -1,4 +1,3 @@
-import { ColorRO } from "./color-ro";
 import { MathUtil } from "./math-util";
 
 /**
@@ -6,14 +5,6 @@ import { MathUtil } from "./math-util";
  * Components range from 0 to 1
  */
 export class Color {
-    // easy access static read-only colors for convenience
-    public static readonly CLEAR: Color = new ColorRO(0, 0, 0, 0);
-    public static readonly BLACK: Color = new ColorRO(0, 0, 0, 1);
-    public static readonly WHITE: Color = new ColorRO(1, 1, 1, 1);
-    public static readonly RED: Color = new ColorRO(1, 0, 0, 1);
-    public static readonly GREEN: Color = new ColorRO(0, 1, 0, 1);
-    public static readonly BLUE: Color = new ColorRO(0, 0, 1, 1);
-
     // color components
     private _r: number;
     private _g: number;

@@ -168,4 +168,11 @@ export class StageRoot extends Entity {
     public set parent(newParent: Entity | undefined) {
         throw new Error("set StageRoot.parent - cannot modify property for root object");
     }
+
+    /**
+     * Return this as the root object
+     */
+    public get isRoot(): boolean {
+        return true;
+    }
 }

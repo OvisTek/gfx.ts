@@ -1,5 +1,4 @@
 import { MathUtil } from "./math-util";
-import { QuaternionRO } from "./quaternion-ro";
 import { Matrix4 } from "./matrix4";
 import { Euler } from "./euler";
 
@@ -23,10 +22,6 @@ export interface QuaternionJson {
  * Some functions implemented/ported from https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/math/Quaternion.java
  */
 export class Quaternion {
-    // static members - read-only and cannot be modified
-    public static readonly IDENTITY: Quaternion = new QuaternionRO(0, 0, 0, 1);
-    public static readonly ZERO: Quaternion = new QuaternionRO(0, 0, 0, 0);
-
     private _x: number;
     private _y: number;
     private _z: number;

@@ -2,7 +2,6 @@ import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
 import { Renderer } from "../renderer";
 import { Component } from "./component";
-import { StageRoot } from "../stage/stage-root";
 
 /**
  * Used for generating a unique ID for objects
@@ -110,11 +109,15 @@ export abstract class Entity {
      */
     public get parent(): Entity | undefined {
         // do not return the stage root
-        if (this._parent instanceof StageRoot) {
+        if (this._parent != undefined && this._parent.isRoot) {
             return undefined;
         }
 
         return this._parent;
+    }
+
+    public get isRoot(): boolean {
+        return false;
     }
 
     /**
