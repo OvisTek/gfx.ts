@@ -2,17 +2,7 @@ import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
 import { Renderer } from "../renderer";
 import { Component } from "./component";
-
-/**
- * Used for generating a unique ID for objects
- */
-class ID {
-    private static _counter: number = 0;
-
-    public static generate() {
-        return this._counter++;
-    }
-}
+import { GlobalID } from "../../math/global-id";
 
 /**
  * Construction options for the Entity
@@ -57,7 +47,7 @@ export abstract class Entity {
         this._children = new Array<Entity>();
         this._components = new Array<Component>();
         this._componentsQueue = new Array<Component>();
-        this._id = ID.generate();
+        this._id = GlobalID.generate();
 
         this._isCreated = false;
         this._visibility = options.visibility;
