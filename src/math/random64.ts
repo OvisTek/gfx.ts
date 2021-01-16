@@ -7,7 +7,7 @@
  */
 export class Random64 {
     // statically available version of Random64 for quick access
-    public static readonly INSTANCE: Random64 = new Random64();
+    private static readonly _instance: Random64 = new Random64();
 
     private _seed: number;
 
@@ -20,18 +20,29 @@ export class Random64 {
      * Get the next random number
      */
     public next(): number {
-        this._seed ^= (this._seed << 13);
-        this._seed ^= (this._seed >>> 17);
-        this._seed ^= (this._seed << 5);
+        let seed: number = this._seed | 0;
 
-        return this._seed;
+        seed ^= (seed << 13);
+        seed ^= (seed >>> 17);
+        seed ^= (seed << 5);
+
+        this._seed = seed;
+
+        return seed;
+    }
+
+    /**
+     * Get the next random number from a static instance of the PRNG
+     */
+    public static next(): number {
+        return Random64._instance.next();
     }
 
     /**
      * Returns a random number between min and max
      * 
-     * @param min 
-     * @param max 
+     * @param min - the minimum value to use
+     * @param max - the maximum value to use
      */
     public rand(min: number, max: number): number {
         if (min > max) {
@@ -43,5 +54,15 @@ export class Random64 {
         }
 
         return (this.next() % (max + 1 - min)) + min;
+    }
+
+    /**
+     * Returns a random number between min and max from a static instance of the PRNG
+     *
+     * @param min - the minimum value to use
+     * @param max - the maximum value to use
+     */
+    public static rand(min: number, max: number): number {
+        return Random64._instance.rand(min, max);
     }
 }

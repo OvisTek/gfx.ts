@@ -7,7 +7,7 @@ import { Stage } from "./stage/stage";
  * Renderer manages the global event loop and all required callbacks. 
  */
 export class Renderer {
-    private static _instance: Renderer;
+    private static readonly _instance: Renderer = new Renderer();
 
     // NOTE: This might have to change away from read-only to allow
     // users to create multiple stages or levels to be loaded/unloaded
@@ -173,10 +173,6 @@ export class Renderer {
      * Access the one and only Global Renderer instance
      */
     public static get instance(): Renderer {
-        if (!Renderer._instance) {
-            Renderer._instance = new Renderer();
-        }
-
         return Renderer._instance;
     }
 
