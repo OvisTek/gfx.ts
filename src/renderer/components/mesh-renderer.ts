@@ -9,8 +9,8 @@ import { Uniform } from "../shader/uniform";
  */
 export class MeshRenderer extends Component {
 
-    private _mesh: Mesh;
-    private _material: Material;
+    private _mesh?: Mesh;
+    private _material?: Material;
 
     // uniforms to be set before every render
     private _modelMatrix: Uniform = Uniform.INVALID;

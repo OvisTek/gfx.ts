@@ -9,9 +9,10 @@ glob(baseDir + '/**/*.glsl', {}, (err, files) => {
     const length = files.length;
 
     for (var i = 0; i < length; i++) {
-        const src = glsl.file(files[i]);
+        const srcFile = files[i];
+        const src = glsl.file(srcFile);
 
-        const newDir = files[i].replace(baseDir, outDir) + ".js";
+        const newDir = srcFile.replace(baseDir, outDir) + ".js";
         const newSrc = 'export default "' + prePass(src) + '";';
 
         fs.outputFile(newDir, newSrc, (err) => {
@@ -19,7 +20,7 @@ glob(baseDir + '/**/*.glsl', {}, (err, files) => {
                 return console.error(err);
             }
 
-            console.log('Input Was - ' + files[i]);
+            console.log('Input Was - ' + srcFile);
             console.log('Output Was - ' + newDir);
         });
     }
