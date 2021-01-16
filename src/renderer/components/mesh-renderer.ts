@@ -9,13 +9,13 @@ import { Uniform } from "../shader/uniform";
  */
 export class MeshRenderer extends Component {
 
-    private _mesh?: Mesh;
-    private _material?: Material;
+    private _mesh: Mesh;
+    private _material: Material;
 
     // uniforms to be set before every render
-    private _modelMatrix?: Uniform;
-    private _viewMatrix?: Uniform;
-    private _projectionMatrix?: Uniform;
+    private _modelMatrix: Uniform = Uniform.INVALID;
+    private _viewMatrix: Uniform = Uniform.INVALID;
+    private _projectionMatrix: Uniform = Uniform.INVALID;
 
     public get mesh(): Mesh | undefined {
         return this._mesh;
@@ -48,33 +48,32 @@ export class MeshRenderer extends Component {
     }
 
     public update(deltaTime: number): void {
-        if (this._material != undefined && this._mesh != undefined && this.valid) {
-            this._material.shader.bind();
+        if (this._material != undefined && this._mesh != undefined && this._material.valid) {
+            const mesh: Mesh = this._mesh;
+            const material: Material = this._material;
+
+            material.bind();
 
             // upload view matrix
-            if (this._viewMatrix) {
-                this._material.setMatrix(this._viewMatrix, this.owner.stage.camera.transform.worldMatrixInverse);
-            }
+            material.setMatrix(this._viewMatrix, this.owner.stage.camera.transform.worldMatrixInverse);
 
             // upload model matrix
-            if (this._modelMatrix) {
-                this._material.setMatrix(this._modelMatrix, this.owner.transform.worldMatrix);
-            }
+            material.setMatrix(this._modelMatrix, this.owner.transform.worldMatrix);
 
             // upload projection matrix
-            if (this._projectionMatrix) {
-                this._material.setMatrix(this._projectionMatrix, this.owner.stage.camera.cameraMatrix);
-            }
+            material.setMatrix(this._projectionMatrix, this.owner.stage.camera.cameraMatrix);
 
-            this._mesh.bind();
+            material.update();
 
-            const length: number = this._mesh.indices.length;
+            mesh.bind();
+
+            const length: number = mesh.indices.length;
 
             const gl: WebGL2RenderingContext = Renderer.instance.gl;
 
             gl.drawElements(gl.TRIANGLES, length, gl.UNSIGNED_SHORT, 0);
 
-            this._mesh.unbind();
+            mesh.unbind();
         }
     }
 
@@ -92,10 +91,6 @@ export class MeshRenderer extends Component {
     }
 
     public get valid(): boolean {
-        return this._mesh != undefined &&
-            (this._material != undefined && this._material.valid) &&
-            this._modelMatrix != undefined &&
-            this._viewMatrix != undefined &&
-            this._projectionMatrix != undefined;
+        return this._mesh != undefined && (this._material != undefined && this._material.valid);
     }
 }

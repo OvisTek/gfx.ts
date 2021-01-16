@@ -5,19 +5,37 @@ renderer.devMode = true;
 renderer.initWithID("render_canvas");
 renderer.start();
 
-const euler = new Euler();
+class MySecondBox extends Box {
+    update(dt) {
+        const euler = this.euler || new Euler();
+        this.euler = euler;
+        euler.rollDeg += 25 * dt;
+        euler.pitchDeg += 25 * dt;
+        euler.yawDeg += 25 * dt;
+
+        this.transform.euler = euler;
+    }
+}
 
 class MyBox extends Box {
 
+    start() {
+        const inBox = new MySecondBox();
+        inBox.transform.position.z = -6;
+
+        inBox.parent = this;
+    }
+
     update(dt) {
-        this.transform.position.z = 0;
+        const euler = this.euler || new Euler();
+        this.euler = euler;
         euler.rollDeg += 25 * dt;
         euler.pitchDeg += 25 * dt;
         euler.yawDeg += 25 * dt;
 
         this.transform.euler = euler;
 
-        this.stage.camera.transform.position.z = 6;
+        this.stage.camera.transform.position.z = 12;
     }
 }
 

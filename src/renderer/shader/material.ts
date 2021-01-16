@@ -30,6 +30,18 @@ export class Material {
         this._shader.destroy();
     }
 
+    public bind() {
+        const shader: Shader = this._shader;
+
+        if (shader.valid) {
+            shader.bind();
+        }
+    }
+
+    public update() {
+        // sets all saved shader variables here
+    }
+
     /**
      * Checks if this Material is valid
      */
