@@ -26,6 +26,10 @@ export class Uniform {
         return this._value;
     }
 
+    public get id(): number {
+        return this._id;
+    }
+
     public get valid(): boolean {
         return this._isValid;
     }

@@ -29,9 +29,9 @@ class MyBox extends Box {
     update(dt) {
         const euler = this.euler || new Euler();
         this.euler = euler;
-        euler.rollDeg += 25 * dt;
-        euler.pitchDeg += 25 * dt;
-        euler.yawDeg += 25 * dt;
+        euler.rollDeg = 25;
+        euler.pitchDeg = 25;
+        euler.yawDeg = 25;
 
         this.transform.euler = euler;
 
@@ -40,3 +40,5 @@ class MyBox extends Box {
 }
 
 const box = new MyBox();
+
+window.renderer = renderer;

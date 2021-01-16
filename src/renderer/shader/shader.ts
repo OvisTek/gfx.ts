@@ -119,16 +119,14 @@ export class Shader {
         this._fShader = fShader;
         this._program = sProgram;
 
-        this.calculateAttributes(sProgram);
-        this.calculateUniforms(sProgram);
+        this.calculateAttributes(sProgram, gl);
+        this.calculateUniforms(sProgram, gl);
     }
 
     /**
      * Calculate and fill the local key-value with the attributes in the Shader
      */
-    private calculateAttributes(program: WebGLProgram) {
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
-
+    private calculateAttributes(program: WebGLProgram, gl: WebGL2RenderingContext) {
         const attribCount: number = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 
         for (let i = 0; i < attribCount; i++) {
@@ -146,9 +144,7 @@ export class Shader {
     /**
      * Calclate and fill the local key-value with the uniforms in the Shader
      */
-    private calculateUniforms(program: WebGLProgram) {
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
-
+    private calculateUniforms(program: WebGLProgram, gl: WebGL2RenderingContext) {
         const uniformCount: number = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
 
         for (let i = 0; i < uniformCount; i++) {
