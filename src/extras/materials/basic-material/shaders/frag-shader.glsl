@@ -1,8 +1,13 @@
 #version 300 es
 
-in highp vec4 vColor;
-out highp vec4 outColor;
+precision highp float;
+
+in vec2 vUV;
+out vec4 outColor;
+
+uniform sampler2D glfx_Texture0;
 
 void main(void) {
-    outColor = vColor;
+    vec4 color = texture(glfx_Texture0, vUV);
+    outColor = color;
 }
