@@ -1,4 +1,5 @@
 import { Renderer, RenderOperable } from "../renderer";
+import { Uniform } from "./uniform";
 
 export class Texture implements RenderOperable {
     private readonly _image: HTMLImageElement;
@@ -40,5 +41,12 @@ export class Texture implements RenderOperable {
      */
     executeOnce(gl: WebGL2RenderingContext): void {
         throw new Error("Method not implemented.");
+    }
+
+    /**
+     * Bind and use this texture for drawing/rendering
+     */
+    public bind(uniform: Uniform) {
+
     }
 }

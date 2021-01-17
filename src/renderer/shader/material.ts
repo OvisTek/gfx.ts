@@ -3,6 +3,7 @@ import { Matrix4 } from "../../math/matrix4";
 import { Vector3 } from "../../math/vector3";
 import { Renderer } from "../renderer";
 import { Shader } from "./shader";
+import { Texture } from "./texture";
 import { Uniform } from "./uniform";
 
 /**
@@ -14,7 +15,8 @@ enum UniformType {
     SET_VECTOR3,
     SET_MATRIX,
     SET_FLOAT,
-    SET_INTEGER
+    SET_INTEGER,
+    SET_TEXTURE
 }
 
 /**
@@ -155,6 +157,16 @@ export class Material {
                     }
                 }
                 break;
+            case UniformType.SET_TEXTURE:
+                for (const [, u] of uniforms) {
+                    const pair: UniformPair = u;
+                    const value: Texture | undefined = pair.value;
+
+                    if (value != undefined) {
+                        value.bind(pair.uniform);
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -197,6 +209,11 @@ export class Material {
         pair.value = value;
     }
 
+    public setTexture(uniform: Uniform, texture: Texture) {
+        const pair: UniformPair = this._getEnumValue(UniformType.SET_TEXTURE, uniform);
+        pair.value = texture;
+    }
+
     public setColorVar(variableName: string, color: Color) {
         this.setColor(this._shader.uniform(variableName), color);
     }
@@ -219,6 +236,10 @@ export class Material {
 
     public setIntegerVar(variableName: string, value: number) {
         this.setInteger(this._shader.uniform(variableName), value);
+    }
+
+    public setTextureVar(variableName: string, texture: Texture) {
+        this.setTexture(this._shader.uniform(variableName), texture);
     }
 
     /**
