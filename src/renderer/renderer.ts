@@ -1,6 +1,32 @@
 import { Stage } from "./stage/stage";
 
 /**
+ * This interface allows async components to be queued and executed
+ * at the start of the next render frame once.
+ * 
+ * Some components is best to update at start of the render frame to avoid
+ * GL state sync or flush issues
+ */
+export interface RenderOperable {
+    executeOnce(gl: WebGL2RenderingContext): void;
+}
+
+/**
+ * Internal class for queue and execution of RenderOperations types at start of the frame
+ */
+class RenderOperation {
+    public readonly operable: RenderOperable;
+    public readonly accept: (value: void | PromiseLike<void>) => void;
+    public readonly reject: (reason?: any) => void;
+
+    constructor(operable: RenderOperable, accept: (value: void | PromiseLike<void>) => void, reject: (reason?: any) => void) {
+        this.operable = operable;
+        this.accept = accept;
+        this.reject = reject;
+    }
+}
+
+/**
  * Renderer is a singleton type that can be accessed from anywhere in the application.
  * Only a single instance of this class exists. Use Renderer.instance to access.
  * 
@@ -20,6 +46,9 @@ export class Renderer {
     private _isPaused: boolean;
     private _isStarted: boolean;
 
+    // render queue updates
+    private readonly _opQueue: Array<RenderOperation>;
+
     // Window Sizes
     private _width: number;
     private _height: number;
@@ -31,6 +60,7 @@ export class Renderer {
         this._isStarted = false;
         this._width = 1024;
         this._height = 1024;
+        this._opQueue = new Array<RenderOperation>();
     }
 
     public get stage(): Stage {
@@ -68,6 +98,12 @@ export class Renderer {
      */
     public get paused(): boolean {
         return this._isPaused;
+    }
+
+    public queueOperation(operable: RenderOperable): Promise<void> {
+        return new Promise<void>((accept, reject) => {
+            this._opQueue.push(new RenderOperation(operable, accept, reject));
+        });
     }
 
     public pause(): void {
@@ -184,6 +220,26 @@ export class Renderer {
      */
     private readonly loop = (currentTime: number) => {
         window.requestAnimationFrame(this.loop);
+
+        const opQueue: Array<RenderOperation> = this._opQueue;
+
+        // execute any operable types at start of the frame once
+        if (opQueue.length > 0) {
+            let newObject: RenderOperation | undefined = opQueue.pop();
+
+            // loop until the queue is completely empty
+            while (newObject) {
+                try {
+                    newObject.operable.executeOnce(this.gl);
+                    newObject.accept();
+                }
+                catch (error) {
+                    newObject.reject(error);
+                }
+
+                newObject = opQueue.pop();
+            }
+        }
 
         if (this._lastTime <= -1) {
             this._lastTime = currentTime;
