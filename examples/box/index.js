@@ -13,7 +13,7 @@ class MyBox extends Box {
         texture.load().then((texture) => {
             const renderer = this.getComponentOfType(MeshRenderer);
 
-            renderer.material.setTexture("glfx_Texture0", texture);
+            renderer.material.setTexture("gfx_Texture0", texture);
         }).catch((err) => {
             console.error(err);
         });

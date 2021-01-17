@@ -243,7 +243,7 @@ export class Mesh {
         const verticesAttrib: string = "gfx_Position";
         const normalsAttrib: string = "gfx_Normal";
         const colorsAttrib: string = "gfx_Color";
-        const uvAttrib: string = "gfx_UV";
+        const uvAttrib: string = "gfx_TexCoord0";
 
         // record all uploaded operations into a single VAO, this way we only need to
         // bind the VAO for rendering reducing cpu-based bound operations

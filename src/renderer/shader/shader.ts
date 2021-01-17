@@ -2,6 +2,10 @@ import { Renderer } from "../renderer";
 import { Attribute } from "./attribute";
 import { Uniform } from "./uniform";
 
+// pragma types - these are injected as part of a shader at load time
+import gfx_matrices_pragma from "./pragma/gfx_matrices.glsl";
+import gfx_mesh_pragma from "./pragma/gfx_mesh.glsl";
+
 /**
  * Represents a WebGL Shader Program. Contains helper methods for compiling
  * and linking shaders
@@ -57,8 +61,8 @@ export class Shader {
         }
 
         // attach the sources
-        gl.shaderSource(vShader, vShaderSource);
-        gl.shaderSource(fShader, fShaderSource);
+        gl.shaderSource(vShader, this.injectPragma(vShaderSource));
+        gl.shaderSource(fShader, this.injectPragma(fShaderSource));
 
         // compile the shaders
         gl.compileShader(vShader);
@@ -159,6 +163,19 @@ export class Shader {
                 }
             }
         }
+    }
+
+    /**
+     * Inject any user-specific pragma types into the shader. This is called
+     * automatically when the shader is loaded
+     * 
+     * @param shader - the shader to use, can be vertex or fragment
+     */
+    private injectPragma(shader: string): string {
+        shader = shader.replace("#pragma gfx_matrices", gfx_matrices_pragma);
+        shader = shader.replace("#pragma gfx_mesh", gfx_mesh_pragma);
+
+        return shader;
     }
 
     /**
