@@ -27,6 +27,7 @@ export * from "./renderer/shader/shader";
 export * from "./renderer/shader/material";
 export * from "./renderer/shader/attribute";
 export * from "./renderer/shader/uniform";
+export * from "./renderer/shader/texture";
 
 // export stage
 export * from "./renderer/stage/stage-root";

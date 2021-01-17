@@ -50,6 +50,8 @@ class UniformPair {
  * uniforms and attributes
  */
 export class Material {
+    private static _TEXTURE_UNIT: number = 0;
+
     private readonly _shader: Shader;
 
     // we store a map of a map, one map for the type and another for uniforms
@@ -84,6 +86,8 @@ export class Material {
     }
 
     public update() {
+        // reset texture unit
+        Material._TEXTURE_UNIT = 0;
         const gl: WebGL2RenderingContext = Renderer.instance.gl;
 
         // sets all saved shader variables here (if any)
@@ -163,7 +167,9 @@ export class Material {
                     const value: Texture | undefined = pair.value;
 
                     if (value != undefined) {
-                        value.bind(pair.uniform);
+                        const textureUnit: number = Material._TEXTURE_UNIT;
+                        value.bind(gl, pair.uniform, textureUnit);
+                        Material._TEXTURE_UNIT++;
                     }
                 }
                 break;
