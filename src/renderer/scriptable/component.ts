@@ -1,12 +1,14 @@
 import { Entity } from "./entity";
+import { Identifiable } from "../identifiable";
 
 /**
  * Base class for creating component systems executed by the Renderer
  */
-export abstract class Component {
+export abstract class Component extends Identifiable {
     private _owner?: Entity;
 
     constructor() {
+        super();
         this._owner = undefined;
     }
 
@@ -26,8 +28,11 @@ export abstract class Component {
      * 
      * @param shouldDestroy - Should this Component be destroyed/removed from memory (default true)
      */
-    public remove(shouldDestroy: boolean = true) {
-        this._owner?.removeComponent(this, shouldDestroy);
+    public remove(shouldDestroy: boolean = true): void {
+        if (this._owner != undefined) {
+            this._owner.removeComponent(this, shouldDestroy);
+        }
+
         this._owner = undefined;
     }
 
@@ -56,6 +61,10 @@ export abstract class Component {
      * @param owner The owner of the Component
      */
     public static create<T extends Component>(instance: T, owner: Entity): T {
+        // remove from previous parent if any
+        instance.remove(false);
+
+        // add the new owner as the provided object
         instance._owner = owner;
 
         return instance;

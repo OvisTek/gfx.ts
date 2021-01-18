@@ -372,13 +372,7 @@ export class Mesh {
      * Destroy/Free all GPU resources for this Mesh
      */
     public destroy() {
-        const renderer: Renderer = Renderer.instance;
-
-        if (!renderer.valid) {
-            throw new Error("Mesh.destroy() - unable to delete mesh data as Renderer instance is not valid");
-        }
-
-        const gl: WebGL2RenderingContext = renderer.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.gl;
 
         // delete buffers if any
         this._vertices.destroy(gl);

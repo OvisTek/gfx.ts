@@ -1,17 +1,19 @@
-import { GlobalID } from "../../math/global-id";
+import { Identifiable } from "../identifiable";
+import { Shader } from "./shader";
 
 /**
  * Represents an attribute value in a Shader
  */
-export class Attribute {
-    private readonly _id: number;
+export class Attribute extends Identifiable {
     private readonly _name: string;
     private readonly _value: number;
+    private readonly _shaderID: number;
 
-    constructor(name: string, value: number) {
-        this._id = GlobalID.generate();
+    constructor(name: string, value: number, shader: Shader | undefined = undefined) {
+        super();
         this._name = name;
         this._value = value;
+        this._shaderID = shader != undefined ? shader.id : -1;
     }
 
     public get name(): string {
@@ -22,7 +24,12 @@ export class Attribute {
         return this._value;
     }
 
-    public get id(): number {
-        return this._id;
+    /**
+     * Checks if this attribute belongs to the provided Shader
+     * 
+     * @param shader - the shader to check against
+     */
+    public belongsTo(shader: Shader): boolean {
+        return this._shaderID === shader.id;
     }
 }

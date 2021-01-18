@@ -1,6 +1,7 @@
 import { Renderer } from "../renderer";
 import { Attribute } from "./attribute";
 import { Uniform } from "./uniform";
+import { Identifiable } from "../identifiable";
 
 // pragma types - these are injected as part of a shader at load time
 import gfx_matrices_pragma from "./pragma/gfx_matrices.glsl";
@@ -10,7 +11,7 @@ import gfx_mesh_pragma from "./pragma/gfx_mesh.glsl";
  * Represents a WebGL Shader Program. Contains helper methods for compiling
  * and linking shaders
  */
-export class Shader {
+export class Shader extends Identifiable {
     // attributes
     private readonly _attributes: Map<string, Attribute>;
     // uniforms
@@ -22,6 +23,8 @@ export class Shader {
     private _program?: WebGLProgram;
 
     constructor() {
+        super();
+
         this._vShader = undefined;
         this._fShader = undefined;
         this._program = undefined;
@@ -140,7 +143,7 @@ export class Shader {
                 const name: string = info.name;
                 const index: number = gl.getAttribLocation(program, name);
 
-                this._attributes.set(name, new Attribute(name, index));
+                this._attributes.set(name, new Attribute(name, index, this));
             }
         }
     }
@@ -159,7 +162,7 @@ export class Shader {
                 const location: WebGLUniformLocation | null = gl.getUniformLocation(program, name);
 
                 if (location != null) {
-                    this._uniforms.set(name, new Uniform(name, location));
+                    this._uniforms.set(name, new Uniform(name, location, this));
                 }
             }
         }
@@ -184,15 +187,19 @@ export class Shader {
      * 
      * @param key - The attribute to return
      */
-    public attribute(key: string): Attribute {
+    public attribute(key: string | undefined): Attribute {
+        if (key == undefined) {
+            throw new Error("Shader.attribute(string) - attribute key was undefined");
+        }
+
         if (!this.hasAttribute(key)) {
-            throw new Error("Shader.attribute(key) - attribute \"" + key + "\" not found");
+            throw new Error("Shader.attribute(string) - attribute \"" + key + "\" not found");
         }
 
         const attrib: Attribute | undefined = this._attributes.get(key);
 
         if (attrib == undefined) {
-            throw new Error("Shader.attribute(key) - attribute \"" + key + "\" was undefined");
+            throw new Error("Shader.attribute(string) - attribute \"" + key + "\" was undefined");
         }
 
         return attrib;
@@ -213,15 +220,19 @@ export class Shader {
      * 
      * @param key - The uniform to return
      */
-    public uniform(key: string): Uniform {
+    public uniform(key: string | undefined): Uniform {
+        if (key == undefined) {
+            throw new Error("Shader.uniform(string) - uniform key was undefined");
+        }
+
         if (!this.hasUniform(key)) {
-            throw new Error("Shader.uniform(key) - uniform \"" + key + "\" not found");
+            throw new Error("Shader.uniform(string) - uniform \"" + key + "\" not found");
         }
 
         const uniform: Uniform | undefined = this._uniforms.get(key);
 
         if (uniform == undefined) {
-            throw new Error("Shader.uniform(key) - uniform \"" + key + "\" was undefined");
+            throw new Error("Shader.uniform(string) - uniform \"" + key + "\" was undefined");
         }
 
         return uniform;

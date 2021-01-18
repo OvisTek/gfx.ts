@@ -5,6 +5,7 @@ import { Renderer } from "../renderer";
 import { Shader } from "./shader";
 import { Texture } from "./texture";
 import { Uniform } from "./uniform";
+import { Identifiable } from "../identifiable";
 
 /**
  * Allows saving for a specific function call with data (internal enum)
@@ -49,7 +50,7 @@ class UniformPair {
  * Represents a single Material with a Shader and helper functionality to set
  * uniforms and attributes
  */
-export class Material {
+export class Material extends Identifiable {
     private static _TEXTURE_UNIT: number = 0;
 
     private readonly _shader: Shader;
@@ -59,6 +60,7 @@ export class Material {
     private readonly _uniforms: Map<UniformType, Map<number, UniformPair>>;
 
     constructor(shader: Shader | undefined = undefined) {
+        super();
         this._shader = shader || new Shader();
         this._uniforms = new Map<UniformType, Map<number, UniformPair>>();
     }
@@ -185,67 +187,81 @@ export class Material {
         return this._shader.valid;
     }
 
-    public setColor(uniform: Uniform, color: Color) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_COLOR, uniform);
-        pair.value = color;
+    public setColor(uniform: Uniform | string, color: Color): void {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_COLOR, uniform);
+            pair.value = color;
+
+            return;
+        }
+
+        this.setColor(this._shader.uniform(uniform), color);
     }
 
-    public setVector4(uniform: Uniform, vector: Vector3) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_VECTOR4, uniform);
-        pair.value = vector;
+    public setVector4(uniform: Uniform | string, vector: Vector3): void {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_VECTOR4, uniform);
+            pair.value = vector;
+
+            return;
+        }
+
+        this.setVector4(this._shader.uniform(uniform), vector);
     }
 
-    public setVector3(uniform: Uniform, vector: Vector3) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_VECTOR3, uniform);
-        pair.value = vector;
+    public setVector3(uniform: Uniform | string, vector: Vector3): void {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_VECTOR3, uniform);
+            pair.value = vector;
+
+            return;
+        }
+
+        this.setVector3(this._shader.uniform(uniform), vector);
     }
 
-    public setMatrix(uniform: Uniform, matrix: Matrix4) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_MATRIX, uniform);
-        pair.value = matrix;
+    public setMatrix(uniform: Uniform | string, matrix: Matrix4): void {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_MATRIX, uniform);
+            pair.value = matrix;
+
+            return;
+        }
+
+        this.setMatrix(this._shader.uniform(uniform), matrix);
     }
 
-    public setFloat(uniform: Uniform, value: number) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_FLOAT, uniform);
-        pair.value = value;
+    public setFloat(uniform: Uniform | string, value: number) {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_FLOAT, uniform);
+            pair.value = value;
+
+            return;
+        }
+
+        this.setFloat(this._shader.uniform(uniform), value);
     }
 
-    public setInteger(uniform: Uniform, value: number) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_INTEGER, uniform);
-        pair.value = value;
+    public setInteger(uniform: Uniform | string, value: number) {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_INTEGER, uniform);
+            pair.value = value;
+
+            return;
+        }
+
+        this.setInteger(this._shader.uniform(uniform), value);
     }
 
-    public setTexture(uniform: Uniform, texture: Texture) {
-        const pair: UniformPair = this._getEnumValue(UniformType.SET_TEXTURE, uniform);
-        pair.value = texture;
-    }
+    public setTexture(uniform: Uniform | string, texture: Texture) {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_TEXTURE, uniform);
+            pair.value = texture;
 
-    public setColorVar(variableName: string, color: Color) {
-        this.setColor(this._shader.uniform(variableName), color);
-    }
+            return;
+        }
 
-    public setVector4Var(variableName: string, vector: Vector3) {
-        this.setVector4(this._shader.uniform(variableName), vector);
-    }
-
-    public setVector3Var(variableName: string, vector: Vector3) {
-        this.setVector3(this._shader.uniform(variableName), vector);
-    }
-
-    public setMatrixVar(variableName: string, matrix: Matrix4) {
-        this.setMatrix(this._shader.uniform(variableName), matrix);
-    }
-
-    public setFloatVar(variableName: string, value: number) {
-        this.setFloat(this._shader.uniform(variableName), value);
-    }
-
-    public setIntegerVar(variableName: string, value: number) {
-        this.setInteger(this._shader.uniform(variableName), value);
-    }
-
-    public setTextureVar(variableName: string, texture: Texture) {
-        this.setTexture(this._shader.uniform(variableName), texture);
+        this.setTexture(this._shader.uniform(uniform), texture);
     }
 
     /**
@@ -254,6 +270,10 @@ export class Material {
      * @param value - the enum value to use
      */
     private _getEnumValue(value: UniformType, uniform: Uniform): UniformPair {
+        if (!uniform.belongsTo(this.shader)) {
+            throw new Error("Material._getEnumValue(UniformType, Uniform) - provided uniform does not belong to this material");
+        }
+
         const collection: Map<number, UniformPair> | undefined = this._uniforms.get(value);
         const id: number = uniform.id;
 

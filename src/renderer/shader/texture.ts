@@ -1,12 +1,14 @@
 import { Renderer, RenderOperable } from "../renderer";
 import { Uniform } from "./uniform";
+import { Identifiable } from "../identifiable";
 
-export class Texture implements RenderOperable {
+export class Texture extends Identifiable implements RenderOperable {
     private readonly _image: HTMLImageElement;
     private readonly _url: string;
     private _texture?: WebGLTexture;
 
     constructor(url: string) {
+        super();
         this._image = new Image();
         this._url = url;
         this._texture = undefined;
@@ -61,6 +63,8 @@ export class Texture implements RenderOperable {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
         this._texture = texture;
+
+        gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
     /**

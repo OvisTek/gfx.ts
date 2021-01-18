@@ -1,21 +1,21 @@
-import { GlobalID } from "../../math/global-id";
+import { Identifiable } from "../identifiable";
+import { Shader } from "./shader";
 
 /**
  * Represents a uniform value in a Shader
  */
-export class Uniform {
-    public static readonly INVALID = new Uniform();
+export class Uniform extends Identifiable {
+    public static readonly INVALID = new Uniform('INVALID', 0);
 
-    private readonly _id: number;
     private readonly _name: string;
     private readonly _value: WebGLUniformLocation;
-    private readonly _isValid: boolean;
+    private readonly _shaderID: number;
 
-    constructor(name: string = '', value: WebGLUniformLocation = 0) {
-        this._id = GlobalID.generate();
+    constructor(name: string, value: WebGLUniformLocation, shader: Shader | undefined = undefined) {
+        super();
         this._name = name;
         this._value = value;
-        this._isValid = this._name == '' ? false : true;
+        this._shaderID = shader != undefined ? shader.id : -1;
     }
 
     public get name(): string {
@@ -26,11 +26,12 @@ export class Uniform {
         return this._value;
     }
 
-    public get id(): number {
-        return this._id;
-    }
-
-    public get valid(): boolean {
-        return this._isValid;
+    /**
+     * Checks if this uniform belongs to the provided Shader
+     * 
+     * @param shader - the shader to check against
+     */
+    public belongsTo(shader: Shader): boolean {
+        return this._shaderID === shader.id;
     }
 }

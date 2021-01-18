@@ -3,6 +3,7 @@ import { Transform } from "../transform";
 import { Renderer } from "../renderer";
 import { Component } from "./component";
 import { GlobalID } from "../../math/global-id";
+import { Identifiable } from "../identifiable";
 
 /**
  * Construction options for the Entity
@@ -16,13 +17,12 @@ export interface EntityOptions {
  * Everything extends the Entity as a base class. Contains a number of 
  * callbacks from the main renderer
  */
-export abstract class Entity {
+export abstract class Entity extends Identifiable {
     // default options
     private static readonly _optDefault: EntityOptions = { visibility: true, autoCreate: true };
 
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
-    private readonly _id: number;
 
     // all the child objects of this entity
     private readonly _children: Array<Entity>;
@@ -38,6 +38,7 @@ export abstract class Entity {
     private _parent?: Entity;
 
     constructor(opt: EntityOptions | undefined = undefined) {
+        super();
         const options: EntityOptions = opt || Entity._optDefault;
 
         this._stage = undefined;
@@ -47,7 +48,6 @@ export abstract class Entity {
         this._children = new Array<Entity>();
         this._components = new Array<Component>();
         this._componentsQueue = new Array<Component>();
-        this._id = GlobalID.generate();
 
         this._isCreated = false;
         this._visibility = options.visibility;
@@ -154,10 +154,11 @@ export abstract class Entity {
 
         if (index >= 0) {
             const removed: Array<Component> = components.splice(index, 1);
-            const len: number = removed.length;
 
             // destroy/cleanup all removed elements
             if (shouldDestroy == true) {
+                const len: number = removed.length;
+
                 for (let i = 0; i < len; i++) {
                     removed[i].destroy();
                 }
@@ -340,13 +341,6 @@ export abstract class Entity {
         }
 
         return undefined;
-    }
-
-    /**
-     * Returns a Unique ID of this object
-     */
-    public get id(): number {
-        return this._id;
     }
 
     /**
