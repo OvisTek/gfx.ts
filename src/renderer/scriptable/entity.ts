@@ -2,7 +2,6 @@ import { Stage } from "../stage/stage";
 import { Transform } from "../transform";
 import { Renderer } from "../renderer";
 import { Component } from "./component";
-import { GlobalID } from "../../math/global-id";
 import { Identifiable } from "../identifiable";
 
 /**

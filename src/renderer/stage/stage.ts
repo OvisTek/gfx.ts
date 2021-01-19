@@ -1,5 +1,6 @@
 import { Camera } from "../camera/camera";
 import { PerspectiveCamera } from "../camera/perspective-camera";
+import { GLContext } from "../gl-context";
 import { Renderer } from "../renderer";
 import { Entity } from "../scriptable/entity";
 import { StageRoot } from "./stage-root";
@@ -75,21 +76,11 @@ export class Stage {
 
             // loop until the queue is completely empty
             while (newObject) {
-                const startResult: Error | undefined = newObject._exec_Start();
-
-                if (startResult != undefined) {
-                    console.error(startResult);
-
-                    renderer.pause();
-
-                    return;
-                }
-
-                newObject = this._queue.pop();
+                renderer.errorOrPass(newObject._exec_Start());
             }
         }
 
-        const gl: WebGL2RenderingContext = renderer.gl;
+        const gl: WebGL2RenderingContext = renderer.context.gl;
         const root: StageRoot = this._root;
 
         // start a new GL frame render
@@ -101,22 +92,7 @@ export class Stage {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         // execute root that will recursively execute all child objects
-        const updateResult: Error | undefined = root._exec_Update(deltaTime);
-
-        if (updateResult != undefined) {
-            console.error(updateResult);
-
-            renderer.pause();
-
-            return;
-        }
-
-        const lateUpdateResult: Error | undefined = root._exec_LateUpdate(deltaTime);
-
-        if (lateUpdateResult != undefined) {
-            console.error(updateResult);
-
-            renderer.pause();
-        }
+        renderer.errorOrPass(root._exec_Update(deltaTime));
+        renderer.errorOrPass(root._exec_LateUpdate(deltaTime));
     }
 }

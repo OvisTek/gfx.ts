@@ -1,8 +1,8 @@
-import { Renderer, RenderOperable } from "../renderer";
+import { Renderer } from "../renderer";
 import { Uniform } from "./uniform";
 import { Identifiable } from "../identifiable";
 
-export class Texture extends Identifiable implements RenderOperable {
+export class Texture extends Identifiable {
     private readonly _image: HTMLImageElement;
     private readonly _url: string;
     private _texture?: WebGLTexture;
@@ -24,7 +24,9 @@ export class Texture extends Identifiable implements RenderOperable {
             const image: HTMLImageElement = this._image;
 
             image.onload = () => {
-                Renderer.instance.queueOperation(this).then(() => {
+                Renderer.instance.yield.next.then((renderer) => {
+                    this._executeOnce(renderer.context.gl);
+
                     accept(this);
                 }).catch(reject);
             };
@@ -44,7 +46,7 @@ export class Texture extends Identifiable implements RenderOperable {
      * 
      * @param gl - the gl context passed by the rendering engine
      */
-    executeOnce(gl: WebGL2RenderingContext): void {
+    private _executeOnce(gl: WebGL2RenderingContext): void {
         const texture: WebGLTexture | null = gl.createTexture();
 
         if (texture == null) {
@@ -90,7 +92,7 @@ export class Texture extends Identifiable implements RenderOperable {
             throw new Error("Texture.destroy() - unable to delete texture as Renderer instance is not valid");
         }
 
-        const gl: WebGL2RenderingContext = renderer.gl;
+        const gl: WebGL2RenderingContext = renderer.context.gl;
 
         if (this._texture != undefined) {
             gl.deleteTexture(this._texture);

@@ -46,7 +46,7 @@ export class Shader extends Identifiable {
             throw new Error("Shader.load(String, String) - unable to compile shader as Renderer instance is not valid");
         }
 
-        const gl: WebGL2RenderingContext = renderer.gl;
+        const gl: WebGL2RenderingContext = renderer.context.gl;
 
         // create shaders
         const vShader: WebGLShader | null = gl.createShader(gl.VERTEX_SHADER);
@@ -257,7 +257,7 @@ export class Shader extends Identifiable {
             throw new Error("Shader.destroy() - unable to delete shader as Renderer instance is not valid");
         }
 
-        const gl: WebGL2RenderingContext = renderer.gl;
+        const gl: WebGL2RenderingContext = renderer.context.gl;
 
         if (this._vShader != undefined) {
             gl.deleteShader(this._vShader);
@@ -284,7 +284,7 @@ export class Shader extends Identifiable {
             return;
         }
 
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
         gl.useProgram(this._program);
     }

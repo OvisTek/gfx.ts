@@ -372,7 +372,7 @@ export class Mesh {
      * Destroy/Free all GPU resources for this Mesh
      */
     public destroy() {
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
         // delete buffers if any
         this._vertices.destroy(gl);
@@ -397,13 +397,13 @@ export class Mesh {
             return;
         }
 
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
         gl.bindVertexArray(this._vao);
     }
 
     public unbind() {
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
         gl.bindVertexArray(null);
     }

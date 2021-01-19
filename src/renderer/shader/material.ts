@@ -90,7 +90,7 @@ export class Material extends Identifiable {
     public update() {
         // reset texture unit
         Material._TEXTURE_UNIT = 0;
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
         // sets all saved shader variables here (if any)
         for (const [k, v] of this._uniforms) {

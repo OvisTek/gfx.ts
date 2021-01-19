@@ -42,7 +42,7 @@ export class MeshRenderer extends Component {
         this._viewMatrix = this._material.shader.uniform("gfx_ViewMatrix");
         this._projectionMatrix = this._material.shader.uniform("gfx_ProjectionMatrix");
 
-        const gl: WebGL2RenderingContext = Renderer.instance.gl;
+        const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
         this._mesh.upload(gl, this._material);
     }
@@ -52,27 +52,26 @@ export class MeshRenderer extends Component {
             const mesh: Mesh = this._mesh;
             const material: Material = this._material;
 
+            // bind our shader for this draw call
             material.bind();
 
             // upload view matrix
             material.setMatrix(this._viewMatrix, this.owner.stage.camera.transform.worldMatrixInverse);
-
             // upload model matrix
             material.setMatrix(this._modelMatrix, this.owner.transform.worldMatrix);
-
             // upload projection matrix
             material.setMatrix(this._projectionMatrix, this.owner.stage.camera.cameraMatrix);
 
             material.update();
 
+            // begin rendering mesh
             mesh.bind();
 
             const length: number = mesh.indices.length;
-
-            const gl: WebGL2RenderingContext = Renderer.instance.gl;
-
+            const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
             gl.drawElements(gl.TRIANGLES, length, gl.UNSIGNED_SHORT, 0);
 
+            // end rendering mesh
             mesh.unbind();
         }
     }

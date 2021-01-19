@@ -1,30 +1,6 @@
+import { GLContext } from "./gl-context";
 import { Stage } from "./stage/stage";
-
-/**
- * This interface allows async components to be queued and executed
- * at the start of the next render frame once.
- * 
- * Some components is best to update at start of the render frame to avoid
- * GL state sync or flush issues
- */
-export interface RenderOperable {
-    executeOnce(gl: WebGL2RenderingContext): void;
-}
-
-/**
- * Internal class for queue and execution of RenderOperations types at start of the frame
- */
-class RenderOperation {
-    public readonly operable: RenderOperable;
-    public readonly accept: (value: void | PromiseLike<void>) => void;
-    public readonly reject: (reason?: any) => void;
-
-    constructor(operable: RenderOperable, accept: (value: void | PromiseLike<void>) => void, reject: (reason?: any) => void) {
-        this.operable = operable;
-        this.accept = accept;
-        this.reject = reject;
-    }
-}
+import { YieldQueue } from "./yield/yield-queue";
 
 /**
  * Renderer is a singleton type that can be accessed from anywhere in the application.
@@ -40,14 +16,11 @@ export class Renderer {
     private readonly _stage: Stage;
 
     // GL Contexts
-    private _canvas?: HTMLCanvasElement;
-    private _gl?: WebGL2RenderingContext;
+    private readonly _context: GLContext;
+    private readonly _yield: YieldQueue;
     private _devMode: boolean;
     private _isPaused: boolean;
     private _isStarted: boolean;
-
-    // render queue updates
-    private readonly _opQueue: Array<RenderOperation>;
 
     // Window Sizes
     private _width: number;
@@ -55,12 +28,13 @@ export class Renderer {
 
     private constructor() {
         this._stage = new Stage();
+        this._context = new GLContext();
+        this._yield = new YieldQueue(this);
         this._devMode = false;
         this._isPaused = false;
         this._isStarted = false;
         this._width = 1024;
         this._height = 1024;
-        this._opQueue = new Array<RenderOperation>();
     }
 
     public get stage(): Stage {
@@ -71,11 +45,25 @@ export class Renderer {
      * Checks if the Renderer is setup properly
      */
     public get valid(): boolean {
-        if (!this._canvas || !this._gl) {
-            return false;
+        return this._context.valid;
+    }
+
+    /**
+     * Choose how to handle error, this could be piped to a user-friendly context
+     * 
+     * @param error - the error to handle (if any)
+     */
+    public errorOrPass(error: Error | string | undefined): void {
+        if (error == undefined) {
+            return;
         }
 
-        return true;
+        console.error(error);
+
+        // only pause on dev-mode
+        if (this.devMode) {
+            this.pause();
+        }
     }
 
     /**
@@ -100,10 +88,8 @@ export class Renderer {
         return this._isPaused;
     }
 
-    public queueOperation(operable: RenderOperable): Promise<void> {
-        return new Promise<void>((accept, reject) => {
-            this._opQueue.push(new RenderOperation(operable, accept, reject));
-        });
+    public get yield(): YieldQueue {
+        return this._yield;
     }
 
     public pause(): void {
@@ -136,23 +122,8 @@ export class Renderer {
     /**
      * Returns the Canvas element being used by this Renderer
      */
-    public get canvas(): HTMLCanvasElement {
-        if (!this._canvas) {
-            throw new Error("Renderer.canvas - property not set, suggest calling Renderer.init()");
-        }
-
-        return this._canvas;
-    }
-
-    /**
-     * Returns the GL element being used by this Renderer
-     */
-    public get gl(): WebGL2RenderingContext {
-        if (!this._gl) {
-            throw new Error("Renderer.gl - property not set, suggest calling Renderer.init()");
-        }
-
-        return this._gl;
+    public get context(): GLContext {
+        return this._context;
     }
 
     /**
@@ -167,8 +138,7 @@ export class Renderer {
             throw new Error("Renderer.init(HTMLCanvasElement) - webgl2 is not supported");
         }
 
-        this._canvas = canvas;
-        this._gl = gl;
+        this._context.setup(gl, canvas);
 
         const oldWidth: number = this._width;
         const oldHeight: number = this._height;
@@ -221,26 +191,6 @@ export class Renderer {
     private readonly loop = (currentTime: number) => {
         window.requestAnimationFrame(this.loop);
 
-        const opQueue: Array<RenderOperation> = this._opQueue;
-
-        // execute any operable types at start of the frame once
-        if (opQueue.length > 0) {
-            let newObject: RenderOperation | undefined = opQueue.pop();
-
-            // loop until the queue is completely empty
-            while (newObject) {
-                try {
-                    newObject.operable.executeOnce(this.gl);
-                    newObject.accept();
-                }
-                catch (error) {
-                    newObject.reject(error);
-                }
-
-                newObject = opQueue.pop();
-            }
-        }
-
         if (this._lastTime <= -1) {
             this._lastTime = currentTime;
         }
@@ -251,8 +201,14 @@ export class Renderer {
         this._lastTime = currentTime;
 
         if (!this._isPaused) {
+            // execute scripts that want to execute at start of the frame
+            this._yield._flushStart();
+
             // update the current active stage
             this.stage._update(deltaTime, this);
+
+            // execute scripts that want to execute at end of the frame
+            this._yield._flushEnd();
         }
     }
 }
