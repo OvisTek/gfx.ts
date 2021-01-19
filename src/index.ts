@@ -37,7 +37,8 @@ export * from "./renderer/stage/stage";
 export * from "./renderer/scriptable/entity";
 
 // export extras materials
-export * from "./extras/materials/basic-material/basic-material";
+export * from "./extras/materials/basic-texture-material/basic-texture-material";
+export * from "./extras/materials/basic-color-material/basic-color-material";
 
 // export extras primitives
 export * from "./extras/primitives/box";

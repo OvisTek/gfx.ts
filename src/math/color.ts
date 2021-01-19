@@ -3,6 +3,8 @@ import { MathUtil } from "./math-util";
 /**
  * Represents 32 bit RGBA Color
  * Components range from 0 to 1
+ * 
+ * Contains a number of static and utility methods for working with colors
  */
 export class Color {
     // color components
@@ -114,11 +116,7 @@ export class Color {
      * B Component is 5 bits
      */
     public get rgb565(): number {
-        const cr: number = (this._r * 31) | 0;
-        const cg: number = (this._g * 63) | 0;
-        const cb: number = (this._b * 31) | 0;
-
-        return (cr << 11) | (cg << 5) | cb;
+        return Color.rgb565(this._r, this._g, this._b);
     }
 
     public set rgb565(color: number) {
@@ -130,6 +128,21 @@ export class Color {
     }
 
     /**
+     * 16 bit RGB565 Color Format
+     * 
+     * @param r - Red Component as 5 bits passed as [0, 1]
+     * @param g - Green Component as 6 bits passed as [0, 1]
+     * @param b - Blue Component as 5 bits passed as [0, 1]
+     */
+    public static rgb565(r: number, g: number, b: number): number {
+        const cr: number = (r * 31) | 0;
+        const cg: number = (g * 63) | 0;
+        const cb: number = (b * 31) | 0;
+
+        return (cr << 11) | (cg << 5) | cb;
+    }
+
+    /**
      * 24 bit RGB888 Color Format
      * 
      * R Component is 8 bits
@@ -137,11 +150,7 @@ export class Color {
      * B Component is 8 bits
      */
     public get rgb888(): number {
-        const cr: number = (this._r * 255) | 0;
-        const cg: number = (this._g * 255) | 0;
-        const cb: number = (this._b * 255) | 0;
-
-        return (cr << 16) | (cg << 8) | cb;
+        return Color.rgb888(this._r, this._g, this._b);
     }
 
     public set rgb888(color: number) {
@@ -153,6 +162,21 @@ export class Color {
     }
 
     /**
+     * 24 bit RGB888 Color Format
+     * 
+     * @param r - Red Component as 8 bits passed as [0, 1]
+     * @param g - Green Component as 8 bits passed as [0, 1]
+     * @param b - Blue Component as 8 bits passed as [0, 1]
+     */
+    public static rgb888(r: number, g: number, b: number): number {
+        const cr: number = (r * 255) | 0;
+        const cg: number = (g * 255) | 0;
+        const cb: number = (b * 255) | 0;
+
+        return (cr << 16) | (cg << 8) | cb;
+    }
+
+    /**
      * 16 bit RGB4444 Color Format
      * 
      * R Component is 4 bits
@@ -161,12 +185,7 @@ export class Color {
      * A Component is 4 bits
      */
     public get rgba4444(): number {
-        const cr: number = (this._r * 15) | 0;
-        const cg: number = (this._g * 15) | 0;
-        const cb: number = (this._b * 15) | 0;
-        const ca: number = (this._a * 15) | 0;
-
-        return (cr << 12) | (cg << 8) | (cb << 4) | ca;
+        return Color.rgba4444(this._r, this._g, this._b, this._a);
     }
 
     public set rgba4444(color: number) {
@@ -179,6 +198,23 @@ export class Color {
     }
 
     /**
+     * 16 bit RGBA4444 Color Format
+     * 
+     * @param r - Red Component as 4 bits passed as [0, 1]
+     * @param g - Green Component as 4 bits passed as [0, 1]
+     * @param b - Blue Component as 4 bits passed as [0, 1]
+     * @param a - Alpha Component as 4 bits passed as [0, 1]
+     */
+    public static rgba4444(r: number, g: number, b: number, a: number): number {
+        const cr: number = (r * 15) | 0;
+        const cg: number = (g * 15) | 0;
+        const cb: number = (b * 15) | 0;
+        const ca: number = (a * 15) | 0;
+
+        return (cr << 12) | (cg << 8) | (cb << 4) | ca;
+    }
+
+    /**
      * 32 bit RGBA8888 Color Format
      * 
      * R Component is 8 bits
@@ -187,12 +223,7 @@ export class Color {
      * A Component is 8 bits
      */
     public get rgba8888(): number {
-        const cr: number = (this._r * 255) | 0;
-        const cg: number = (this._g * 255) | 0;
-        const cb: number = (this._b * 255) | 0;
-        const ca: number = (this._a * 255) | 0;
-
-        return (cr << 24) | (cg << 16) | (cb << 8) | ca;
+        return Color.rgba8888(this._r, this._g, this._b, this._a);
     }
 
     public set rgba8888(color: number) {
@@ -205,6 +236,23 @@ export class Color {
     }
 
     /**
+     * 32 bit RGBA8888 Color Format
+     * 
+     * @param r - Red Component as 8 bits passed as [0, 1]
+     * @param g - Green Component as 8 bits passed as [0, 1]
+     * @param b - Blue Component as 8 bits passed as [0, 1]
+     * @param a - Alpha Component as 8 bits passed as [0, 1]
+     */
+    public static rgba8888(r: number, g: number, b: number, a: number): number {
+        const cr: number = (r * 255) | 0;
+        const cg: number = (g * 255) | 0;
+        const cb: number = (b * 255) | 0;
+        const ca: number = (a * 255) | 0;
+
+        return (cr << 24) | (cg << 16) | (cb << 8) | ca;
+    }
+
+    /**
      * 32 bit ARGB8888 Color Format
      * 
      * R Component is 8 bits
@@ -213,12 +261,7 @@ export class Color {
      * A Component is 8 bits
      */
     public get argb8888(): number {
-        const cr: number = (this._r * 255) | 0;
-        const cg: number = (this._g * 255) | 0;
-        const cb: number = (this._b * 255) | 0;
-        const ca: number = (this._a * 255) | 0;
-
-        return (ca << 24) | (cr << 16) | (cg << 8) | cb;
+        return Color.argb8888(this._r, this._g, this._b, this._a);
     }
 
     public set argb8888(color: number) {
@@ -228,5 +271,22 @@ export class Color {
         this.r = ((value & 0x00ff0000) >>> 16) / 255.0;
         this.g = ((value & 0x0000ff00) >>> 8) / 255.0;
         this.b = ((value & 0x000000ff)) / 255.0;
+    }
+
+    /**
+     * 32 bit ARGB8888 Color Format
+     * 
+     * @param r - Red Component as 8 bits passed as [0, 1]
+     * @param g - Green Component as 8 bits passed as [0, 1]
+     * @param b - Blue Component as 8 bits passed as [0, 1]
+     * @param a - Alpha Component as 8 bits passed as [0, 1]
+     */
+    public static argb8888(r: number, g: number, b: number, a: number): number {
+        const cr: number = (r * 255) | 0;
+        const cg: number = (g * 255) | 0;
+        const cb: number = (b * 255) | 0;
+        const ca: number = (a * 255) | 0;
+
+        return (ca << 24) | (cr << 16) | (cg << 8) | cb;
     }
 }
