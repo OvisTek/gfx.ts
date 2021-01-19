@@ -1,11 +1,15 @@
-import { Box, Euler, MeshRenderer, Renderer, Texture } from "../../dist/index";
+import { BasicColorMaterial, BasicTextureMaterial, Box, Euler, MeshRenderer, Renderer, Texture } from "../../dist/index";
 
 const renderer = Renderer.instance;
 renderer.devMode = true;
 renderer.initWithID("render_canvas");
 renderer.start();
 
-class MyBox extends Box {
+class MyTexturedBox extends Box {
+
+    constructor() {
+        super(new BasicTextureMaterial());
+    }
 
     start() {
         const texture = new Texture("https://webgl2fundamentals.org/webgl/resources/leaves.jpg");
@@ -17,6 +21,29 @@ class MyBox extends Box {
         }).catch((err) => {
             console.error(err);
         });
+
+        this.transform.position.x = 1;
+    }
+
+    update(dt) {
+        const euler = this.euler || new Euler();
+        this.euler = euler;
+        euler.rollDeg += dt * 25;
+        euler.pitchDeg += dt * 25;
+        euler.yawDeg += dt * 25;
+
+        this.transform.euler = euler;
+    }
+}
+
+class MyColoredBox extends Box {
+
+    constructor() {
+        super(new BasicColorMaterial());
+    }
+
+    start() {
+        this.transform.position.x = -1;
     }
 
     update(dt) {
@@ -32,6 +59,7 @@ class MyBox extends Box {
     }
 }
 
-const box = new MyBox();
+const tbox = new MyTexturedBox();
+const cbox = new MyColoredBox();
 
 window.renderer = renderer;

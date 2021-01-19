@@ -1,13 +1,24 @@
+import { Color } from "../../math/color";
 import { MeshRenderer } from "../../renderer/components/mesh-renderer";
 import { Mesh } from "../../renderer/mesh/mesh";
-import { Entity } from "../../renderer/scriptable/entity";
-import { BasicMaterial } from "../materials/basic-material/basic-material";
+import { Entity, EntityOptions } from "../../renderer/scriptable/entity";
+import { Material } from "../../renderer/shader/material";
+import { BasicColorMaterial } from "../materials/basic-color-material/basic-color-material";
 
 export class Box extends Entity {
 
+    protected readonly material: Material;
+
+    constructor(material: Material | undefined = undefined, opt: EntityOptions | undefined = undefined) {
+        super(opt);
+
+        this.material = material == undefined ? new BasicColorMaterial() : material;
+    }
+
     protected create(): Promise<void> {
-        return new Promise<void>((accept, reject) => {
+        return new Promise<void>((accept, _reject) => {
             const mesh: Mesh = new Mesh();
+            const material: Material = this.material;
 
             mesh.vertices.data = [
                 // front face vertices
@@ -75,6 +86,39 @@ export class Box extends Entity {
                 0.0, 1.0,
             ];
 
+            mesh.colors.data = [
+                // front face colors
+                1.0, 0.0, 0.0, 1.0,
+                1.0, 0.0, 0.0, 1.0,
+                1.0, 0.0, 0.0, 1.0,
+                1.0, 0.0, 0.0, 1.0,
+                // back face colors
+                0.0, 1.0, 0.0, 1.0,
+                0.0, 1.0, 0.0, 1.0,
+                0.0, 1.0, 0.0, 1.0,
+                0.0, 1.0, 0.0, 1.0,
+                // top face colors
+                0.0, 0.0, 1.0, 1.0,
+                0.0, 0.0, 1.0, 1.0,
+                0.0, 0.0, 1.0, 1.0,
+                0.0, 0.0, 1.0, 1.0,
+                // bottom face colors
+                1.0, 0.0, 1.0, 1.0,
+                1.0, 0.0, 1.0, 1.0,
+                1.0, 0.0, 1.0, 1.0,
+                1.0, 0.0, 1.0, 1.0,
+                // right face colors
+                0.0, 1.0, 1.0, 1.0,
+                0.0, 1.0, 1.0, 1.0,
+                0.0, 1.0, 1.0, 1.0,
+                0.0, 1.0, 1.0, 1.0,
+                // left face colors
+                1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0,
+                1.0, 1.0, 1.0, 1.0
+            ];
+
             mesh.indices.data = [
                 // front triangles
                 0, 1, 2, 0, 2, 3,
@@ -94,7 +138,7 @@ export class Box extends Entity {
             const renderer: MeshRenderer = this.addComponent(new MeshRenderer());
 
             // assign material and mesh for this object
-            renderer.material = new BasicMaterial();
+            renderer.material = material;
             renderer.mesh = mesh;
 
             return accept();
