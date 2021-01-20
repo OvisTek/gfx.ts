@@ -9,14 +9,16 @@ import { GfxMatricesPragma } from "../shader/pragma/gfx-matrices";
  * Handles standard Mesh rendering
  */
 export class MeshRenderer extends Component {
+    // zero allocation temporary variables. This works since JavaScript
+    // is single threaded, so there wont be any race conditions/deadlocks
+    private static readonly _mv: Matrix4 = new Matrix4();
+    private static readonly _mvp: Matrix4 = new Matrix4();
+    private static readonly _mvt: Matrix4 = new Matrix4();
 
     private _mesh?: Mesh;
     private _material?: Material;
 
     private readonly _matrices: GfxMatricesPragma = new GfxMatricesPragma();
-    private readonly _mv: Matrix4 = new Matrix4();
-    private readonly _mvp: Matrix4 = new Matrix4();
-    private readonly _mvt: Matrix4 = new Matrix4();
 
     public get mesh(): Mesh | undefined {
         return this._mesh;
@@ -63,9 +65,9 @@ export class MeshRenderer extends Component {
 
             // these require calculation before setting
             // gfx_ProjectionMatrix * gfx_ViewMatrix * gfx_ModelMatrix
-            const modelViewMatrix: Matrix4 = this._mv;
-            const modelViewProjectionMatrix: Matrix4 = this._mvp;
-            const normalMatrix: Matrix4 = this._mvt;
+            const modelViewMatrix: Matrix4 = MeshRenderer._mv;
+            const modelViewProjectionMatrix: Matrix4 = MeshRenderer._mvp;
+            const normalMatrix: Matrix4 = MeshRenderer._mvt;
 
             // calculate the modelView and modelViewProjection matrices
             Matrix4.multiply(viewInverseMatrix, modelMatrix, modelViewMatrix);
