@@ -83,9 +83,9 @@ export class GfxMatricesPragma {
         this._setMatrixForUniform(this._gfx_normalMatrix, data);
     }
 
-    private _setMatrixForUniform(uniform: Uniform, data: Matrix4) {
+    private _setMatrixForUniform(uniform: Uniform, data: Matrix4): void {
         if (this._owner == undefined) {
-            throw new Error("GfxMatricesPragma._setMatrixForUniform(Unfiform, Matrix4) - called on invalid pragma, object is missing owner");
+            throw new Error("GfxMatricesPragma._setMatrixForUniform(Uniform, Matrix4) - called invalid pragma, object is missing owner");
         }
 
         if (uniform.valid) {
@@ -97,7 +97,7 @@ export class GfxMatricesPragma {
      * Resets everything. NOTE this does not call destroy on the actual
      * internal material, just resets references
      */
-    public destroy() {
+    public destroy(): void {
         this._owner = undefined;
         this._gfx_projectionMatrix = Uniform.INVALID;;
         this._gfx_modelMatrix = Uniform.INVALID;;
