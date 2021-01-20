@@ -83,40 +83,47 @@ export class Box extends Entity {
                 0.0, 0.0,
                 1.0, 0.0,
                 1.0, 1.0,
-                0.0, 1.0,
+                0.0, 1.0
             ];
+
+            const frontColor: number = Color.rgba8888(1, 0, 0, 1);
+            const backColor: number = Color.rgba8888(0, 1, 0, 1);
+            const topColor: number = Color.rgba8888(0, 0, 1, 1);
+            const bottomColor: number = Color.rgba8888(0, 0, 0, 1);
+            const rightColor: number = Color.rgba8888(1, 1, 1, 1);
+            const leftColor: number = Color.rgba8888(1, 0, 1, 1);
 
             mesh.colors.data = [
                 // front face colors
-                1.0, 0.0, 0.0, 1.0,
-                1.0, 0.0, 0.0, 1.0,
-                1.0, 0.0, 0.0, 1.0,
-                1.0, 0.0, 0.0, 1.0,
+                frontColor,
+                frontColor,
+                frontColor,
+                frontColor,
                 // back face colors
-                0.0, 1.0, 0.0, 1.0,
-                0.0, 1.0, 0.0, 1.0,
-                0.0, 1.0, 0.0, 1.0,
-                0.0, 1.0, 0.0, 1.0,
+                backColor,
+                backColor,
+                backColor,
+                backColor,
                 // top face colors
-                0.0, 0.0, 1.0, 1.0,
-                0.0, 0.0, 1.0, 1.0,
-                0.0, 0.0, 1.0, 1.0,
-                0.0, 0.0, 1.0, 1.0,
+                topColor,
+                topColor,
+                topColor,
+                topColor,
                 // bottom face colors
-                1.0, 0.0, 1.0, 1.0,
-                1.0, 0.0, 1.0, 1.0,
-                1.0, 0.0, 1.0, 1.0,
-                1.0, 0.0, 1.0, 1.0,
+                bottomColor,
+                bottomColor,
+                bottomColor,
+                bottomColor,
                 // right face colors
-                0.0, 1.0, 1.0, 1.0,
-                0.0, 1.0, 1.0, 1.0,
-                0.0, 1.0, 1.0, 1.0,
-                0.0, 1.0, 1.0, 1.0,
+                rightColor,
+                rightColor,
+                rightColor,
+                rightColor,
                 // left face colors
-                1.0, 1.0, 1.0, 1.0,
-                1.0, 1.0, 1.0, 1.0,
-                1.0, 1.0, 1.0, 1.0,
-                1.0, 1.0, 1.0, 1.0
+                leftColor,
+                leftColor,
+                leftColor,
+                leftColor
             ];
 
             mesh.indices.data = [

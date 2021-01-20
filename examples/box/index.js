@@ -22,15 +22,15 @@ class MyTexturedBox extends Box {
             console.error(err);
         });
 
-        this.transform.position.x = 1;
+        this.transform.position.x = 2;
     }
 
     update(dt) {
         const euler = this.euler || new Euler();
         this.euler = euler;
         euler.rollDeg += dt * 25;
-        euler.pitchDeg += dt * 25;
-        euler.yawDeg += dt * 25;
+        euler.pitchDeg += dt * 35;
+        euler.yawDeg += dt * 45;
 
         this.transform.euler = euler;
     }
@@ -43,19 +43,19 @@ class MyColoredBox extends Box {
     }
 
     start() {
-        this.transform.position.x = -1;
+        this.transform.position.x = -2;
     }
 
     update(dt) {
         const euler = this.euler || new Euler();
         this.euler = euler;
-        euler.rollDeg += dt * 25;
-        euler.pitchDeg += dt * 25;
+        euler.rollDeg += dt * 45;
+        euler.pitchDeg += dt * 35;
         euler.yawDeg += dt * 25;
 
         this.transform.euler = euler;
 
-        this.stage.camera.transform.position.z = 6;
+        this.stage.camera.transform.position.z = 9;
     }
 }
 

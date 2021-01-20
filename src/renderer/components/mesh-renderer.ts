@@ -1,8 +1,9 @@
+import { Matrix4 } from "../../math/matrix4";
 import { Mesh } from "../mesh/mesh";
 import { Renderer } from "../renderer";
 import { Component } from "../scriptable/component";
 import { Material } from "../shader/material";
-import { Uniform } from "../shader/uniform";
+import { GfxMatricesPragma } from "../shader/pragma/gfx-matrices";
 
 /**
  * Handles standard Mesh rendering
@@ -12,10 +13,10 @@ export class MeshRenderer extends Component {
     private _mesh?: Mesh;
     private _material?: Material;
 
-    // uniforms to be set before every render
-    private _modelMatrix: Uniform = Uniform.INVALID;
-    private _viewMatrix: Uniform = Uniform.INVALID;
-    private _projectionMatrix: Uniform = Uniform.INVALID;
+    private readonly _matrices: GfxMatricesPragma = new GfxMatricesPragma();
+    private readonly _mv: Matrix4 = new Matrix4();
+    private readonly _mvp: Matrix4 = new Matrix4();
+    private readonly _mvt: Matrix4 = new Matrix4();
 
     public get mesh(): Mesh | undefined {
         return this._mesh;
@@ -31,16 +32,15 @@ export class MeshRenderer extends Component {
 
     public set material(newMaterial: Material | undefined) {
         this._material = newMaterial;
+
+        // resets the pragma so we are targeting the new material
+        this._matrices.material = this._material;
     }
 
     public create(): void {
         if (this._mesh == undefined || this._material == undefined || !this._material.valid) {
             return;
         }
-
-        this._modelMatrix = this._material.shader.uniform("gfx_ModelMatrix");
-        this._viewMatrix = this._material.shader.uniform("gfx_ViewMatrix");
-        this._projectionMatrix = this._material.shader.uniform("gfx_ProjectionMatrix");
 
         const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
 
@@ -51,16 +51,35 @@ export class MeshRenderer extends Component {
         if (this._material != undefined && this._mesh != undefined && this._material.valid) {
             const mesh: Mesh = this._mesh;
             const material: Material = this._material;
+            const matrices: GfxMatricesPragma = this._matrices;
 
             // bind our shader for this draw call
             material.bind();
 
-            // upload view matrix
-            material.setMatrix(this._viewMatrix, this.owner.stage.camera.transform.worldMatrixInverse);
-            // upload model matrix
-            material.setMatrix(this._modelMatrix, this.owner.transform.worldMatrix);
-            // upload projection matrix
-            material.setMatrix(this._projectionMatrix, this.owner.stage.camera.cameraMatrix);
+            const projectionMatrix: Matrix4 = this.owner.stage.camera.cameraMatrix;
+            const modelMatrix: Matrix4 = this.owner.transform.worldMatrix;
+            const viewMatrix: Matrix4 = this.owner.stage.camera.transform.worldMatrix;
+            const viewInverseMatrix: Matrix4 = this.owner.stage.camera.transform.worldMatrixInverse;
+
+            // these require calculation before setting
+            // gfx_ProjectionMatrix * gfx_ViewMatrix * gfx_ModelMatrix
+            const modelViewMatrix: Matrix4 = this._mv;
+            const modelViewProjectionMatrix: Matrix4 = this._mvp;
+            const normalMatrix: Matrix4 = this._mvt;
+
+            // calculate the modelView and modelViewProjection matrices
+            Matrix4.multiply(viewInverseMatrix, modelMatrix, modelViewMatrix);
+            Matrix4.multiply(projectionMatrix, modelViewMatrix, modelViewProjectionMatrix);
+
+            // used for transforming normals for lighting purposes
+            normalMatrix.copy(modelViewMatrix).transpose();
+
+            matrices.projectionMatrix = projectionMatrix;
+            matrices.modelMatrix = modelMatrix;
+            matrices.viewMatrix = viewMatrix;
+            matrices.viewInverseMatrix = viewInverseMatrix;
+            matrices.mvpMatrix = modelViewProjectionMatrix;
+            matrices.normalMatrix = normalMatrix;
 
             material.update();
 
@@ -87,6 +106,9 @@ export class MeshRenderer extends Component {
 
         this._material = undefined;
         this._mesh = undefined;
+
+        // resets the pragma
+        this._matrices.destroy();
     }
 
     public get valid(): boolean {

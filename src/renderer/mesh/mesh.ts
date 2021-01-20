@@ -132,10 +132,11 @@ export class Mesh {
         return new Float32Array(data != undefined ? data : Mesh._EMPTY);
     }
 
-    private get colorData(): Float32Array {
+    private get colorData(): Uint8Array {
         const data: Array<number> | undefined = this._colors.data;
+        const view: Float32Array = new Float32Array(data != undefined ? data : Mesh._EMPTY)
 
-        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
+        return new Uint8Array(view.buffer);
     }
 
     private get uvData(): Float32Array {
@@ -202,10 +203,7 @@ export class Mesh {
         for (let i = 0; i < length; i++) {
             const color: Color = colors[i];
 
-            buff.push(color.r);
-            buff.push(color.g);
-            buff.push(color.b);
-            buff.push(color.a);
+            buff.push(color.rgba8888);
         }
 
         this.colors.data = buff;
@@ -348,7 +346,7 @@ export class Mesh {
         const buffer: WebGLBuffer = this._colors.buffer;
 
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.vertexAttribPointer(attribute.location, 4, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(attribute.location, 4, gl.UNSIGNED_BYTE, true, 0, 0);
         gl.enableVertexAttribArray(attribute.location);
     }
 

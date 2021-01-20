@@ -4,8 +4,8 @@ import { Uniform } from "./uniform";
 import { Identifiable } from "../identifiable";
 
 // pragma types - these are injected as part of a shader at load time
-import gfx_matrices_pragma from "./pragma/gfx_matrices.glsl";
-import gfx_mesh_pragma from "./pragma/gfx_mesh.glsl";
+import gfx_matrices_pragma from "./pragma/shaders/gfx_matrices.glsl";
+import gfx_mesh_pragma from "./pragma/shaders/gfx_mesh.glsl";
 
 /**
  * Represents a WebGL Shader Program. Contains helper methods for compiling
@@ -222,17 +222,17 @@ export class Shader extends Identifiable {
      */
     public uniform(key: string | undefined): Uniform {
         if (key == undefined) {
-            throw new Error("Shader.uniform(string) - uniform key was undefined");
+            return Uniform.INVALID;
         }
 
         if (!this.hasUniform(key)) {
-            throw new Error("Shader.uniform(string) - uniform \"" + key + "\" not found");
+            return Uniform.INVALID;
         }
 
         const uniform: Uniform | undefined = this._uniforms.get(key);
 
         if (uniform == undefined) {
-            throw new Error("Shader.uniform(string) - uniform \"" + key + "\" was undefined");
+            return Uniform.INVALID;
         }
 
         return uniform;

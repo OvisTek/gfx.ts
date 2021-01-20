@@ -5,6 +5,6 @@
 out vec2 vTexCoord;
 
 void main(void) {
-    gl_Position = gfx_WorldMatrix() * gfx_Position;
+    gl_Position = gfx_mvpMatrix * gfx_Position;
     vTexCoord = gfx_TexCoord0;
 }

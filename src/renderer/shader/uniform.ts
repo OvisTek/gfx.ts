@@ -26,6 +26,10 @@ export class Uniform extends Identifiable {
         return this._value;
     }
 
+    public get valid(): boolean {
+        return this._shaderID > -1;
+    }
+
     /**
      * Checks if this uniform belongs to the provided Shader
      * 
