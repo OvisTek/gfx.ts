@@ -169,7 +169,7 @@ export class Renderer {
         const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById(canvasID);
 
         if (!canvas) {
-            throw new Error("Renderer.initWithID(String) - canvas with ID of " + canvasID + " could not be found");
+            throw new Error("Renderer.initWithID(string) - canvas with ID of " + canvasID + " could not be found");
         }
 
         this.init(canvas);

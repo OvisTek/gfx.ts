@@ -44,15 +44,15 @@ export class Stage {
      * 
      * @param instance The object instance to be created
      */
-    public queue<T extends Entity>(instance: T): void {
-        Renderer.instance.yield.next.then((renderer) => {
-            instance._exec_Create(this).then(() => {
-                this._queue.push(instance);
-            }).catch((error) => {
-                Renderer.instance.errorOrPass(error);
-            });
-        }).catch((error) => {
-            Renderer.instance.errorOrPass(error);
+    public queue<T extends Entity>(instance: T): Promise<T> {
+        return new Promise<T>((accept, reject) => {
+            Renderer.instance.yield.next.then((renderer) => {
+                instance._exec_Create(this).then(() => {
+                    this._queue.push(instance);
+
+                    accept(instance);
+                }).catch(reject);
+            }).catch(reject);
         });
     }
 

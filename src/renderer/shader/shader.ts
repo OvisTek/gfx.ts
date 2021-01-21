@@ -43,7 +43,7 @@ export class Shader extends Identifiable {
         const renderer: Renderer = Renderer.instance;
 
         if (!renderer.valid) {
-            throw new Error("Shader.load(String, String) - unable to compile shader as Renderer instance is not valid");
+            throw new Error("Shader.load(string, string) - unable to compile shader as Renderer instance is not valid");
         }
 
         const gl: WebGL2RenderingContext = renderer.context.gl;
@@ -52,7 +52,7 @@ export class Shader extends Identifiable {
         const vShader: WebGLShader | null = gl.createShader(gl.VERTEX_SHADER);
 
         if (vShader == null) {
-            throw new Error("Shader.load(String, String) - gl.createShader(VERTEX_SHADER) failed");
+            throw new Error("Shader.load(string, string) - gl.createShader(VERTEX_SHADER) failed");
         }
 
         const fShader: WebGLShader | null = gl.createShader(gl.FRAGMENT_SHADER);
@@ -60,7 +60,7 @@ export class Shader extends Identifiable {
         if (fShader == null) {
             gl.deleteShader(vShader);
 
-            throw new Error("Shader.load(String, String) - gl.createShader(FRAGMENT_SHADER) failed");
+            throw new Error("Shader.load(string, string) - gl.createShader(FRAGMENT_SHADER) failed");
         }
 
         // attach the sources
@@ -80,7 +80,7 @@ export class Shader extends Identifiable {
                 gl.deleteShader(vShader);
                 gl.deleteShader(fShader);
 
-                throw new Error("Shader.load(String, String) - error compiling the Vertex Shader. " + error);
+                throw new Error("Shader.load(string, string) - error compiling the Vertex Shader. " + error);
             }
 
             // check for compile errors - fragment shader
@@ -90,7 +90,7 @@ export class Shader extends Identifiable {
                 gl.deleteShader(vShader);
                 gl.deleteShader(fShader);
 
-                throw new Error("Shader.load(String, String) - error compiling the Fragment Shader. " + error);
+                throw new Error("Shader.load(string, string) - error compiling the Fragment Shader. " + error);
             }
         }
 
@@ -100,7 +100,7 @@ export class Shader extends Identifiable {
             gl.deleteShader(vShader);
             gl.deleteShader(fShader);
 
-            throw new Error("Shader.load(String, String) - gl.createProgram() failed");
+            throw new Error("Shader.load(string, string) - gl.createProgram() failed");
         }
 
         gl.attachShader(sProgram, vShader);
@@ -117,7 +117,7 @@ export class Shader extends Identifiable {
                 gl.deleteShader(fShader);
                 gl.deleteProgram(sProgram);
 
-                throw new Error("Shader.load(String, String) - error compiling the Shader Program. " + error);
+                throw new Error("Shader.load(string, string) - error compiling the Shader Program. " + error);
             }
         }
 
@@ -143,7 +143,7 @@ export class Shader extends Identifiable {
                 const name: string = info.name;
                 const index: number = gl.getAttribLocation(program, name);
 
-                this._attributes.set(name, new Attribute(name, index, this));
+                this._attributes.set(name, new Attribute(name, index));
             }
         }
     }
@@ -290,7 +290,7 @@ export class Shader extends Identifiable {
     }
 
     /**
-     * Checks the Validity of this Shader. Shader.load(String, String) must be called
+     * Checks the Validity of this Shader. Shader.load(string, string) must be called
      * successfully for this to return true
      */
     public get valid(): boolean {

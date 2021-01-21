@@ -1,6 +1,17 @@
 import { MathUtil } from "./math-util";
 
 /**
+ * Interface for serialising and deserialising Color structure
+ * for storage/database purposes
+ */
+export interface ColorJson {
+    readonly r: number;
+    readonly g: number;
+    readonly b: number;
+    readonly a: number;
+}
+
+/**
  * Represents 32 bit RGBA Color
  * Components range from 0 to 1
  * 
@@ -18,6 +29,37 @@ export class Color {
         this._g = green;
         this._b = blue;
         this._a = alpha;
+    }
+
+    /**
+     * Serialise this Color for storage/database purposes
+     * See ColorJson Interface for details
+     */
+    public serialise(): ColorJson {
+        return {
+            r: this._r,
+            g: this._g,
+            b: this._b,
+            a: this._a
+        }
+    }
+
+    /**
+     * Deserialise a previously serialised version of a Color
+     * 
+     * @param values The serialised Color to deserialise
+     */
+    public static deserialise(values: ColorJson): Color {
+        return new Color().deserialise(values);
+    }
+
+    /**
+     * Deserialise a previously serialised version of a Color
+     *
+     * @param values The serialised Color to deserialise
+     */
+    public deserialise(values: ColorJson): Color {
+        return this.set(values.r, values.g, values.b, values.a);
     }
 
     /**
@@ -106,6 +148,21 @@ export class Color {
 
     public set alpha(value: number) {
         this.a = value / 255;
+    }
+
+    /**
+     * @param r red component to set
+     * @param g green component to set
+     * @param b blue component to set
+     * @param a alpha component to set
+     */
+    public set(r: number, g: number, b: number, a: number): Color {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
+
+        return this;
     }
 
     /**

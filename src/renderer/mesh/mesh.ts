@@ -170,6 +170,30 @@ export class Mesh {
     }
 
     /**
+     * Sets the current normals from an Array of Vector3
+     * NOTE: he Vector3 array will be unpacked which could have unintended performance
+     * issues at runtime. For speed use Mesh.vertices instead.
+     * 
+     * @param normals - The Vector3 Array to use as normals for this Mesh
+     */
+    public setNormals(normals: Array<Vector3>): Mesh {
+        const length: number = normals.length;
+        const buff: Array<number> = this._normals.clean();
+
+        for (let i = 0; i < length; i++) {
+            const vec: Vector3 = normals[i];
+
+            buff.push(vec.x);
+            buff.push(vec.y);
+            buff.push(vec.z);
+        }
+
+        this.normals.data = buff;
+
+        return this;
+    }
+
+    /**
      * Sets the current indices from an Array of numbers
      * NOTE: The Array will be copied to an internal buffer which could have unintended
      * performance issues at runtime. For speed use Mesh.indices instead.
@@ -211,6 +235,12 @@ export class Mesh {
         return this;
     }
 
+    /**
+     * Upload this Mesh into the GPU
+     * 
+     * @param gl - the GL instance
+     * @param material - the Material to be used for uploading this Mesh
+     */
     public upload(gl: WebGL2RenderingContext, material: Material) {
         const shader: Shader = material.shader;
 

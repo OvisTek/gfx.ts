@@ -99,11 +99,11 @@ export class GfxMatricesPragma {
      */
     public destroy(): void {
         this._owner = undefined;
-        this._gfx_projectionMatrix = Uniform.INVALID;;
-        this._gfx_modelMatrix = Uniform.INVALID;;
-        this._gfx_viewMatrix = Uniform.INVALID;;
-        this._gfx_viewInverseMatrix = Uniform.INVALID;;
-        this._gfx_mvpMatrix = Uniform.INVALID;;
-        this._gfx_normalMatrix = Uniform.INVALID;;
+        this._gfx_projectionMatrix = Uniform.INVALID;
+        this._gfx_modelMatrix = Uniform.INVALID;
+        this._gfx_viewMatrix = Uniform.INVALID;
+        this._gfx_viewInverseMatrix = Uniform.INVALID;
+        this._gfx_mvpMatrix = Uniform.INVALID;
+        this._gfx_normalMatrix = Uniform.INVALID;
     }
 }

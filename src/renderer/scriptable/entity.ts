@@ -506,6 +506,10 @@ export abstract class Entity extends Identifiable {
      * @param stage The Stage reference
      */
     public _exec_Create(stage: Stage): Promise<void> {
+        if (this._stage != undefined) {
+            throw new Error("Entity._exec_Create(Stage) - entity already part of a stage, destroy it first before re-creating");
+        }
+
         // sets the stage reference
         this._stage = stage;
 
@@ -606,8 +610,12 @@ export abstract class Entity extends Identifiable {
     public _exec_OnDestroy(): Error | undefined {
         try {
             this.onDestroy();
+
+            this._stage = undefined;
         }
         catch (error) {
+            this._stage = undefined;
+
             return error;
         }
 

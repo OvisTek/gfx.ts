@@ -1,8 +1,18 @@
 import { Euler } from "../math/euler";
 import { MathUtil } from "../math/math-util";
 import { Matrix4 } from "../math/matrix4";
-import { Quaternion } from "../math/quaternion";
-import { Vector3 } from "../math/vector3";
+import { Quaternion, QuaternionJson } from "../math/quaternion";
+import { Vector3, Vector3Json } from "../math/vector3";
+
+/**
+ * Interface for serialising and deserialising Transform structure
+ * for storage/database purposes
+ */
+export interface TransformJson {
+    readonly position: Vector3Json;
+    readonly rotation: QuaternionJson;
+    readonly scale: Vector3Json;
+}
 
 /**
  * Transform is responsible for allowing positioning, rotating and scaling of
@@ -46,6 +56,40 @@ export class Transform {
         // inverse of the identity matrix is also the identity matrix
         this._requiresLocalInverseUpdate = false;
         this._requiresWorldInverseUpdate = false;
+    }
+
+    /**
+     * Serialise this Transform for storage/database purposes
+     * See TransformJson Interface for details
+     */
+    public serialise(): TransformJson {
+        return {
+            position: this._position.serialise(),
+            rotation: this._rotation.serialise(),
+            scale: this._scale.serialise()
+        }
+    }
+
+    /**
+     * Deserialise a previously serialised version of a Transform
+     * 
+     * @param values The serialised Transform to deserialise
+     */
+    public static deserialise(values: TransformJson): Transform {
+        return new Transform().deserialise(values);
+    }
+
+    /**
+     * Deserialise a previously serialised version of a Transform
+     *
+     * @param values The serialised Transform to deserialise
+     */
+    public deserialise(values: TransformJson): Transform {
+        this._position.deserialise(values.position);
+        this._rotation.deserialise(values.rotation);
+        this._scale.deserialise(values.scale);
+
+        return this;
     }
 
     public get position(): Vector3 {

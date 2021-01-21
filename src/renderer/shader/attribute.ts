@@ -7,13 +7,11 @@ import { Shader } from "./shader";
 export class Attribute extends Identifiable {
     private readonly _name: string;
     private readonly _value: number;
-    private readonly _shaderID: number;
 
-    constructor(name: string, value: number, shader: Shader | undefined = undefined) {
+    constructor(name: string, value: number) {
         super();
         this._name = name;
         this._value = value;
-        this._shaderID = shader != undefined ? shader.id : -1;
     }
 
     public get name(): string {
@@ -22,14 +20,5 @@ export class Attribute extends Identifiable {
 
     public get location(): number {
         return this._value;
-    }
-
-    /**
-     * Checks if this attribute belongs to the provided Shader
-     * 
-     * @param shader - the shader to check against
-     */
-    public belongsTo(shader: Shader): boolean {
-        return this._shaderID === shader.id;
     }
 }
