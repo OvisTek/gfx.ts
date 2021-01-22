@@ -12,7 +12,7 @@ export class Box extends Entity {
     constructor(material: Material | undefined = undefined, opt: EntityOptions | undefined = undefined) {
         super(opt);
 
-        this.material = material == undefined ? new BasicColorMaterial() : material;
+        this.material = material === undefined ? new BasicColorMaterial() : material;
     }
 
     protected create(): Promise<void> {

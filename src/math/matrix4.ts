@@ -578,7 +578,7 @@ export class Matrix4 {
 	public invert(optresult: Matrix4 | undefined = undefined): Matrix4 {
 		const det: number = this.determinant;
 
-		if (det == 0) {
+		if (det === 0) {
 			throw new Error("Matrix4.invert() - cannot invert Matrix as determinant is 0");
 		}
 

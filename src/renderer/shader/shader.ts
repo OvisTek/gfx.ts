@@ -4,9 +4,9 @@ import { Uniform } from "./uniform";
 import { Identifiable } from "../identifiable";
 
 // pragma types - these are injected as part of a shader at load time
-import gfx_matrices_pragma from "./pragma/shaders/gfx_matrices.glsl";
-import gfx_mesh_pragma from "./pragma/shaders/gfx_mesh.glsl";
-import gfx_lights_pragma from "./pragma/shaders/gfx_lights.glsl";
+import gfxMatricesPragma from "./pragma/shaders/gfx_matrices.glsl";
+import gfxMeshPragma from "./pragma/shaders/gfx_mesh.glsl";
+import gfxLightsPragma from "./pragma/shaders/gfx_lights.glsl";
 
 /**
  * Represents a WebGL Shader Program. Contains helper methods for compiling
@@ -176,9 +176,9 @@ export class Shader extends Identifiable {
      * @param shader - the shader to use, can be vertex or fragment
      */
     private injectPragma(shader: string): string {
-        shader = shader.replace("#pragma gfx_matrices", gfx_matrices_pragma);
-        shader = shader.replace("#pragma gfx_mesh", gfx_mesh_pragma);
-        shader = shader.replace("#pragma gfx_lights", gfx_lights_pragma);
+        shader = shader.replace("#pragma gfx_matrices", gfxMatricesPragma);
+        shader = shader.replace("#pragma gfx_mesh", gfxMeshPragma);
+        shader = shader.replace("#pragma gfx_lights", gfxLightsPragma);
 
         return shader;
     }

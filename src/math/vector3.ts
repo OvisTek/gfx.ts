@@ -321,7 +321,7 @@ export class Vector3 {
     public normalise(): Vector3 {
         const lenSq: number = this.lengthSq;
 
-        if (lenSq == 0 || lenSq == 1) {
+        if (lenSq === 0 || lenSq === 1) {
             return this;
         }
 
