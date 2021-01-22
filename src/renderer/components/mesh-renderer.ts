@@ -105,11 +105,11 @@ export class MeshRenderer extends Component {
     }
 
     public destroy(): void {
-        if (this._material != undefined) {
+        if (this._material !== undefined) {
             this._material.destroy();
         }
 
-        if (this._mesh != undefined) {
+        if (this._mesh !== undefined) {
             this._mesh.destroy();
         }
 
@@ -121,6 +121,6 @@ export class MeshRenderer extends Component {
     }
 
     public get valid(): boolean {
-        return this._mesh != undefined && (this._material != undefined && this._material.valid);
+        return this._mesh !== undefined && (this._material !== undefined && this._material.valid);
     }
 }

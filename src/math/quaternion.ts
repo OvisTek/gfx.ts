@@ -504,7 +504,7 @@ export class Quaternion {
         const qw: number = this._w;
 
         // calculate the rotation angles
-        if (pole == 0) {
+        if (pole === 0) {
             result.roll = Math.atan2(2.0 * (qw * qz + qy * qx), 1.0 - 2.0 * (qx * qx + qz * qz));
             result.pitch = Math.asin(MathUtil.clamp(2.0 * (qw * qx - qz * qy), -1.0, 1.0));
             result.yaw = Math.atan2(2.0 * (qy * qw + qx * qz), 1.0 - 2.0 * (qy * qy + qx * qx));

@@ -132,7 +132,7 @@ export class Renderer {
      * @param canvas - The HTML Canvas to load
      */
     public init(canvas: HTMLCanvasElement): void {
-        const gl: WebGL2RenderingContext | null = canvas.getContext('webgl2');
+        const gl: WebGL2RenderingContext | null = canvas.getContext("webgl2");
 
         if (!gl) {
             throw new Error("Renderer.init(HTMLCanvasElement) - webgl2 is not supported");

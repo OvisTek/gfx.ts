@@ -98,7 +98,7 @@ export abstract class Entity extends Identifiable {
      */
     public get parent(): Entity | undefined {
         // do not return the stage root
-        if (this._parent != undefined && this._parent.isRoot) {
+        if (this._parent !== undefined && this._parent.isRoot) {
             return undefined;
         }
 
@@ -155,7 +155,7 @@ export abstract class Entity extends Identifiable {
             const removed: Array<Component> = components.splice(index, 1);
 
             // destroy/cleanup all removed elements
-            if (shouldDestroy == true) {
+            if (shouldDestroy === true) {
                 const len: number = removed.length;
 
                 for (let i = 0; i < len; i++) {
@@ -520,8 +520,8 @@ export abstract class Entity extends Identifiable {
      * 
      * @param stage The Stage reference
      */
-    public _exec_Create(stage: Stage): Promise<void> {
-        if (this._stage != undefined) {
+    public _execCreate(stage: Stage): Promise<void> {
+        if (this._stage !== undefined) {
             throw new Error("Entity._exec_Create(Stage) - entity already part of a stage, destroy it first before re-creating");
         }
 
@@ -541,7 +541,7 @@ export abstract class Entity extends Identifiable {
      * 
      * @param stage The Stage reference
      */
-    public _exec_Start(): Error | undefined {
+    public _execStart(): Error | undefined {
         // sets the tag that this object has been created properly
         this._isCreated = true;
 
@@ -562,7 +562,7 @@ export abstract class Entity extends Identifiable {
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    public _exec_Update(deltaTime: number): Error | undefined {
+    public _execUpdate(deltaTime: number): Error | undefined {
         try {
             this._clearComponentQueue();
 
@@ -580,7 +580,7 @@ export abstract class Entity extends Identifiable {
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    public _exec_LateUpdate(deltaTime: number): Error | undefined {
+    public _execLateUpdate(deltaTime: number): Error | undefined {
         try {
             this.lateUpdate(deltaTime);
         }
@@ -594,7 +594,7 @@ export abstract class Entity extends Identifiable {
     /**
      * Safe execution of the onPause() function. This should not be called from user-space
      */
-    public _exec_OnPause(): Error | undefined {
+    public _execOnPause(): Error | undefined {
         try {
             this.onPause();
         }
@@ -608,7 +608,7 @@ export abstract class Entity extends Identifiable {
     /**
      * Safe execution of the onResume() function. This should not be called from user-space
      */
-    public _exec_OnResume(): Error | undefined {
+    public _execOnResume(): Error | undefined {
         try {
             this.onResume();
         }
@@ -622,7 +622,7 @@ export abstract class Entity extends Identifiable {
     /**
      * Safe execution of the onDestroy() function. This should not be called from user-space
      */
-    public _exec_OnDestroy(): Error | undefined {
+    public _execOnDestroy(): Error | undefined {
         try {
             this.onDestroy();
 
@@ -643,7 +643,7 @@ export abstract class Entity extends Identifiable {
      * @param newWidth The new width of the Renderer/Canvas
      * @param newHeight The new height of the Renderer/Canvas
      */
-    public _exec_OnResize(newWidth: number, newHeight: number): Error | undefined {
+    public _execOnResize(newWidth: number, newHeight: number): Error | undefined {
         try {
             this.onResize(newWidth, newHeight);
         }

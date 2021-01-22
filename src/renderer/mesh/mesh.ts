@@ -134,7 +134,7 @@ export class Mesh {
 
     private get colorData(): Uint8Array {
         const data: Array<number> | undefined = this._colors.data;
-        const view: Float32Array = new Float32Array(data !== undefined ? data : Mesh._EMPTY)
+        const view: Float32Array = new Float32Array(data !== undefined ? data : Mesh._EMPTY);
 
         return new Uint8Array(view.buffer);
     }

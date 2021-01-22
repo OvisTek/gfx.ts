@@ -74,9 +74,9 @@ export class StageRoot extends Entity {
     }
 
     private recurseUpdate(entity: Entity, dt: number) {
-        const result: Error | undefined = entity._exec_Update(dt);
+        const result: Error | undefined = entity._execUpdate(dt);
 
-        if (result != undefined) {
+        if (result !== undefined) {
             throw result;
         }
 
@@ -97,9 +97,9 @@ export class StageRoot extends Entity {
     }
 
     private recurseLateUpdate(entity: Entity, dt: number) {
-        const result: Error | undefined = entity._exec_LateUpdate(dt);
+        const result: Error | undefined = entity._execLateUpdate(dt);
 
-        if (result != undefined) {
+        if (result !== undefined) {
             throw result;
         }
 

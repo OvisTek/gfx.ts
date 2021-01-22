@@ -49,7 +49,7 @@ export class Random64 {
             return this.rand(max, min);
         }
 
-        if (min == max) {
+        if (min === max) {
             return min;
         }
 

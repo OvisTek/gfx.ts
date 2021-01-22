@@ -47,7 +47,7 @@ export class Stage {
     public queue<T extends Entity>(instance: T): Promise<T> {
         return new Promise<T>((accept, reject) => {
             Renderer.instance.yield.next.then((renderer) => {
-                instance._exec_Create(this).then(() => {
+                instance._execCreate(this).then(() => {
                     this._queue.push(instance);
 
                     accept(instance);
@@ -79,7 +79,7 @@ export class Stage {
 
             // loop until the queue is completely empty
             while (newObject) {
-                renderer.errorOrPass(newObject._exec_Start());
+                renderer.errorOrPass(newObject._execStart());
 
                 newObject = this._queue.pop();
             }
@@ -100,7 +100,7 @@ export class Stage {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         // execute root that will recursively execute all child objects
-        renderer.errorOrPass(root._exec_Update(deltaTime));
-        renderer.errorOrPass(root._exec_LateUpdate(deltaTime));
+        renderer.errorOrPass(root._execUpdate(deltaTime));
+        renderer.errorOrPass(root._execLateUpdate(deltaTime));
     }
 }

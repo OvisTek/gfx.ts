@@ -49,7 +49,7 @@ export class Texture extends Identifiable {
     private _executeOnce(gl: WebGL2RenderingContext): void {
         const texture: WebGLTexture | null = gl.createTexture();
 
-        if (texture == null) {
+        if (texture === null) {
             throw new Error("Texture.executeOnce(gl) - failed gl.createTexture()");
         }
 
@@ -73,7 +73,7 @@ export class Texture extends Identifiable {
      * Bind and use this texture for drawing/rendering
      */
     public bind(gl: WebGL2RenderingContext, uniform: Uniform, unit: number = 0): void {
-        if (this._texture == undefined) {
+        if (this._texture === undefined) {
             return;
         }
 
@@ -94,7 +94,7 @@ export class Texture extends Identifiable {
 
         const gl: WebGL2RenderingContext = renderer.context.gl;
 
-        if (this._texture != undefined) {
+        if (this._texture !== undefined) {
             gl.deleteTexture(this._texture);
         }
 
