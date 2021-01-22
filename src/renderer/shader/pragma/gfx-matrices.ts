@@ -33,14 +33,14 @@ export class GfxMatricesPragma {
      * Checks if this pragma is valid
      */
     public get valid(): boolean {
-        return this._owner != undefined;
+        return this._owner !== undefined;
     }
 
     /**
      * Sets the material owner of this pragma
      */
     public set material(owner: Material | undefined) {
-        if (this._owner == owner) {
+        if (this._owner === owner) {
             return;
         }
 

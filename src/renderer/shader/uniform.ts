@@ -15,7 +15,7 @@ export class Uniform extends Identifiable {
         super();
         this._name = name;
         this._value = value;
-        this._shaderID = shader != undefined ? shader.id : -1;
+        this._shaderID = shader !== undefined ? shader.id : -1;
     }
 
     public get name(): string {

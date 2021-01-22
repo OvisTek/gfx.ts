@@ -332,7 +332,7 @@ export abstract class Entity extends Identifiable {
                     const subChild: T | undefined = child.findChildOfType(type);
 
                     // return first valid encounter (if any)
-                    if (subChild != undefined) {
+                    if (subChild !== undefined) {
                         return subChild;
                     }
                 }
@@ -370,7 +370,7 @@ export abstract class Entity extends Identifiable {
         }
 
         // if local visibility is false, then no way children are being rendered
-        if (localVisibility == false) {
+        if (localVisibility === false) {
             return localVisibility;
         }
 

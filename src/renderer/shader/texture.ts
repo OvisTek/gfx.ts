@@ -33,7 +33,7 @@ export class Texture extends Identifiable {
 
             image.onerror = () => {
                 reject(new Error("Texture.load(string) - failed to load image at url " + this._url));
-            }
+            };
 
             image.crossOrigin = "anonymous";
             image.src = this._url;

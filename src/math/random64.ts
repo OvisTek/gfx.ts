@@ -13,7 +13,7 @@ export class Random64 {
 
     constructor(seed: number = 0) {
         // create the initial seed
-        this._seed = seed == 0 ? Math.random() : seed;
+        this._seed = seed === 0 ? Math.random() : seed;
     }
 
     /**

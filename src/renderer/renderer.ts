@@ -146,7 +146,7 @@ export class Renderer {
         this._width = canvas.width;
         this._height = canvas.height;
 
-        if (this._width != oldWidth || this._height != oldHeight) {
+        if (this._width !== oldWidth || this._height !== oldHeight) {
             this.stage._resize(this._width, this._height);
         }
     }
