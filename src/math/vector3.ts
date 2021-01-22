@@ -40,7 +40,7 @@ export class Vector3 {
             x: this._x,
             y: this._y,
             z: this._z
-        }
+        };
     }
 
     /**
@@ -286,6 +286,13 @@ export class Vector3 {
      */
     public get lengthSq(): number {
         return this._x * this._x + this._y * this._y + this._z * this._z;
+    }
+
+    /**
+     * Static methid to quickly calculate the length of a provided Vector
+     */
+    public static len(x: number, y: number, z: number): number {
+        return Math.sqrt(x * x + y * y + z * z);
     }
 
     /**

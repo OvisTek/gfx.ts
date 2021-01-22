@@ -16,7 +16,7 @@ export abstract class Component extends Identifiable {
      * Get the read-only owner of this component
      */
     public get owner(): Entity {
-        if (this._owner == undefined) {
+        if (this._owner === undefined) {
             throw new Error("Component.owner - invalid access, component was not setup properly");
         }
 
@@ -29,7 +29,7 @@ export abstract class Component extends Identifiable {
      * @param shouldDestroy - Should this Component be destroyed/removed from memory (default true)
      */
     public remove(shouldDestroy: boolean = true): void {
-        if (this._owner != undefined) {
+        if (this._owner !== undefined) {
             this._owner.removeComponent(this, shouldDestroy);
         }
 
@@ -76,7 +76,7 @@ export abstract class Component extends Identifiable {
      * @param type The object type to check
      */
     public isType<T extends Component>(type: new (...args: [any]) => T): boolean {
-        return (this instanceof type) == true;
+        return (this instanceof type) === true;
     }
 
     /**
@@ -86,7 +86,7 @@ export abstract class Component extends Identifiable {
      * @param type The object type to cast this component into
      */
     public cast<T extends Component>(type: new (...args: [any]) => T): T | undefined {
-        return (this instanceof type) ? <T>this : undefined;
+        return (this instanceof type) ? this as T : undefined;
     }
 
     /**
@@ -99,7 +99,7 @@ export abstract class Component extends Identifiable {
         return new Promise((accept, reject) => {
             const object: T | undefined = this.cast(type);
 
-            if (object) {
+            if (object !== undefined) {
                 return accept(object);
             }
 

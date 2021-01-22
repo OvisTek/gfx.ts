@@ -20,7 +20,7 @@ export abstract class Identifiable {
      * 
      * @param other - the object to check
      */
-    public is(other: Identifiable | undefined): boolean {
-        return other != undefined ? this._id === other._id : false;
+    public is(other: Identifiable | undefined | null): boolean {
+        return (other !== undefined && other !== null) ? this._id === other._id : false;
     }
 }

@@ -8,11 +8,11 @@ export class GLContext {
     }
 
     public get valid(): boolean {
-        return this._gl != undefined;
+        return this._gl !== undefined;
     }
 
     public get gl(): WebGL2RenderingContext {
-        if (this._gl == undefined) {
+        if (this._gl === undefined) {
             throw new Error("GLContext.gl - context was not setup properly, cannot access gl");
         }
 
@@ -20,7 +20,7 @@ export class GLContext {
     }
 
     public get canvas(): HTMLCanvasElement {
-        if (this._canvas == undefined) {
+        if (this._canvas === undefined) {
             throw new Error("GLContext.canvas - context was not setup properly, cannot access canvas");
         }
 

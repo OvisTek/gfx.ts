@@ -37,7 +37,7 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set fov(value: number) {
-        if (this._fov != value) {
+        if (this._fov !== value) {
             this._fov = value;
             this._requiresUpdate = true;
         }
@@ -48,7 +48,7 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set width(value: number) {
-        if (this._width != value) {
+        if (this._width !== value) {
             this._width = value;
             this._requiresUpdate = true;
         }
@@ -59,7 +59,7 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set height(value: number) {
-        if (this._height != value) {
+        if (this._height !== value) {
             this._height = value;
             this._requiresUpdate = true;
         }
@@ -70,7 +70,7 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set near(value: number) {
-        if (this._near != value) {
+        if (this._near !== value) {
             this._near = value;
             this._requiresUpdate = true;
         }
@@ -81,7 +81,7 @@ export class PerspectiveCamera extends Camera {
     }
 
     public set far(value: number) {
-        if (this._far != value) {
+        if (this._far !== value) {
             this._far = value;
             this._requiresUpdate = true;
         }
@@ -103,6 +103,10 @@ export class PerspectiveCamera extends Camera {
         return this._cameraMatrix;
     }
 
+    /**
+     * Called by the Renderer every frame. This will update the projection matrix
+     * if any of the components have changed.
+     */
     protected update(dt: number) {
         if (this._requiresUpdate) {
             // resets the projection matrix to the new values

@@ -52,13 +52,13 @@ export class Shader extends Identifiable {
         // create shaders
         const vShader: WebGLShader | null = gl.createShader(gl.VERTEX_SHADER);
 
-        if (vShader == null) {
+        if (vShader === null) {
             throw new Error("Shader.load(string, string) - gl.createShader(VERTEX_SHADER) failed");
         }
 
         const fShader: WebGLShader | null = gl.createShader(gl.FRAGMENT_SHADER);
 
-        if (fShader == null) {
+        if (fShader === null) {
             gl.deleteShader(vShader);
 
             throw new Error("Shader.load(string, string) - gl.createShader(FRAGMENT_SHADER) failed");
@@ -97,7 +97,7 @@ export class Shader extends Identifiable {
 
         const sProgram: WebGLProgram | null = gl.createProgram();
 
-        if (sProgram == null) {
+        if (sProgram === null) {
             gl.deleteShader(vShader);
             gl.deleteShader(fShader);
 
@@ -140,7 +140,7 @@ export class Shader extends Identifiable {
         for (let i = 0; i < attribCount; i++) {
             const info: WebGLActiveInfo | null = gl.getActiveAttrib(program, i);
 
-            if (info != null) {
+            if (info !== null) {
                 const name: string = info.name;
                 const index: number = gl.getAttribLocation(program, name);
 
@@ -158,11 +158,11 @@ export class Shader extends Identifiable {
         for (let i = 0; i < uniformCount; i++) {
             const info: WebGLActiveInfo | null = gl.getActiveUniform(program, i);
 
-            if (info != null) {
+            if (info !== null) {
                 const name: string = info.name;
                 const location: WebGLUniformLocation | null = gl.getUniformLocation(program, name);
 
-                if (location != null) {
+                if (location !== null) {
                     this._uniforms.set(name, new Uniform(name, location, this));
                 }
             }
@@ -190,7 +190,7 @@ export class Shader extends Identifiable {
      * @param key - The attribute to return
      */
     public attribute(key: string | undefined): Attribute {
-        if (key == undefined) {
+        if (key === undefined) {
             throw new Error("Shader.attribute(string) - attribute key was undefined");
         }
 
@@ -200,7 +200,7 @@ export class Shader extends Identifiable {
 
         const attrib: Attribute | undefined = this._attributes.get(key);
 
-        if (attrib == undefined) {
+        if (attrib === undefined) {
             throw new Error("Shader.attribute(string) - attribute \"" + key + "\" was undefined");
         }
 
@@ -223,7 +223,7 @@ export class Shader extends Identifiable {
      * @param key - The uniform to return
      */
     public uniform(key: string | undefined): Uniform {
-        if (key == undefined) {
+        if (key === undefined) {
             return Uniform.INVALID;
         }
 
@@ -233,7 +233,7 @@ export class Shader extends Identifiable {
 
         const uniform: Uniform | undefined = this._uniforms.get(key);
 
-        if (uniform == undefined) {
+        if (uniform === undefined) {
             return Uniform.INVALID;
         }
 
@@ -261,15 +261,15 @@ export class Shader extends Identifiable {
 
         const gl: WebGL2RenderingContext = renderer.context.gl;
 
-        if (this._vShader != undefined) {
+        if (this._vShader !== undefined) {
             gl.deleteShader(this._vShader);
         }
 
-        if (this._fShader != undefined) {
+        if (this._fShader !== undefined) {
             gl.deleteShader(this._fShader);
         }
 
-        if (this._program != undefined) {
+        if (this._program !== undefined) {
             gl.deleteProgram(this._program);
         }
 
@@ -282,7 +282,7 @@ export class Shader extends Identifiable {
      * Bind and use this Shader Program for drawing
      */
     public bind() {
-        if (this._program == undefined) {
+        if (this._program === undefined) {
             return;
         }
 
@@ -296,6 +296,6 @@ export class Shader extends Identifiable {
      * successfully for this to return true
      */
     public get valid(): boolean {
-        return this._program != undefined;
+        return this._program !== undefined;
     }
 }

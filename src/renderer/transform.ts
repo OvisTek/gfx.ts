@@ -67,7 +67,7 @@ export class Transform {
             position: this._position.serialise(),
             rotation: this._rotation.serialise(),
             scale: this._scale.serialise()
-        }
+        };
     }
 
     /**
@@ -207,6 +207,15 @@ export class Transform {
     }
 
     /**
+     * Converts the current world matrix into the local matrix. This is useful
+     * when attaching/detaching from/to parent objects and want to maintain the
+     * current world position of the object.
+     */
+    public worldToLocal(): void {
+        this._worldMatrix.decomposePosRotSca(this._position, this._rotation, this._scale);
+    }
+
+    /**
      * Called by the renderer to update the world position of this transform.
      * Passes the transform that represents the parent/root of this transform
      * 
@@ -220,7 +229,7 @@ export class Transform {
 
         // we update the world matrix only if either the local transform has changed
         // or the parent transform has changed
-        if (isUpdated || parentHash != this._parentHash) {
+        if (isUpdated || parentHash !== this._parentHash) {
             // update the world matrix of this transform from parent
             Matrix4.multiply(parent.worldMatrix, this._localMatrix, this._worldMatrix);
 
@@ -239,11 +248,11 @@ export class Transform {
 
         // this means the transform has changed since the last update, we need to re-update
         // the local matrix
-        if (computedHash != this._hash) {
+        if (computedHash !== this._hash) {
             this._localMatrix.composePosRotSca(this._position, this._rotation, this._scale);
 
             this._requiresLocalInverseUpdate = true;
-            this._hash = computedHash
+            this._hash = computedHash;
 
             return true;
         }

@@ -62,7 +62,7 @@ export abstract class Entity extends Identifiable {
      * @param type The object type to check
      */
     public isType<T extends Entity>(type: new (...params: any[]) => T): boolean {
-        return (this instanceof type) == true;
+        return (this instanceof type) === true;
     }
 
     /**
@@ -72,7 +72,7 @@ export abstract class Entity extends Identifiable {
      * @param type The object type to cast this entity into
      */
     public cast<T extends Entity>(type: new (...params: any[]) => T): T | undefined {
-        return (this instanceof type) ? <T>this : undefined;
+        return (this instanceof type) ? this as T : undefined;
     }
 
     /**
@@ -85,7 +85,7 @@ export abstract class Entity extends Identifiable {
         return new Promise((accept, reject) => {
             const object: T | undefined = this.cast(type);
 
-            if (object != undefined) {
+            if (object !== undefined) {
                 return accept(object);
             }
 
@@ -401,6 +401,21 @@ export abstract class Entity extends Identifiable {
         if (this._parent) {
             this._parent._children.push(this);
         }
+    }
+
+    /**
+     * Sets a new parent for this Entity. Additionally, provides an option to preserve
+     * the current world coordinates of this object in the transform.
+     * 
+     * @param newParent - the new parent to set
+     * @param preserveWorld - (default true) optionally preserves the current world coordinates
+     */
+    public setParent(newParent: Entity | undefined, preserveWorld: boolean = true) {
+        if (preserveWorld === true) {
+            this.transform.worldToLocal();
+        }
+
+        this.parent = newParent;
     }
 
     /**

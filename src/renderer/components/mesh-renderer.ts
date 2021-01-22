@@ -40,7 +40,7 @@ export class MeshRenderer extends Component {
     }
 
     public create(): void {
-        if (this._mesh == undefined || this._material == undefined || !this._material.valid) {
+        if (this._mesh === undefined || this._material === undefined || !this._material.valid) {
             return;
         }
 
@@ -50,7 +50,7 @@ export class MeshRenderer extends Component {
     }
 
     public update(deltaTime: number): void {
-        if (this._material != undefined && this._mesh != undefined && this._material.valid) {
+        if (this._material !== undefined && this._mesh !== undefined && this._material.valid) {
             const mesh: Mesh = this._mesh;
             const material: Material = this._material;
             const matrices: GfxMatricesPragma = this._matrices;
@@ -90,7 +90,14 @@ export class MeshRenderer extends Component {
 
             const length: number = mesh.indices.length;
             const gl: WebGL2RenderingContext = Renderer.instance.context.gl;
-            gl.drawElements(gl.TRIANGLES, length, gl.UNSIGNED_SHORT, 0);
+
+            // decide if we want to do wireframe rendering (for debug purposes)
+            if (material.wireframe) {
+                gl.drawElements(gl.LINE_STRIP, length, gl.UNSIGNED_SHORT, 0);
+            }
+            else {
+                gl.drawElements(gl.TRIANGLES, length, gl.UNSIGNED_SHORT, 0);
+            }
 
             // end rendering mesh
             mesh.unbind();

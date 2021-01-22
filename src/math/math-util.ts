@@ -19,8 +19,13 @@ export class MathUtil {
      * @param max The maximum value to clamp to
      */
     public static clamp(value: number, min: number, max: number): number {
-        if (value < min) { return min };
-        if (value > max) { return max };
+        if (value < min) {
+            return min;
+        }
+
+        if (value > max) {
+            return max;
+        }
 
         return value;
     }

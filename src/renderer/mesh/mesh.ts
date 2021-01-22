@@ -19,7 +19,7 @@ export class MeshAttribute {
     }
 
     public get valid(): boolean {
-        return this._data != undefined && this._data.length > 0;
+        return this._data !== undefined && this._data.length > 0;
     }
 
     public get data(): Array<number> | undefined {
@@ -31,11 +31,11 @@ export class MeshAttribute {
     }
 
     public get length(): number {
-        return this._data != undefined ? this._data.length : 0;
+        return this._data !== undefined ? this._data.length : 0;
     }
 
     public get buffer(): WebGLBuffer {
-        if (this._buffer == undefined) {
+        if (this._buffer === undefined) {
             throw new Error("MeshAttribute.buffer - attempted to access an undefined buffer");
         }
 
@@ -51,7 +51,7 @@ export class MeshAttribute {
     }
 
     public clean(): Array<number> {
-        if (this._data == undefined) {
+        if (this._data === undefined) {
             this._data = new Array<number>();
         }
 
@@ -61,7 +61,7 @@ export class MeshAttribute {
     }
 
     public destroy(gl: WebGL2RenderingContext) {
-        if (this._buffer != undefined) {
+        if (this._buffer !== undefined) {
             gl.deleteBuffer(this._buffer);
         }
 
@@ -117,24 +117,24 @@ export class Mesh {
     private get vertexData(): Float32Array {
         const data: Array<number> | undefined = this._vertices.data;
 
-        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
+        return new Float32Array(data !== undefined ? data : Mesh._EMPTY);
     }
 
     private get indexData(): Uint16Array {
         const data: Array<number> | undefined = this._indices.data;
 
-        return new Uint16Array(data != undefined ? data : Mesh._EMPTY);
+        return new Uint16Array(data !== undefined ? data : Mesh._EMPTY);
     }
 
     private get normalData(): Float32Array {
         const data: Array<number> | undefined = this._normals.data;
 
-        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
+        return new Float32Array(data !== undefined ? data : Mesh._EMPTY);
     }
 
     private get colorData(): Uint8Array {
         const data: Array<number> | undefined = this._colors.data;
-        const view: Float32Array = new Float32Array(data != undefined ? data : Mesh._EMPTY)
+        const view: Float32Array = new Float32Array(data !== undefined ? data : Mesh._EMPTY)
 
         return new Uint8Array(view.buffer);
     }
@@ -142,7 +142,7 @@ export class Mesh {
     private get uvData(): Float32Array {
         const data: Array<number> | undefined = this._uv.data;
 
-        return new Float32Array(data != undefined ? data : Mesh._EMPTY);
+        return new Float32Array(data !== undefined ? data : Mesh._EMPTY);
     }
 
     /**
@@ -156,7 +156,7 @@ export class Mesh {
         const length: number = verts.length;
         const buff: Array<number> = this._vertices.clean();
 
-        for (let i = 0; i < length; i++) {
+        for (let i: number = 0; i < length; i++) {
             const vec: Vector3 = verts[i];
 
             buff.push(vec.x);
@@ -180,7 +180,7 @@ export class Mesh {
         const length: number = normals.length;
         const buff: Array<number> = this._normals.clean();
 
-        for (let i = 0; i < length; i++) {
+        for (let i: number = 0; i < length; i++) {
             const vec: Vector3 = normals[i];
 
             buff.push(vec.x);
@@ -204,7 +204,7 @@ export class Mesh {
         const length: number = indices.length;
         const buff: Array<number> = this._indices.clean();
 
-        for (let i = 0; i < length; i++) {
+        for (let i: number = 0; i < length; i++) {
             buff.push(indices[i]);
         }
 
@@ -224,10 +224,8 @@ export class Mesh {
         const length: number = colors.length;
         const buff: Array<number> = this._colors.clean();
 
-        for (let i = 0; i < length; i++) {
-            const color: Color = colors[i];
-
-            buff.push(color.rgba8888);
+        for (let i: number = 0; i < length; i++) {
+            buff.push(colors[i].rgba8888);
         }
 
         this.colors.data = buff;
@@ -410,7 +408,7 @@ export class Mesh {
         this._normals.destroy(gl);
 
         // delete VAO if any
-        if (this._vao != undefined) {
+        if (this._vao !== undefined) {
             gl.deleteVertexArray(this._vao);
         }
 
@@ -421,7 +419,7 @@ export class Mesh {
      * Bind and use this Mesh for drawing
      */
     public bind() {
-        if (this._vao == undefined) {
+        if (this._vao === undefined) {
             return;
         }
 

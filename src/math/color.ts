@@ -41,7 +41,7 @@ export class Color {
             g: this._g,
             b: this._b,
             a: this._a
-        }
+        };
     }
 
     /**

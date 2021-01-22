@@ -79,7 +79,7 @@ export class Matrix4 {
 			m13: m[13],
 			m23: m[14],
 			m33: m[15],
-		}
+		};
 	}
 
 	/**
@@ -253,6 +253,95 @@ export class Matrix4 {
 		m[15] = 1;
 
 		return this;
+	}
+
+	/**
+	 * Decomposes PRS (Position, Rotation, Scale) 4x4 Matrix into the provided
+	 * Position, Rotation and Scale factors
+	 * 
+	 * @param position The position (Vector3)
+	 * @param rotation The rotation (Quaternion)
+	 * @param scale The scale (Vector3)
+	 */
+	public decomposePosRotSca(position: Vector3, rotation: Quaternion, scale: Vector3): void {
+		const val: number[] = this._val;
+
+		// SET ROTATION COMPONENT
+		const xx: number = val[0];
+		const xy: number = val[1];
+		const xz: number = val[2];
+		const yx: number = val[4];
+		const yy: number = val[5];
+		const yz: number = val[6];
+		const zx: number = val[8];
+		const zy: number = val[9];
+		const zz: number = val[10];
+
+		const sx = Vector3.len(xx, xy, xz);
+		const sy = Vector3.len(yx, yy, yz);
+		const sz = Vector3.len(zx, zy, zz);
+
+		// normalise due to scale component
+		const lx: number = 1.0 / sx;
+		const ly: number = 1.0 / sy;
+		const lz: number = 1.0 / sz;
+
+		// scaled components
+		const sxx: number = xx * lx;
+		const sxy: number = xy * lx;
+		const sxz: number = xz * lx;
+		const syx: number = yx * ly;
+		const syy: number = yy * ly;
+		const syz: number = yz * ly;
+		const szx: number = zx * lz;
+		const szy: number = zy * lz;
+		const szz: number = zz * lz;
+
+		const t: number = sxx + syy + szz;
+
+		if (t >= 0) {
+			const s: number = Math.sqrt(t + 1);
+			const w: number = 0.5 * s;
+			const sd: number = 0.5 / s;
+			const x: number = (szy - syz) * sd;
+			const y: number = (sxz - szx) * sd;
+			const z: number = (syx - sxy) * sd;
+
+			rotation.set(x, y, z, w);
+		}
+		else if ((sxx > syy) && (sxx > szz)) {
+			const s: number = Math.sqrt(1.0 + sxx - syy - szz);
+			const x: number = s * 0.5;
+			const sd: number = 0.5 / s;
+			const y: number = (syx + sxy) * sd;
+			const z: number = (sxz + szx) * sd;
+			const w: number = (szy - syz) * sd;
+
+			rotation.set(x, y, z, w);
+		}
+		else if (syy > szz) {
+			const s: number = Math.sqrt(1.0 + syy - sxx - szz);
+			const y: number = s * 0.5;
+			const sd: number = 0.5 / s;
+			const x: number = (syx + sxy) * sd;
+			const z: number = (szy + syz) * sd;
+			const w: number = (sxz - szx) * sd;
+
+			rotation.set(x, y, z, w);
+		}
+		else {
+			const s: number = Math.sqrt(1.0 + szz - sxx - syy);
+			const z: number = s * 0.5;
+			const sd: number = 0.5 / s;
+			const x: number = (sxz + szx) * sd;
+			const y: number = (szy + syz) * sd;
+			const w: number = (syx - sxy) * sd;
+
+			rotation.set(x, y, z, w);
+		}
+
+		scale.set(sx, sy, sz);
+		position.set(val[12], val[13], val[14]);
 	}
 
 	/**

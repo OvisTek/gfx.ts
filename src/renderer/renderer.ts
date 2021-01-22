@@ -53,17 +53,17 @@ export class Renderer {
      * 
      * @param error - the error to handle (if any)
      */
-    public errorOrPass(error: Error | string | undefined): void {
-        if (error == undefined) {
+    public errorOrPass(error: Error | string | undefined | null): void {
+        if (error === undefined || error === null) {
             return;
         }
-
-        console.error(error);
 
         // only pause on dev-mode
         if (this.devMode) {
             this.pause();
         }
+
+        console.error(error);
     }
 
     /**
@@ -166,7 +166,7 @@ export class Renderer {
      * @param canvasID - The HTML Canvas id to load
      */
     public initWithID(canvasID: string): void {
-        const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.getElementById(canvasID);
+        const canvas: HTMLCanvasElement = document.getElementById(canvasID) as HTMLCanvasElement;
 
         if (!canvas) {
             throw new Error("Renderer.initWithID(string) - canvas with ID of " + canvasID + " could not be found");

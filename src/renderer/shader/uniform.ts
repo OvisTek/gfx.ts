@@ -5,7 +5,7 @@ import { Shader } from "./shader";
  * Represents a uniform value in a Shader
  */
 export class Uniform extends Identifiable {
-    public static readonly INVALID = new Uniform('INVALID', 0);
+    public static readonly INVALID = new Uniform("INVALID", 0);
 
     private readonly _name: string;
     private readonly _value: WebGLUniformLocation;

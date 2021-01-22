@@ -89,10 +89,13 @@ export class Stage {
         const root: StageRoot = this._root;
 
         // start a new GL frame render
-        gl.clearColor(0.5, 0.5, 0.5, 1.0);
-        gl.clearDepth(1.0);
         gl.enable(gl.DEPTH_TEST);
         gl.depthFunc(gl.LEQUAL);
+        gl.enable(gl.CULL_FACE);
+        gl.cullFace(gl.BACK);
+        gl.frontFace(gl.CCW);
+        gl.clearColor(0.1, 0.1, 0.1, 1.0);
+        gl.clearDepth(1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 

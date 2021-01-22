@@ -18,6 +18,7 @@ class MyTexturedBox extends Box {
             const renderer = this.getComponentOfType(MeshRenderer);
 
             renderer.material.setTexture("gfx_Texture0", texture);
+            renderer.material.wireframe = true;
         }).catch((err) => {
             console.error(err);
         });
@@ -43,6 +44,8 @@ class MyColoredBox extends Box {
     }
 
     start() {
+        const renderer = this.getComponentOfType(MeshRenderer);
+        renderer.material.wireframe = true;
         this.transform.position.x = -2;
     }
 

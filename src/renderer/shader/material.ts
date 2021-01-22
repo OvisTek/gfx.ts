@@ -37,6 +37,10 @@ class UniformPair {
         return this._uniform;
     }
 
+    public get valid(): boolean {
+        return this._uniform.valid;
+    }
+
     public get value(): any | undefined {
         return this._value;
     }
@@ -59,10 +63,13 @@ export class Material extends Identifiable {
     // NOTE: Uniform ID is unique and cannot have the same uniform multiple times per material
     private readonly _uniforms: Map<UniformType, Map<number, UniformPair>>;
 
+    private _isWireframe: boolean;
+
     constructor(shader: Shader | undefined = undefined) {
         super();
-        this._shader = shader || new Shader();
+        this._shader = shader ?? new Shader();
         this._uniforms = new Map<UniformType, Map<number, UniformPair>>();
+        this._isWireframe = false;
     }
 
     /**
@@ -70,6 +77,17 @@ export class Material extends Identifiable {
      */
     public get shader(): Shader {
         return this._shader;
+    }
+
+    public get wireframe(): boolean {
+        return this._isWireframe;
+    }
+
+    /**
+     * GET/SET wireframe mode rendering
+     */
+    public set wireframe(isWireframe: boolean) {
+        this._isWireframe = isWireframe;
     }
 
     /**
@@ -108,7 +126,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: Color | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         gl.uniform4f(pair.uniform.location, value.r, value.g, value.b, value.a);
                     }
                 }
@@ -118,7 +136,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: number | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         gl.uniform1f(pair.uniform.location, value);
                     }
                 }
@@ -128,7 +146,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: number | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         gl.uniform1i(pair.uniform.location, value | 0);
                     }
                 }
@@ -138,7 +156,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: Matrix4 | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         gl.uniformMatrix4fv(pair.uniform.location, false, value.values);
                     }
                 }
@@ -148,7 +166,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: Vector3 | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         gl.uniform3f(pair.uniform.location, value.x, value.y, value.z);
                     }
                 }
@@ -158,7 +176,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: Vector3 | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         gl.uniform4f(pair.uniform.location, value.x, value.y, value.z, 0.0);
                     }
                 }
@@ -168,7 +186,7 @@ export class Material extends Identifiable {
                     const pair: UniformPair = u;
                     const value: Texture | undefined = pair.value;
 
-                    if (value != undefined) {
+                    if (value !== undefined) {
                         const textureUnit: number = Material._TEXTURE_UNIT;
                         value.bind(gl, pair.uniform, textureUnit);
                         Material._TEXTURE_UNIT++;
@@ -270,15 +288,19 @@ export class Material extends Identifiable {
      * @param value - the enum value to use
      */
     private _getEnumValue(value: UniformType, uniform: Uniform): UniformPair {
+        if (!uniform.valid) {
+            throw new Error("Material._getEnumValue(UniformType, Uniform) - provided uniform is invalid and cannot be used");
+        }
+
         if (!uniform.belongsTo(this.shader)) {
-            throw new Error("Material._getEnumValue(UniformType, Uniform) - provided uniform does not belong to this material");
+            throw new Error("Material._getEnumValue(UniformType, Uniform) - provided uniform with name " + uniform.name + " does not belong to this material");
         }
 
         const collection: Map<number, UniformPair> | undefined = this._uniforms.get(value);
         const id: number = uniform.id;
 
         // we need to create a new collection
-        if (collection == undefined) {
+        if (collection === undefined) {
             const newCollection: Map<number, UniformPair> = new Map<number, UniformPair>();
 
             // new collection will need a new Uniform pair instance
@@ -294,7 +316,7 @@ export class Material extends Identifiable {
         const oldPair: UniformPair | undefined = collection.get(id);
 
         // if the old pair does not exist, create a new one and add to collection
-        if (oldPair == undefined) {
+        if (oldPair === undefined) {
             const newPair: UniformPair = new UniformPair(uniform);
 
             collection.set(id, newPair);

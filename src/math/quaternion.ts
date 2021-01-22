@@ -44,7 +44,7 @@ export class Quaternion {
             y: this._y,
             z: this._z,
             w: this._w
-        }
+        };
     }
 
     /**
@@ -189,15 +189,15 @@ export class Quaternion {
         const shy: number = Math.sin(hy);
         const chy: number = Math.cos(hy);
 
-        const chy_shp: number = chy * shp;
-        const shy_chp: number = shy * chp;
-        const chy_chp: number = chy * chp;
-        const shy_shp: number = shy * shp;
+        const chyShp: number = chy * shp;
+        const shyChp: number = shy * chp;
+        const chyChp: number = chy * chp;
+        const shyShp: number = shy * shp;
 
-        this.x = (chy_shp * chr) + (shy_chp * shr);
-        this.y = (shy_chp * chr) - (chy_shp * shr);
-        this.z = (chy_chp * shr) - (shy_shp * chr);
-        this.w = (chy_chp * chr) + (shy_shp * shr);
+        this.x = (chyShp * chr) + (shyChp * shr);
+        this.y = (shyChp * chr) - (chyShp * shr);
+        this.z = (chyChp * shr) - (shyShp * chr);
+        this.w = (chyChp * chr) + (shyShp * shr);
 
         return this;
     }
@@ -220,7 +220,7 @@ export class Quaternion {
     public normalise(): Quaternion {
         const lenSq: number = this.lengthSq;
 
-        if (lenSq == 0 || lenSq == 1) {
+        if (lenSq === 0 || lenSq === 1) {
             return this;
         }
 
@@ -265,7 +265,7 @@ export class Quaternion {
         const qz: number = this._z;
         const qw: number = this._w;
 
-        return pole == 0 ?
+        return pole === 0 ?
             Math.atan2(2.0 * (qw * qz + qy * qx), 1.0 - 2.0 * (qx * qx + qz * qz)) :
             pole * 2.0 * Math.atan2(qy, qw);
     }
@@ -281,7 +281,7 @@ export class Quaternion {
         const qz: number = this._z;
         const qw: number = this._w;
 
-        return pole == 0 ?
+        return pole === 0 ?
             Math.asin(MathUtil.clamp(2.0 * (qw * qx - qz * qy), -1.0, 1.0)) :
             pole * Math.PI * 0.5;
     }
@@ -297,7 +297,7 @@ export class Quaternion {
         const qz: number = this._z;
         const qw: number = this._w;
 
-        return pole == 0 ?
+        return pole === 0 ?
             Math.atan2(2.0 * (qy * qw + qx * qz), 1.0 - 2.0 * (qy * qy + qx * qx)) :
             0.0;
     }
