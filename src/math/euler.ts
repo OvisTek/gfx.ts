@@ -1,5 +1,6 @@
 import { MathUtil } from "./math-util";
 import { Quaternion } from "./quaternion";
+import { Vector3 } from "./vector3";
 
 /**
  * Stores Euler Rotations in 3D space as radians
@@ -173,6 +174,19 @@ export class Euler {
         this.rollDeg = roll;
 
         return this;
+    }
+
+    /**
+     * Sets this Euler from a Vector3
+     * @param vector 
+     */
+    public static fromVector(vector: Vector3, optres: Euler | undefined = undefined): Euler {
+        const euler: Euler = optres || new Euler();
+        euler.x = vector.x;
+        euler.y = vector.y;
+        euler.z = vector.z;
+
+        return euler;
     }
 
     /**

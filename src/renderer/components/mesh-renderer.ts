@@ -64,6 +64,7 @@ export class MeshRenderer extends Component {
 
             const projectionMatrix: Matrix4 = this.owner.stage.camera.cameraMatrix;
             const modelMatrix: Matrix4 = this.owner.transform.worldMatrix;
+            const modelInvMatrix: Matrix4 = this.owner.transform.worldMatrixInverse;
             const viewMatrix: Matrix4 = this.owner.stage.camera.transform.worldMatrix;
             const viewInverseMatrix: Matrix4 = this.owner.stage.camera.transform.worldMatrixInverse;
 
@@ -78,7 +79,7 @@ export class MeshRenderer extends Component {
             Matrix4.multiply(projectionMatrix, modelViewMatrix, modelViewProjectionMatrix);
 
             // used for transforming normals for lighting purposes
-            normalMatrix.copy(modelViewMatrix).resetPos().transpose();
+            normalMatrix.copy(modelInvMatrix).transpose();
 
             // set matrices
             matrices.projectionMatrix = projectionMatrix;
