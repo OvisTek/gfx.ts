@@ -6,6 +6,7 @@ import { Shader } from "./shader";
 import { Texture } from "./texture";
 import { Uniform } from "./uniform";
 import { Identifiable } from "../identifiable";
+import { Euler } from "../../math/euler";
 
 /**
  * Allows saving for a specific function call with data (internal enum)
@@ -17,7 +18,8 @@ enum UniformType {
     SET_MATRIX,
     SET_FLOAT,
     SET_INTEGER,
-    SET_TEXTURE
+    SET_TEXTURE,
+    SET_EULER
 }
 
 /**
@@ -193,6 +195,15 @@ export class Material extends Identifiable {
                     }
                 }
                 break;
+            case UniformType.SET_EULER:
+                for (const [, u] of uniforms) {
+                    const pair: UniformPair = u;
+                    const value: Euler | undefined = pair.value;
+
+                    if (value !== undefined) {
+                        gl.uniform3f(pair.uniform.location, value.x, value.y, value.z);
+                    }
+                }
             default:
                 break;
         }
@@ -236,6 +247,17 @@ export class Material extends Identifiable {
         }
 
         this.setVector3(this._shader.uniform(uniform), vector);
+    }
+
+    public setEuler(uniform: Uniform | string, euler: Euler): void {
+        if (uniform instanceof Uniform) {
+            const pair: UniformPair = this._getEnumValue(UniformType.SET_EULER, uniform);
+            pair.value = euler;
+
+            return;
+        }
+
+        this.setEuler(this._shader.uniform(uniform), euler);
     }
 
     public setMatrix(uniform: Uniform | string, matrix: Matrix4): void {

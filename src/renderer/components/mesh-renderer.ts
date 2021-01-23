@@ -3,6 +3,7 @@ import { Mesh } from "../mesh/mesh";
 import { Renderer } from "../renderer";
 import { Component } from "../scriptable/component";
 import { Material } from "../shader/material";
+import { GfxLightsPragma } from "../shader/pragma/gfx-lights";
 import { GfxMatricesPragma } from "../shader/pragma/gfx-matrices";
 
 /**
@@ -19,6 +20,7 @@ export class MeshRenderer extends Component {
     private _material?: Material;
 
     private readonly _matrices: GfxMatricesPragma = new GfxMatricesPragma();
+    private readonly _lights: GfxLightsPragma = new GfxLightsPragma();
 
     public get mesh(): Mesh | undefined {
         return this._mesh;
@@ -37,6 +39,7 @@ export class MeshRenderer extends Component {
 
         // resets the pragma so we are targeting the new material
         this._matrices.material = this._material;
+        this._lights.material = this._material;
     }
 
     public create(): void {
@@ -54,6 +57,7 @@ export class MeshRenderer extends Component {
             const mesh: Mesh = this._mesh;
             const material: Material = this._material;
             const matrices: GfxMatricesPragma = this._matrices;
+            const lights: GfxLightsPragma = this._lights;
 
             // bind our shader for this draw call
             material.bind();
@@ -74,14 +78,19 @@ export class MeshRenderer extends Component {
             Matrix4.multiply(projectionMatrix, modelViewMatrix, modelViewProjectionMatrix);
 
             // used for transforming normals for lighting purposes
-            normalMatrix.copy(modelViewMatrix).transpose();
+            normalMatrix.copy(modelViewMatrix).resetPos().transpose();
 
+            // set matrices
             matrices.projectionMatrix = projectionMatrix;
             matrices.modelMatrix = modelMatrix;
             matrices.viewMatrix = viewMatrix;
             matrices.viewInverseMatrix = viewInverseMatrix;
             matrices.mvpMatrix = modelViewProjectionMatrix;
             matrices.normalMatrix = normalMatrix;
+
+            // set lights
+            lights.lightDirection = this.owner.stage.light.direction;
+            lights.lightColor = this.owner.stage.light.color;
 
             material.update();
 

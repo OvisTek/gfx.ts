@@ -656,6 +656,19 @@ export class Matrix4 {
 	}
 
 	/**
+	 * Resets the position component into 0,0,0
+	 */
+	public resetPos(): Matrix4 {
+		const m: number[] = this._val;
+
+		m[12] = 0.0;
+		m[13] = 0.0;
+		m[14] = 0.0;
+
+		return this;
+	}
+
+	/**
 	 * Calculate and return the determinant of this Matrix
 	 */
 	public get determinant(): number {

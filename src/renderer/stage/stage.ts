@@ -1,6 +1,6 @@
 import { Camera } from "../camera/camera";
 import { PerspectiveCamera } from "../camera/perspective-camera";
-import { GLContext } from "../gl-context";
+import { DirectionalLight } from "../lights/directional-light";
 import { Renderer } from "../renderer";
 import { Entity } from "../scriptable/entity";
 import { StageRoot } from "./stage-root";
@@ -14,11 +14,14 @@ import { StageRoot } from "./stage-root";
 export class Stage {
     private readonly _root: StageRoot;
     private readonly _camera: PerspectiveCamera;
+    private readonly _light: DirectionalLight;
     private readonly _queue: Array<Entity>;
 
     constructor() {
         this._root = new StageRoot();
         this._camera = new PerspectiveCamera();
+        this._light = new DirectionalLight();
+
         this._queue = new Array<Entity>();
 
         this._camera.parent = this._root;
@@ -30,6 +33,10 @@ export class Stage {
      */
     public get root(): StageRoot {
         return this._root;
+    }
+
+    public get light(): DirectionalLight {
+        return this._light;
     }
 
     /**
