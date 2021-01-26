@@ -20,7 +20,7 @@ export class Box extends Entity {
             const mesh: Mesh = new Mesh();
             const material: Material = this.material;
 
-            mesh.vertices.data = [
+            mesh.vertices.dataRef = [
                 // front face vertices
                 -1.0, -1.0, 1.0,
                 1.0, -1.0, 1.0,
@@ -53,7 +53,7 @@ export class Box extends Entity {
                 -1.0, 1.0, -1.0
             ];
 
-            mesh.normals.data = [
+            mesh.normals.dataRef = [
                 // front face normals
                 0.0, 0.0, 1.0,
                 0.0, 0.0, 1.0,
@@ -86,7 +86,7 @@ export class Box extends Entity {
                 -1.0, 0.0, 0.0
             ];
 
-            mesh.uv.data = [
+            mesh.uv.dataRef = [
                 // front face uv
                 0.0, 0.0,
                 1.0, 0.0,
@@ -126,7 +126,7 @@ export class Box extends Entity {
             const rightColor: number = Color.rgba8888(1, 1, 1, 1);
             const leftColor: number = Color.rgba8888(1, 0, 1, 1);
 
-            mesh.colors.data = [
+            mesh.colors.dataRef = [
                 // front face colors
                 frontColor,
                 frontColor,
@@ -159,7 +159,7 @@ export class Box extends Entity {
                 leftColor
             ];
 
-            mesh.indices.data = [
+            mesh.indices.dataRef = [
                 // front triangles
                 0, 1, 2, 0, 2, 3,
                 // back triangles
