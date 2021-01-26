@@ -204,6 +204,7 @@ export class Material extends Identifiable {
                         gl.uniform3f(pair.uniform.location, value.x, value.y, value.z);
                     }
                 }
+                break;
             default:
                 break;
         }
