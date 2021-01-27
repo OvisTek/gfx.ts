@@ -14,7 +14,6 @@ export class MeshRenderer extends Component {
     // is single threaded, so there wont be any race conditions/deadlocks
     private static readonly _mv: Matrix4 = new Matrix4();
     private static readonly _mvp: Matrix4 = new Matrix4();
-    private static readonly _mvt: Matrix4 = new Matrix4();
 
     private _mesh?: Mesh;
     private _material?: Material;
@@ -64,7 +63,7 @@ export class MeshRenderer extends Component {
 
             const projectionMatrix: Matrix4 = this.owner.stage.camera.cameraMatrix;
             const modelMatrix: Matrix4 = this.owner.transform.worldMatrix;
-            const modelInvMatrix: Matrix4 = this.owner.transform.worldMatrixInverse;
+            const normalMatrix: Matrix4 = this.owner.transform.normalMatrix;
             const viewMatrix: Matrix4 = this.owner.stage.camera.transform.worldMatrix;
             const viewInverseMatrix: Matrix4 = this.owner.stage.camera.transform.worldMatrixInverse;
 
@@ -72,14 +71,10 @@ export class MeshRenderer extends Component {
             // gfx_ProjectionMatrix * gfx_ViewMatrix * gfx_ModelMatrix
             const modelViewMatrix: Matrix4 = MeshRenderer._mv;
             const modelViewProjectionMatrix: Matrix4 = MeshRenderer._mvp;
-            const normalMatrix: Matrix4 = MeshRenderer._mvt;
 
             // calculate the modelView and modelViewProjection matrices
             Matrix4.multiply(viewInverseMatrix, modelMatrix, modelViewMatrix);
             Matrix4.multiply(projectionMatrix, modelViewMatrix, modelViewProjectionMatrix);
-
-            // used for transforming normals for lighting purposes
-            normalMatrix.copy(modelInvMatrix).transpose();
 
             // set matrices
             matrices.projectionMatrix = projectionMatrix;

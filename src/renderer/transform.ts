@@ -34,8 +34,10 @@ export class Transform {
     // these components are updated on-demand
     private _requiresLocalInverseUpdate: boolean;
     private _requiresWorldInverseUpdate: boolean;
+    private _requiresNormalMatrixUpdate: boolean;
     private readonly _localMatrixInverse: Matrix4;
     private readonly _worldMatrixInverse: Matrix4;
+    private readonly _normalMatrix: Matrix4;
 
     // the previously computed hash of this Transform
     private _hash: number = 0;
@@ -49,6 +51,7 @@ export class Transform {
 
         this._localMatrix = new Matrix4();
         this._worldMatrix = new Matrix4();
+        this._normalMatrix = new Matrix4();
 
         this._localMatrixInverse = new Matrix4();
         this._worldMatrixInverse = new Matrix4();
@@ -56,6 +59,7 @@ export class Transform {
         // inverse of the identity matrix is also the identity matrix
         this._requiresLocalInverseUpdate = false;
         this._requiresWorldInverseUpdate = false;
+        this._requiresNormalMatrixUpdate = false;
     }
 
     /**
@@ -138,7 +142,7 @@ export class Transform {
      */
     public get localMatrixInverse(): Matrix4 {
         // update on-demand if needed
-        if (this._requiresLocalInverseUpdate) {
+        if (this._requiresLocalInverseUpdate === true) {
             this._localMatrix.invert(this._localMatrixInverse);
 
             this._requiresLocalInverseUpdate = false;
@@ -162,13 +166,26 @@ export class Transform {
      */
     public get worldMatrixInverse(): Matrix4 {
         // update on-demand if needed
-        if (this._requiresWorldInverseUpdate) {
+        if (this._requiresWorldInverseUpdate === true) {
             this._worldMatrix.invert(this._worldMatrixInverse);
 
             this._requiresWorldInverseUpdate = false;
         }
 
         return this._worldMatrixInverse;
+    }
+
+    /**
+     * Returns the 4x4 Matrix required for transforming normals
+     */
+    public get normalMatrix(): Matrix4 {
+        if (this._requiresNormalMatrixUpdate === true) {
+            this._normalMatrix.copy(this.worldMatrixInverse).transpose();
+
+            this._requiresNormalMatrixUpdate = false;
+        }
+
+        return this._normalMatrix;
     }
 
     /**
@@ -234,6 +251,7 @@ export class Transform {
             Matrix4.multiply(parent.worldMatrix, this._localMatrix, this._worldMatrix);
 
             this._requiresWorldInverseUpdate = true;
+            this._requiresNormalMatrixUpdate = true;
         }
 
         // update hash codes for the next apply() call

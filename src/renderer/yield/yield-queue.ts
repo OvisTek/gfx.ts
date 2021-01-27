@@ -1,7 +1,8 @@
 import { Renderer } from "../renderer";
 
 /**
- * Internal class for queue and execution of RenderOperations types at start of the frame
+ * Internal class for queue and execution of operations at various stages
+ * of the engine runtime. See YieldType enum.
  */
 class YieldOperation {
     public readonly accept: (value: Renderer) => void;
@@ -62,7 +63,7 @@ export class YieldQueue {
      * 
      * @param yieldType - when the operation should execute
      */
-    public exec(yieldType: YieldType = YieldType.START_OF_FRAME): Promise<Renderer> {
+    public exec(yieldType: YieldType = 0): Promise<Renderer> {
         switch (yieldType) {
             case YieldType.START_OF_FRAME:
                 return this.next;
