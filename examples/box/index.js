@@ -1,4 +1,4 @@
-import { BasicColorMaterial, BasicTextureMaterial, Box, Euler, MeshRenderer, Renderer, Texture } from "../../dist/index";
+import { BasicColorMaterial, BasicTextureMaterial, Box, Euler, MeshRenderer, Renderer, Texture, Input, Key } from "../../dist/index";
 
 const renderer = Renderer.instance;
 renderer.devMode = true;
@@ -33,6 +33,18 @@ class MyTexturedBox extends Box {
         euler.yawDeg += dt * 45;
 
         this.transform.euler = euler;
+
+        if (Input.instance.keyboard.isPressed(Key.KEY_W)) {
+            console.log("pressed w");
+        }
+
+        if (Input.instance.keyboard.isReleased(Key.KEY_W)) {
+            console.log("released w");
+        }
+
+        if (Input.instance.keyboard.isPressedDown(Key.KEY_W)) {
+            console.log("held w");
+        }
     }
 }
 

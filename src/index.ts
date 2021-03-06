@@ -7,6 +7,11 @@ export * from "./math/vector3";
 export * from "./math/random64";
 export * from "./math/math-util";
 
+// export input library
+export * from "./input/input";
+export * from "./input/devices/keyboard";
+export * from "./input/devices/mouse";
+
 // export core
 export * from "./renderer/renderer";
 export * from "./renderer/transform";
