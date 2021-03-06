@@ -1,3 +1,4 @@
+import { Input } from "../input/input";
 import { GLContext } from "./gl-context";
 import { Stage } from "./stage/stage";
 import { YieldQueue } from "./yield/yield-queue";
@@ -95,11 +96,15 @@ export class Renderer {
     public pause(): void {
         this._isPaused = true;
 
+        Input.instance.pause();
+
         // TO-DO propogate onPause event to stage
     }
 
     public resume(): void {
         this._isPaused = false;
+
+        Input.instance.resume();
 
         // TO-DO propogate onResume event to stage
     }
@@ -201,11 +206,14 @@ export class Renderer {
         this._lastTime = currentTime;
 
         if (!this._isPaused) {
+            // update the input system for keyboard/mouse events
+            Input.instance.update();
+
             // execute scripts that want to execute at start of the frame
             this._yield._flushStart();
 
             // update the current active stage
-            this.stage._update(deltaTime, this);
+            this._stage._update(deltaTime, this);
 
             // execute scripts that want to execute at end of the frame
             this._yield._flushEnd();
