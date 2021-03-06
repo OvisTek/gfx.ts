@@ -63,6 +63,34 @@ export class Keyboard extends InputDevice {
         this.resume();
     }
 
+    /**
+     * Checks if the provided keyboard key has been pressed/clicked
+     * 
+     * @param key - the keyboard key to check
+     */
+    public isPressed(key: Key): boolean {
+        return this._keys[key] === Event.PRESS;
+    }
+
+    /**
+     * Checks if the provided keyboard key has been released. This normally follows
+     * a pressed event.
+     * 
+     * @param key - the keyboard key to check
+     */
+    public isReleased(key: Key): boolean {
+        return this._keys[key] === Event.RELEASE;
+    }
+
+    /**
+     * Checks if the provided keyboard key has been pressed/held down without release.
+     * 
+     * @param key - the keyboard key to check
+     */
+    public isPressedDown(key: Key): boolean {
+        return this._keys[key] === Event.HOLD;
+    }
+
     public pause(): void {
         if (this._isPaused === false) {
             // remove all existing listeners
@@ -139,16 +167,9 @@ export class Keyboard extends InputDevice {
             return;
         }
 
-        let handled: boolean = false;
-
         if (event.keyCode !== undefined) {
             this._states[event.keyCode] = Event.PRESS;
 
-            handled = true;
-        }
-
-        if (handled === true) {
-            // Suppress "double action" if event handled
             event.preventDefault();
         }
     }
@@ -158,16 +179,9 @@ export class Keyboard extends InputDevice {
             return;
         }
 
-        let handled: boolean = false;
-
         if (event.keyCode !== undefined) {
             this._states[event.keyCode] = Event.RELEASE;
 
-            handled = true;
-        }
-
-        if (handled === true) {
-            // Suppress "double action" if event handled
             event.preventDefault();
         }
     }
