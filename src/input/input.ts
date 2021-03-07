@@ -30,6 +30,14 @@ export class Input extends InputDevice {
         return this._instance;
     }
 
+    public static get keyboard(): Keyboard {
+        return this.instance.keyboard;
+    }
+
+    public static get mouse(): Mouse {
+        return this.instance.mouse;
+    }
+
     public pause(): void {
         this._keyboard.pause();
         this._mouse.pause();

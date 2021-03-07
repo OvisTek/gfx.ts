@@ -8,6 +8,7 @@ import { Vector3 } from "./vector3";
  * This is a port from THREE.js Spherical class for TypeScript
  */
 export class Spherical {
+    private static readonly EPS: number = 0.000001;
 
     private _radius: number;
     private _phi: number;
@@ -29,6 +30,12 @@ export class Spherical {
 
     public get theta(): number {
         return this._theta;
+    }
+
+    public makeSafe(): Spherical {
+        this._phi = Math.max(Spherical.EPS, Math.min(Math.PI - Spherical.EPS, this._phi));
+
+        return this;
     }
 
     public setFromVector3(vec: Vector3): Spherical {
