@@ -6,12 +6,14 @@ export class Texture extends Identifiable {
     private readonly _image: HTMLImageElement;
     private readonly _url: string;
     private _texture?: WebGLTexture;
+    private _crossOrigin: string;
 
     constructor(url: string) {
         super();
         this._image = new Image();
         this._url = url;
         this._texture = undefined;
+        this._crossOrigin = "anonymous";
     }
 
     /**
@@ -35,9 +37,17 @@ export class Texture extends Identifiable {
                 reject(new Error("Texture.load(string) - failed to load image at url " + this._url));
             };
 
-            image.crossOrigin = "anonymous";
+            image.crossOrigin = this._crossOrigin;
             image.src = this._url;
         });
+    }
+
+    public get crossOrigin(): string {
+        return this._crossOrigin;
+    }
+
+    public set crossOrigin(newOrigin: string) {
+        this._crossOrigin = newOrigin;
     }
 
     /**
