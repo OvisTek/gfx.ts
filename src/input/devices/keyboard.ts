@@ -68,11 +68,15 @@ export class Keyboard extends InputDevice {
         this._states = new Array<KeyData>(Keyboard.NUM_KEYS);
 
         this._isPaused = true;
-        this._holdFrameDelay = 0;
+        this._holdFrameDelay = 5;
 
         this.resume();
     }
 
+    /**
+     * Get or Set the frame-delay of when the PRESSED event is changed into the HELD event.
+     * Default is 5 frame delay
+     */
     public get holdFrameDelay(): number {
         return this._holdFrameDelay;
     }
@@ -86,8 +90,10 @@ export class Keyboard extends InputDevice {
      * 
      * @param key - the keyboard key to check
      */
-    public isPressed(key: Key): boolean {
-        return this._keys[key] ? this._keys[key].event === Event.PRESS : false;
+    public isPressed(key: Key, firstOnly: boolean = true): boolean {
+        const kd: KeyData = this._keys[key];
+
+        return kd ? (firstOnly ? kd.event === Event.PRESS && kd.frame === 0 : kd.event === Event.PRESS) : false;
     }
 
     /**
