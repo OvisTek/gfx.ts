@@ -17,7 +17,7 @@ class MyTexturedBox extends Box {
         texture.load().then((texture) => {
             const renderer = this.getComponentOfType(MeshRenderer);
 
-            renderer.material.setTexture("gfx_Texture0", texture);
+            renderer.material.texture = texture;
         }).catch((err) => {
             console.error(err);
         });
@@ -34,15 +34,15 @@ class MyTexturedBox extends Box {
 
         this.transform.euler = euler;
 
-        if (Input.instance.keyboard.isPressed(Key.KEY_W)) {
+        if (Input.keyboard.isPressed(Key.KEY_W)) {
             console.log("pressed w");
         }
 
-        if (Input.instance.keyboard.isReleased(Key.KEY_W)) {
+        if (Input.keyboard.isReleased(Key.KEY_W)) {
             console.log("released w");
         }
 
-        if (Input.instance.keyboard.isPressedDown(Key.KEY_W)) {
+        if (Input.keyboard.isPressedDown(Key.KEY_W)) {
             console.log("held w");
         }
     }

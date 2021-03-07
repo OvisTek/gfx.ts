@@ -306,6 +306,14 @@ export class Material extends Identifiable {
     }
 
     /**
+     * Sets the default texture. This call binds the texture to
+     * the default gfx_Texture0 uniform
+     */
+    public set texture(texture: Texture) {
+        this.setTexture("gfx_Texture0", texture);
+    }
+
+    /**
      * Private functionality that returns the collection instance for the provided Enum
      * 
      * @param value - the enum value to use
