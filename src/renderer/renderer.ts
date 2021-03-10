@@ -136,7 +136,11 @@ export class Renderer {
      * 
      * @param canvas - The HTML Canvas to load
      */
-    public init(canvas: HTMLCanvasElement): void {
+    public init(canvas: HTMLCanvasElement | undefined | null): void {
+        if (canvas === undefined || canvas === null) {
+            throw new Error("Renderer.init(HTMLCanvasElement) - unable to initialise as argument was undefined or null");
+        }
+
         const gl: WebGL2RenderingContext | null = canvas.getContext("webgl2");
 
         if (!gl) {
@@ -144,6 +148,9 @@ export class Renderer {
         }
 
         this._context.setup(gl, canvas);
+
+        // ensure the input system is listening for events from the rendering canvas
+        Input.instance.setup(canvas);
 
         const oldWidth: number = this._width;
         const oldHeight: number = this._height;

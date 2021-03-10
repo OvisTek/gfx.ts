@@ -8,6 +8,7 @@ export enum Event {
 export abstract class InputDevice {
     constructor() { }
 
+    public abstract setup(element: HTMLElement | undefined): void;
     public abstract pause(): void;
     public abstract resume(): void;
 

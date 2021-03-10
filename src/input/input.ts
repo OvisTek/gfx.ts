@@ -2,6 +2,7 @@ import { InputDevice } from "./input-device";
 import { Keyboard } from "./devices/keyboard";
 import { Mouse } from "./devices/mouse";
 
+
 /**
  * Input allows querying and accessing keyboard and mouse events from a global context. Input
  * is a singleton managed by the gfx runtime.
@@ -36,6 +37,11 @@ export class Input extends InputDevice {
 
     public static get mouse(): Mouse {
         return this.instance.mouse;
+    }
+
+    public setup(element: HTMLElement | undefined): void {
+        this._keyboard.setup(element);
+        this._mouse.setup(element);
     }
 
     public pause(): void {
