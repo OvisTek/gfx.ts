@@ -96,20 +96,19 @@ export class KeyState {
 }
 
 export class Keyboard extends InputDevice {
-    private static readonly NUM_KEYS: number = 223;
     private static readonly DEFAULT_KEY: KeyState = new KeyState();
 
     private _isPaused: boolean;
-    private readonly _keys: Array<KeyState>;
-    private readonly _states: Array<KeyState>;
+    private readonly _keys: Map<Key, KeyState>;
+    private readonly _states: Map<Key, KeyState>;
     private _holdFrameDelay: number;
 
     private _element: HTMLElement | undefined = undefined;
 
     constructor() {
         super();
-        this._keys = new Array<KeyState>(Keyboard.NUM_KEYS);
-        this._states = new Array<KeyState>(Keyboard.NUM_KEYS);
+        this._keys = new Map<Key, KeyState>();
+        this._states = new Map<Key, KeyState>();
 
         this._isPaused = true;
         this._holdFrameDelay = 5;
@@ -135,7 +134,7 @@ export class Keyboard extends InputDevice {
      * @param key - the keyboard key to check
      */
     public isPressed(key: Key, firstOnly: boolean = true): boolean {
-        const kd: KeyState = this._keys[key];
+        const kd: KeyState | undefined = this._keys.get(key);
 
         return kd ? (firstOnly ? kd.event === Event.PRESS && kd.frame === 0 : kd.event === Event.PRESS) : false;
     }
@@ -147,7 +146,9 @@ export class Keyboard extends InputDevice {
      * @param key - the keyboard key to check
      */
     public isReleased(key: Key): boolean {
-        return this._keys[key] ? this._keys[key].event === Event.RELEASE : false;
+        const kd: KeyState | undefined = this._keys.get(key);
+
+        return kd ? kd.event === Event.RELEASE : false;
     }
 
     /**
@@ -156,7 +157,9 @@ export class Keyboard extends InputDevice {
      * @param key - the keyboard key to check
      */
     public isPressedDown(key: Key): boolean {
-        return this._keys[key] ? this._keys[key].event === Event.HOLD : false;
+        const kd: KeyState | undefined = this._keys.get(key);
+
+        return kd ? kd.event === Event.HOLD : false;
     }
 
     /**
@@ -164,7 +167,9 @@ export class Keyboard extends InputDevice {
      * @param key - the key to check
      */
     public key(key: Key): KeyState {
-        return this._keys[key] ?? Keyboard.DEFAULT_KEY;
+        const kd: KeyState | undefined = this._keys.get(key);
+
+        return kd ? kd : Keyboard.DEFAULT_KEY;
     }
 
     public setup(element: HTMLElement | undefined = undefined): void {
@@ -203,60 +208,58 @@ export class Keyboard extends InputDevice {
     }
 
     public update(): void {
-        const length: number = Keyboard.NUM_KEYS;
+        const keys: Map<Key, KeyState> = this._keys;
+        const states: Map<Key, KeyState> = this._states;
 
-        for (let i: number = 0; i < length; i++) {
-            const stateData: KeyState = this._states[i];
+        // update all current key states every frame
+        for (const [k, v] of keys.entries()) {
+            if (v !== undefined && v !== null) {
+                const stateData: KeyState | undefined = states.get(k);
 
-            if (stateData === undefined || stateData === null) {
-                continue;
-            }
-
-            const keyData: KeyState = this._keys[i];
-
-            const state: Event = stateData.event;
-            const key: Event = keyData.event;
-
-            if (key === Event.PRESS && state === Event.PRESS) {
-                if (this._holdFrameDelay <= keyData.frame) {
-                    keyData._set(Event.HOLD, keyData.ctrlKey, keyData.altKey, keyData.frame);
+                if (stateData === undefined || stateData === null) {
+                    continue;
                 }
 
-                keyData._framepp();
+                const keyData: KeyState = v;
 
-                continue;
-            }
+                const state: Event = stateData.event;
+                const key: Event = keyData.event;
 
-            if ((key === Event.PRESS || key === Event.HOLD) && state === Event.RELEASE) {
-                keyData._set(Event.RELEASE, stateData.altKey, stateData.ctrlKey, keyData.frame);
-                keyData._framepp();
+                if (key === Event.PRESS && state === Event.PRESS) {
+                    if (this._holdFrameDelay <= keyData.frame) {
+                        keyData._set(Event.HOLD, keyData.ctrlKey, keyData.altKey, keyData.frame);
+                    }
 
-                continue;
-            }
+                    keyData._framepp();
 
-            if (key === Event.RELEASE && state === Event.RELEASE) {
-                keyData._reset();
+                    continue;
+                }
 
-                continue;
-            }
+                if ((key === Event.PRESS || key === Event.HOLD) && state === Event.RELEASE) {
+                    keyData._set(Event.RELEASE, stateData.altKey, stateData.ctrlKey, keyData.frame);
+                    keyData._framepp();
 
-            if ((key === Event.NONE || key === Event.RELEASE) && state === Event.PRESS) {
-                keyData._set(Event.PRESS, stateData.altKey, stateData.ctrlKey, 0);
+                    continue;
+                }
+
+                if (key === Event.RELEASE && state === Event.RELEASE) {
+                    keyData._reset();
+
+                    continue;
+                }
+
+                if ((key === Event.NONE || key === Event.RELEASE) && state === Event.PRESS) {
+                    keyData._set(Event.PRESS, stateData.altKey, stateData.ctrlKey, 0);
+                }
             }
         }
     }
 
-    private static _fillKeys(keyRef: Array<KeyState>, event: Event): void {
-        const length: number = Keyboard.NUM_KEYS;
-
-        for (let i: number = 0; i < length; i++) {
-            const key: KeyState = keyRef[i];
-
-            if (key === undefined || key === null) {
-                continue;
+    private static _fillKeys(keyRef: Map<Key, KeyState>, event: Event): void {
+        for (const [, value] of keyRef.entries()) {
+            if (value !== undefined && value !== null) {
+                value._set(event, false, false, 0);
             }
-
-            key._set(event, false, false, 0);
         }
     }
 
@@ -268,7 +271,7 @@ export class Keyboard extends InputDevice {
         const keyCode: number = event.keyCode;
 
         if (keyCode !== undefined) {
-            const key: KeyState = this._states[keyCode];
+            const key: KeyState | undefined = this._states.get(keyCode);
 
             // ensure this key event is created and exists. Keys will be created on-demand
             if (key !== undefined && key !== null) {
@@ -278,8 +281,8 @@ export class Keyboard extends InputDevice {
                 const sKey: KeyState = new KeyState()._set(Event.PRESS, event.altKey, event.ctrlKey, 0);
                 const nKey: KeyState = new KeyState();
 
-                this._states[keyCode] = sKey;
-                this._keys[keyCode] = nKey;
+                this._states.set(keyCode, sKey);
+                this._keys.set(keyCode, nKey);
             }
 
             event.preventDefault();
@@ -294,7 +297,7 @@ export class Keyboard extends InputDevice {
         const keyCode: number = event.keyCode;
 
         if (event.keyCode !== undefined) {
-            const key: KeyState = this._states[keyCode];
+            const key: KeyState | undefined = this._states.get(keyCode);
 
             // ensure this key event is created and exists. Keys will be created on-demand
             if (key !== undefined && key !== null) {
@@ -304,8 +307,8 @@ export class Keyboard extends InputDevice {
                 const sKey: KeyState = new KeyState()._set(Event.RELEASE, event.altKey, event.ctrlKey, 0);
                 const nKey: KeyState = new KeyState();
 
-                this._states[keyCode] = sKey;
-                this._keys[keyCode] = nKey;
+                this._states.set(keyCode, sKey);
+                this._keys.set(keyCode, nKey);
             }
 
             event.preventDefault();
