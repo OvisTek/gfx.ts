@@ -184,7 +184,7 @@ export class Keyboard extends InputDevice {
 
                 if (key === Event.PRESS && state === Event.PRESS) {
                     if (this._holdFrameDelay <= keyData.frame) {
-                        keyData._set(Event.HOLD, keyData.ctrlKey, keyData.altKey, keyData.frame);
+                        keyData._set(Event.HOLD, keyData.states, keyData.frame);
                     }
 
                     keyData._framepp();
@@ -193,7 +193,7 @@ export class Keyboard extends InputDevice {
                 }
 
                 if ((key === Event.PRESS || key === Event.HOLD) && state === Event.RELEASE) {
-                    keyData._set(Event.RELEASE, stateData.altKey, stateData.ctrlKey, keyData.frame);
+                    keyData._set(Event.RELEASE, stateData.states, keyData.frame);
                     keyData._framepp();
 
                     continue;
@@ -206,7 +206,7 @@ export class Keyboard extends InputDevice {
                 }
 
                 if ((key === Event.NONE || key === Event.RELEASE) && state === Event.PRESS) {
-                    keyData._set(Event.PRESS, stateData.altKey, stateData.ctrlKey, 0);
+                    keyData._set(Event.PRESS, stateData.states, 0);
                 }
             }
         }
@@ -215,7 +215,7 @@ export class Keyboard extends InputDevice {
     private static _fillKeys(keyRef: Map<Key, KeyState>, event: Event): void {
         for (const [, value] of keyRef.entries()) {
             if (value !== undefined && value !== null) {
-                value._set(event, false, false, 0);
+                value._set(event, 0, 0);
             }
         }
     }
@@ -229,13 +229,14 @@ export class Keyboard extends InputDevice {
 
         if (keyCode !== undefined) {
             const key: KeyState | undefined = this._states.get(keyCode);
+            const states: number = InputState.compileStates(event.altKey, event.ctrlKey, event.metaKey, event.shiftKey);
 
             // ensure this key event is created and exists. Keys will be created on-demand
             if (key !== undefined && key !== null) {
-                key._set(Event.PRESS, event.altKey, event.ctrlKey, 0);
+                key._set(Event.PRESS, states, 0);
             }
             else {
-                const sKey: KeyState = new KeyState()._set(Event.PRESS, event.altKey, event.ctrlKey, 0);
+                const sKey: KeyState = new KeyState()._set(Event.PRESS, states, 0);
                 const nKey: KeyState = new KeyState();
 
                 this._states.set(keyCode, sKey);
@@ -255,13 +256,14 @@ export class Keyboard extends InputDevice {
 
         if (event.keyCode !== undefined) {
             const key: KeyState | undefined = this._states.get(keyCode);
+            const states: number = InputState.compileStates(event.altKey, event.ctrlKey, event.metaKey, event.shiftKey);
 
             // ensure this key event is created and exists. Keys will be created on-demand
             if (key !== undefined && key !== null) {
-                key._set(Event.RELEASE, event.altKey, event.ctrlKey, 0);
+                key._set(Event.RELEASE, states, 0);
             }
             else {
-                const sKey: KeyState = new KeyState()._set(Event.RELEASE, event.altKey, event.ctrlKey, 0);
+                const sKey: KeyState = new KeyState()._set(Event.RELEASE, states, 0);
                 const nKey: KeyState = new KeyState();
 
                 this._states.set(keyCode, sKey);

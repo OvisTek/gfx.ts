@@ -1,4 +1,5 @@
-import { BasicColorMaterial, BasicTextureMaterial, Box, Euler, MeshRenderer, Renderer, Texture, Input, Key } from "../../dist/index";
+import { BasicColorMaterial, BasicTextureMaterial, Box, Euler, MeshRenderer, Renderer, Texture, Input, Key, KeyState } from "../../dist/index";
+import { InputState } from "../../dist/input/input-device";
 
 const renderer = Renderer.instance;
 renderer.devMode = true;
@@ -56,7 +57,7 @@ class MyTexturedBox extends Box {
 
         //console.log(Input.keyboard);
 
-        console.log(Input.mouse.positionX + " " + Input.mouse.positionY);
+        //console.log(Input.mouse.positionX + " " + Input.mouse.positionY);
     }
 }
 

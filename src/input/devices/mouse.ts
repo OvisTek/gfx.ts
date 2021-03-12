@@ -183,6 +183,10 @@ export class Mouse extends InputDevice {
     }
 
     private readonly _updatePosition = (event: MouseEvent): void => {
+        if (event.defaultPrevented) {
+            return;
+        }
+
         this._posX = event.clientX;
         this._posY = event.clientY;
 
@@ -194,5 +198,7 @@ export class Mouse extends InputDevice {
             this._movX = 0.0;
             this._movY = 0.0;
         }
+
+        event.preventDefault();
     }
 }

@@ -5,19 +5,24 @@ export enum Event {
     HOLD = 3
 }
 
+export enum States {
+    ALT = 0,
+    CTRL = 1,
+    META = 2,
+    SHIFT = 3
+}
+
 /**
  * The current Button or Key state for a particular Query
  */
 export abstract class InputState {
     private _event: Event;
-    private _altKey: boolean;
-    private _ctrlKey: boolean;
+    private _states: number;
     private _frame: number;
 
     constructor() {
         this._event = Event.NONE;
-        this._altKey = false;
-        this._ctrlKey = false;
+        this._states = 0 | 0;
         this._frame = 0;
     }
 
@@ -25,12 +30,24 @@ export abstract class InputState {
         return this._event;
     }
 
+    public get states(): number {
+        return this._states;
+    }
+
     public get altKey(): boolean {
-        return this._altKey;
+        return !!((this._states >> States.ALT) & 1);
     }
 
     public get ctrlKey(): boolean {
-        return this._ctrlKey;
+        return !!((this._states >> States.CTRL) & 1);
+    }
+
+    public get metaKey(): boolean {
+        return !!((this._states >> States.META) & 1);
+    }
+
+    public get shiftKey(): boolean {
+        return !!((this._states >> States.SHIFT) & 1);
     }
 
     public get frame(): number {
@@ -49,23 +66,33 @@ export abstract class InputState {
         return this._event === Event.HOLD;
     }
 
-    public _set(event: Event, altKey: boolean, ctrlKey: boolean, frame: number): InputState {
+    public _set(event: Event, states: number, frame: number): InputState {
         this._event = event;
-        this._altKey = altKey;
-        this._ctrlKey = ctrlKey;
+        this._states = states;
         this._frame = frame;
 
         return this;
     }
 
     public _reset(): InputState {
-        return this._set(Event.NONE, false, false, 0);
+        return this._set(Event.NONE, 0, 0);
     }
 
     public _framepp(): InputState {
         this._frame++;
 
         return this;
+    }
+
+    public static compileStates(altKey: boolean, ctrlKey: boolean, metaKey: boolean, shiftKey: boolean): number {
+        let states: number = 0;
+
+        states = altKey ? states | (1 << States.ALT) : states & ~(1 << States.ALT);
+        states = ctrlKey ? states | (1 << States.CTRL) : states & ~(1 << States.CTRL);
+        states = metaKey ? states | (1 << States.META) : states & ~(1 << States.META);
+        states = shiftKey ? states | (1 << States.SHIFT) : states & ~(1 << States.SHIFT);
+
+        return states;
     }
 }
 
