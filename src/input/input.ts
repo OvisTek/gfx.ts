@@ -1,58 +1,6 @@
-import { InputDevice, Event } from "./input-device";
+import { InputDevice } from "./input-device";
 import { Keyboard } from "./devices/keyboard";
 import { Mouse } from "./devices/mouse";
-
-/**
- * The current Button or Key state for a particular Query
- */
-export class InputState {
-    private _event: Event;
-    private _altKey: boolean;
-    private _ctrlKey: boolean;
-    private _frame: number;
-
-    constructor() {
-        this._event = Event.NONE;
-        this._altKey = false;
-        this._ctrlKey = false;
-        this._frame = 0;
-    }
-
-    public get event(): Event {
-        return this._event;
-    }
-
-    public get altKey(): boolean {
-        return this._altKey;
-    }
-
-    public get ctrlKey(): boolean {
-        return this._ctrlKey;
-    }
-
-    public get frame(): number {
-        return this._frame;
-    }
-
-    public _set(event: Event, altKey: boolean, ctrlKey: boolean, frame: number): InputState {
-        this._event = event;
-        this._altKey = altKey;
-        this._ctrlKey = ctrlKey;
-        this._frame = frame;
-
-        return this;
-    }
-
-    public _reset(): InputState {
-        return this._set(Event.NONE, false, false, 0);
-    }
-
-    public _framepp(): InputState {
-        this._frame++;
-
-        return this;
-    }
-}
 
 /**
  * Input allows querying and accessing keyboard and mouse events from a global context. Input

@@ -1,5 +1,4 @@
-import { Event, InputDevice } from "../input-device";
-import { InputState } from "../input";
+import { Event, InputDevice, InputState } from "../input-device";
 
 /**
  * See key mappings in http://gcctech.org/csc/javascript/javascript_keycodes.htm
