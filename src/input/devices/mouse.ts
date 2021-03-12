@@ -29,7 +29,7 @@ export class Mouse extends InputDevice {
         this._unlockPointerPromises = new SavedPromiseArray<void>();
 
         this._posX = 0.0;
-        this._posY = 0.0
+        this._posY = 0.0;
 
         this._movX = 0.0;
         this._movY = 0.0;
@@ -61,8 +61,8 @@ export class Mouse extends InputDevice {
     public pause(): void {
         if (this._isPaused === false && this._element !== undefined) {
             // remove all existing listeners
-            document.removeEventListener('pointerlockerror', this._pointerLockError, false);
-            document.removeEventListener('pointerlockchange', this._pointerLockChange, false);
+            document.removeEventListener("pointerlockerror", this._pointerLockError, false);
+            document.removeEventListener("pointerlockchange", this._pointerLockChange, false);
 
             this._element.removeEventListener("mousemove", this._updatePosition, false);
         }
@@ -73,8 +73,8 @@ export class Mouse extends InputDevice {
     public resume(): void {
         if (this._isPaused === true && this._element !== undefined) {
             // add the listeners
-            document.addEventListener('pointerlockerror', this._pointerLockError, false);
-            document.addEventListener('pointerlockchange', this._pointerLockChange, false);
+            document.addEventListener("pointerlockerror", this._pointerLockError, false);
+            document.addEventListener("pointerlockchange", this._pointerLockChange, false);
 
             this._element.addEventListener("mousemove", this._updatePosition, false);
         }

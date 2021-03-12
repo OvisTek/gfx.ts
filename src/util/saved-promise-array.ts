@@ -40,7 +40,9 @@ export class SavedPromiseArray<T> {
                 try {
                     newObject.accept(value);
                 }
-                catch (error) { }
+                catch (_error) {
+                    /* continue regardless of error */
+                }
 
                 newObject = queue.pop();
             }
@@ -69,7 +71,9 @@ export class SavedPromiseArray<T> {
                     try {
                         newObject.reject(error);
                     }
-                    catch (rError) { }
+                    catch (_rError) {
+                        /* continue regardless of error */
+                    }
                 }
 
                 newObject = queue.pop();
@@ -94,7 +98,9 @@ export class SavedPromiseArray<T> {
                 try {
                     newObject.reject(reason);
                 }
-                catch (error) { }
+                catch (_error) {
+                    /* continue regardless of error */
+                }
 
                 newObject = queue.pop();
             }
