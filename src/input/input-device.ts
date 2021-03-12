@@ -8,7 +8,7 @@ export enum Event {
 /**
  * The current Button or Key state for a particular Query
  */
-export class InputState {
+export abstract class InputState {
     private _event: Event;
     private _altKey: boolean;
     private _ctrlKey: boolean;

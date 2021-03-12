@@ -1,10 +1,38 @@
 import { SavedPromiseArray } from "../../util/saved-promise-array";
-import { InputDevice } from "../input-device";
+import { InputDevice, InputState } from "../input-device";
 
 export enum Button {
     LEFT = 0,
     MIDDLE = 1,
     RIGHT = 2
+}
+
+export class ButtonState extends InputState {
+
+    private _posX: number;
+    private _posY: number;
+
+    constructor() {
+        super();
+
+        this._posX = 0.0;
+        this._posY = 0.0;
+    }
+
+    public get posX(): number {
+        return this._posX;
+    }
+
+    public get posY(): number {
+        return this._posY;
+    }
+
+    public _setPosition(posX: number, posY: number): ButtonState {
+        this._posX = posX;
+        this._posY - posY;
+
+        return this;
+    }
 }
 
 export class Mouse extends InputDevice {
@@ -39,11 +67,11 @@ export class Mouse extends InputDevice {
         this.resume();
     }
 
-    public get positionX(): number {
+    public get posX(): number {
         return this._posX + this._movX;
     }
 
-    public get positionY(): number {
+    public get posY(): number {
         return this._posY + this._movY;
     }
 
