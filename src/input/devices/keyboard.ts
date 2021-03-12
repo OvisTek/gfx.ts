@@ -186,8 +186,8 @@ export class Keyboard extends InputDevice {
     public pause(): void {
         if (this._isPaused === false && this._element !== undefined) {
             // remove all existing listeners
-            this._element.removeEventListener("keydown", this._handlerDown, false);
-            this._element.removeEventListener("keyup", this._handlerUp, false);
+            document.removeEventListener("keydown", this._handlerDown, false);
+            document.removeEventListener("keyup", this._handlerUp, false);
         }
 
         this._isPaused = true;
@@ -200,8 +200,8 @@ export class Keyboard extends InputDevice {
             Keyboard._fillKeys(this._states, Event.NONE);
 
             // add the listeners
-            this._element.addEventListener("keydown", this._handlerDown, false);
-            this._element.addEventListener("keyup", this._handlerUp, false);
+            document.addEventListener("keydown", this._handlerDown, false);
+            document.addEventListener("keyup", this._handlerUp, false);
         }
 
         this._isPaused = false;
@@ -263,7 +263,7 @@ export class Keyboard extends InputDevice {
         }
     }
 
-    private readonly _handlerDown = (event: KeyboardEvent) => {
+    private readonly _handlerDown = (event: KeyboardEvent): void => {
         if (event.defaultPrevented) {
             return;
         }
@@ -289,7 +289,7 @@ export class Keyboard extends InputDevice {
         }
     }
 
-    private readonly _handlerUp = (event: KeyboardEvent) => {
+    private readonly _handlerUp = (event: KeyboardEvent): void => {
         if (event.defaultPrevented) {
             return;
         }

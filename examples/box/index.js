@@ -36,15 +36,27 @@ class MyTexturedBox extends Box {
 
         if (Input.keyboard.isPressed(Key.KEY_W)) {
             console.log("pressed w");
+
+            Input.mouse.lockPointer().then(() => {
+                console.log("locking mouse");
+            }).catch((err) => {
+                console.log(err);
+            });
         }
 
         if (Input.keyboard.isReleased(Key.KEY_W)) {
             console.log("released w");
+
+            Input.mouse.unlockPointer().then(() => {
+                console.log("unlocking mouse");
+            }).catch((err) => {
+                console.log(err);
+            });
         }
 
-        if (Input.keyboard.isPressedDown(Key.KEY_W)) {
-            console.log("held w");
-        }
+        //console.log(Input.keyboard);
+
+        console.log(Input.mouse.positionX + " " + Input.mouse.positionY);
     }
 }
 
