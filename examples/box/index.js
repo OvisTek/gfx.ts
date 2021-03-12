@@ -34,7 +34,7 @@ class MyTexturedBox extends Box {
 
         this.transform.euler = euler;
 
-        if (Input.keyboard.isPressed(Key.KEY_W)) {
+        if (Input.keyboard.isPressed(Key.W)) {
             console.log("pressed w");
 
             Input.mouse.lockPointer().then(() => {
@@ -44,7 +44,7 @@ class MyTexturedBox extends Box {
             });
         }
 
-        if (Input.keyboard.isReleased(Key.KEY_W)) {
+        if (Input.keyboard.isReleased(Key.W)) {
             console.log("released w");
 
             Input.mouse.unlockPointer().then(() => {

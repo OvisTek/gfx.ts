@@ -37,6 +37,18 @@ export abstract class InputState {
         return this._frame;
     }
 
+    public get isPressed(): boolean {
+        return this._event === Event.PRESS;
+    }
+
+    public get isReleased(): boolean {
+        return this._event === Event.RELEASE;
+    }
+
+    public get isHeld(): boolean {
+        return this._event === Event.HOLD;
+    }
+
     public _set(event: Event, altKey: boolean, ctrlKey: boolean, frame: number): InputState {
         this._event = event;
         this._altKey = altKey;
