@@ -125,7 +125,7 @@ export class Mouse extends InputDevice {
                 return reject(new Error("Mouse.lockPointer() - cannot lock pointer as target element is undefined"));
             }
 
-            if (this.pointerLocked === true) {
+            if (this.isPointerLocked === true) {
                 return reject(new Error("Mouse.lockPointer() - cannot lock as pointer is already locked"));
             }
 
@@ -145,7 +145,7 @@ export class Mouse extends InputDevice {
      */
     public unlockPointer(): Promise<void> {
         return new Promise<void>((accept, reject) => {
-            if (this.pointerLocked === false) {
+            if (this.isPointerLocked === false) {
                 return reject(new Error("Mouse.unlockPointer() - cannot unlock as pointer is not locked"));
             }
 
@@ -161,7 +161,7 @@ export class Mouse extends InputDevice {
     /**
      * Check if the current Mouse pointer is in a locked or unlocked state
      */
-    public get pointerLocked(): boolean {
+    public get isPointerLocked(): boolean {
         const state: Element | null = document.pointerLockElement;
 
         return state !== undefined && state !== null;
@@ -186,7 +186,7 @@ export class Mouse extends InputDevice {
         this._posX = event.clientX;
         this._posY = event.clientY;
 
-        if (this.pointerLocked) {
+        if (this.isPointerLocked === true) {
             this._movX += event.movementX;
             this._movY += event.movementY;
         }
