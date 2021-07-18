@@ -7,11 +7,6 @@ export class MathUtil {
     /** Multiply to convert from degrees to radians */
     public static readonly DEGTRAD: number = Math.PI / 180.0;
 
-    // used internally for some bit-shift operations
-    private static readonly INT8 = new Int8Array(4);
-    private static readonly INT32 = new Int32Array(MathUtil.INT8.buffer, 0, 1);
-    private static readonly FLOAT32 = new Float32Array(MathUtil.INT8.buffer, 0, 1);
-
     /**
      * Clamps a number between min and max
      * @param value The value to clamp
@@ -28,17 +23,5 @@ export class MathUtil {
         }
 
         return value;
-    }
-
-    /**
-     * Convert a provided number into its integer bit representation
-     * This is useful for certain hashing operations
-     * 
-     * @param value The value to convert
-     */
-    public static floatToIntBits(value: number): number {
-        MathUtil.FLOAT32[0] = value;
-
-        return MathUtil.INT32[0];
     }
 }
