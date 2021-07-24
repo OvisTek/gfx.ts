@@ -38,7 +38,7 @@ export class Input extends InputDevice {
         return this.instance.mouse;
     }
 
-    public setup(element: HTMLElement | undefined): void {
+    public setup(element: HTMLElement | null): void {
         this._keyboard.setup(element);
         this._mouse.setup(element);
     }

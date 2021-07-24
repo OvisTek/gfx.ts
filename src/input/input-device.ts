@@ -99,7 +99,7 @@ export abstract class InputState {
 export abstract class InputDevice {
     constructor() { }
 
-    public abstract setup(element: HTMLElement | undefined): void;
+    public abstract setup(element: HTMLElement | null): void;
     public abstract pause(): void;
     public abstract resume(): void;
 

@@ -60,7 +60,7 @@ export class Keyboard extends InputDevice {
     private readonly _states: Map<Key, KeyState>;
     private _holdFrameDelay: number;
 
-    private _element: HTMLElement | undefined = undefined;
+    private _element: HTMLElement | null = null;
 
     constructor() {
         super();
@@ -129,7 +129,7 @@ export class Keyboard extends InputDevice {
         return kd ? kd : Keyboard.DEFAULT_KEY;
     }
 
-    public setup(element: HTMLElement | undefined = undefined): void {
+    public setup(element: HTMLElement | null = null): void {
         // potentially de-register any previously registered events
         this.pause();
 
@@ -141,7 +141,7 @@ export class Keyboard extends InputDevice {
     }
 
     public pause(): void {
-        if (this._isPaused === false && this._element !== undefined) {
+        if (this._isPaused === false && this._element !== null) {
             // remove all existing listeners
             document.removeEventListener("keydown", this._handlerDown, false);
             document.removeEventListener("keyup", this._handlerUp, false);
@@ -151,7 +151,7 @@ export class Keyboard extends InputDevice {
     }
 
     public resume(): void {
-        if (this._isPaused === true && this._element !== undefined) {
+        if (this._isPaused === true && this._element !== null) {
             // reset all the key states
             Keyboard._fillKeys(this._keys, Event.NONE);
             Keyboard._fillKeys(this._states, Event.NONE);
@@ -170,10 +170,10 @@ export class Keyboard extends InputDevice {
 
         // update all current key states every frame
         for (const [k, v] of keys.entries()) {
-            if (v !== undefined && v !== null) {
+            if (v !== null && v !== null) {
                 const stateData: KeyState | undefined = states.get(k);
 
-                if (stateData === undefined || stateData === null) {
+                if (!stateData) {
                     continue;
                 }
 
@@ -214,7 +214,7 @@ export class Keyboard extends InputDevice {
 
     private static _fillKeys(keyRef: Map<Key, KeyState>, event: Event): void {
         for (const [, value] of keyRef.entries()) {
-            if (value !== undefined && value !== null) {
+            if (value !== null && value !== null) {
                 value._set(event, 0, 0);
             }
         }
@@ -227,12 +227,12 @@ export class Keyboard extends InputDevice {
 
         const keyCode: number = event.keyCode;
 
-        if (keyCode !== undefined) {
+        if (keyCode !== null) {
             const key: KeyState | undefined = this._states.get(keyCode);
             const states: number = InputState.compileStates(event.altKey, event.ctrlKey, event.metaKey, event.shiftKey);
 
             // ensure this key event is created and exists. Keys will be created on-demand
-            if (key !== undefined && key !== null) {
+            if (key) {
                 key._set(Event.PRESS, states, 0);
             }
             else {
@@ -254,12 +254,12 @@ export class Keyboard extends InputDevice {
 
         const keyCode: number = event.keyCode;
 
-        if (event.keyCode !== undefined) {
+        if (event.keyCode !== null) {
             const key: KeyState | undefined = this._states.get(keyCode);
             const states: number = InputState.compileStates(event.altKey, event.ctrlKey, event.metaKey, event.shiftKey);
 
             // ensure this key event is created and exists. Keys will be created on-demand
-            if (key !== undefined && key !== null) {
+            if (key) {
                 key._set(Event.RELEASE, states, 0);
             }
             else {

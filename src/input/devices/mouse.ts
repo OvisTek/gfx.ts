@@ -37,7 +37,7 @@ export class ButtonState extends InputState {
 
 export class Mouse extends InputDevice {
 
-    private _element: HTMLElement | undefined = undefined;
+    private _element: HTMLElement | null = null;
     private _isPaused: boolean;
 
     private _posX: number;
@@ -75,7 +75,7 @@ export class Mouse extends InputDevice {
         return this._posY + this._movY;
     }
 
-    public setup(element: HTMLElement | undefined = undefined): void {
+    public setup(element: HTMLElement | null = null): void {
         // potentially de-register any previously registered events
         this.pause();
 
@@ -87,7 +87,7 @@ export class Mouse extends InputDevice {
     }
 
     public pause(): void {
-        if (this._isPaused === false && this._element !== undefined) {
+        if (this._isPaused === false && this._element !== null) {
             // remove all existing listeners
             document.removeEventListener("pointerlockerror", this._pointerLockError, false);
             document.removeEventListener("pointerlockchange", this._pointerLockChange, false);
@@ -99,7 +99,7 @@ export class Mouse extends InputDevice {
     }
 
     public resume(): void {
-        if (this._isPaused === true && this._element !== undefined) {
+        if (this._isPaused === true && this._element !== null) {
             // add the listeners
             document.addEventListener("pointerlockerror", this._pointerLockError, false);
             document.addEventListener("pointerlockchange", this._pointerLockChange, false);
@@ -121,8 +121,8 @@ export class Mouse extends InputDevice {
      */
     public lockPointer(): Promise<void> {
         return new Promise<void>((accept, reject) => {
-            if (this._element === undefined) {
-                return reject(new Error("Mouse.lockPointer() - cannot lock pointer as target element is undefined"));
+            if (this._element === null) {
+                return reject(new Error("Mouse.lockPointer() - cannot lock pointer as target element is null"));
             }
 
             if (this.isPointerLocked === true) {
@@ -164,13 +164,13 @@ export class Mouse extends InputDevice {
     public get isPointerLocked(): boolean {
         const state: Element | null = document.pointerLockElement;
 
-        return state !== undefined && state !== null;
+        return state !== null && state !== null;
     }
 
     private readonly _pointerLockChange = (_event: Event): void => {
         const state: Element | null = document.pointerLockElement;
 
-        if (state !== undefined && state !== null && state === this._element) {
+        if (state !== null && state !== null && state === this._element) {
             this._lockPointerPromises.accept();
         }
         else {
