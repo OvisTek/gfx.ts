@@ -1,4 +1,5 @@
 import { Object3D } from "three";
+import { Identifiable } from "./identifiable";
 import { Entity } from "./stage/entity";
 
 /**
@@ -7,14 +8,15 @@ import { Entity } from "./stage/entity";
  * 
  * When assigning new values for a Transform, the values are copied
  */
-export class Transform {
+export class Transform extends Identifiable {
     private readonly _threeObject: Object3D;
     private readonly _owner: Entity;
-
-    private _parent: Transform | null = null;
     private readonly _children: Array<Transform>;
 
+    private _parent: Transform | null = null;
+
     constructor(owner: Entity) {
+        super();
         this._children = new Array<Transform>();
         this._threeObject = new Object3D();
         this._owner = owner;
@@ -74,7 +76,7 @@ export class Transform {
     public add(transform: Transform, preserveWorld: boolean = true): Transform {
         // the transform being added is already a hierarchy of this transform
         // there is nothing to do in this scenario
-        if (transform._parent === this) {
+        if (this.is(transform._parent)) {
             return this;
         }
 
@@ -111,7 +113,7 @@ export class Transform {
     public remove(transform: Transform): Transform {
         // the transform being removed is not actually part of this transform
         // hierarchy, thus there is nothing to do
-        if (transform._parent !== this) {
+        if (!this.is(transform._parent)) {
             return this;
         }
 
