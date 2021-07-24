@@ -99,9 +99,9 @@ export class PerspectiveCamera extends Camera {
     }
 
     public update(_dt: number): void {
-        if (this._requiresUpdate) {
-            const camera: ThreePerspectiveCamera = this._threeCamera;
+        const camera: ThreePerspectiveCamera = this._threeCamera;
 
+        if (this._requiresUpdate) {
             camera.fov = this.fov;
             camera.aspect = this.aspect;
             camera.near = this.near;
@@ -109,6 +109,13 @@ export class PerspectiveCamera extends Camera {
             camera.updateProjectionMatrix();
 
             this._requiresUpdate = false;
+        }
+
+        // copy the transforms from user into the camera so we can move around
+        if (!this.lock) {
+            camera.position.copy(this.transform.position);
+            camera.quaternion.copy(this.transform.orientation);
+            camera.scale.copy(this.transform.scale);
         }
     }
 

@@ -35,10 +35,7 @@ export class Transform extends Identifiable {
     }
 
     public set position(pos: Vector3) {
-        const posi: Vector3 = this._threeObject.position;
-        posi.x = pos.x;
-        posi.y = pos.y;
-        posi.z = pos.z;
+        this._threeObject.position.copy(pos);
     }
 
     public get orientation(): Quaternion {
@@ -46,12 +43,7 @@ export class Transform extends Identifiable {
     }
 
     public set orientation(quat: Quaternion) {
-        const quati: Quaternion = this._threeObject.quaternion;
-
-        quati.x = quat.x;
-        quati.y = quat.y;
-        quati.z = quat.z;
-        quati.w = quat.w;
+        this._threeObject.quaternion.copy(quat);
     }
 
     public get rotation(): Euler {
@@ -59,11 +51,7 @@ export class Transform extends Identifiable {
     }
 
     public set rotation(rot: Euler) {
-        const roti: Euler = this._threeObject.rotation;
-
-        roti.x = rot.x;
-        roti.y = rot.y;
-        roti.z = rot.z;
+        this._threeObject.rotation.copy(rot);
     }
 
     public get scale(): Vector3 {
@@ -71,10 +59,7 @@ export class Transform extends Identifiable {
     }
 
     public set scale(sca: Vector3) {
-        const scai: Vector3 = this._threeObject.scale;
-        scai.x = sca.x;
-        scai.y = sca.y;
-        scai.z = sca.z;
+        this._threeObject.scale.copy(sca);
     }
 
     /**

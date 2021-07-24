@@ -7,4 +7,14 @@ import { Entity, EntityOptions } from "../stage/entity";
 export abstract class Camera extends Entity {
     public abstract get isPerspective(): boolean;
     public abstract get isOrthographic(): boolean;
+
+    private _lock: boolean = false;
+
+    public get lock(): boolean {
+        return this._lock;
+    }
+
+    public set lock(locked: boolean) {
+        this._lock = locked;
+    }
 }
