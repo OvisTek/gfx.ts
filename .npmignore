@@ -1,6 +1,7 @@
 node_modules/
 examples/
 local-server/
+local-server.yml
 tsconfig.json
 package-lock.json
 src/
