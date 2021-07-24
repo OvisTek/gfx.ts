@@ -62,7 +62,7 @@ export class Renderer {
      * @param error - the error to handle (if any)
      */
     public errorOrPass(error: Error | string | undefined | null): void {
-        if (error === undefined || error === null) {
+        if (!error) {
             return;
         }
 

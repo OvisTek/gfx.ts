@@ -12,7 +12,7 @@ export class SavedPromiseArray<T> {
     }
 
     public push(promise: SavedPromise<T> | undefined | null): void {
-        if (promise === undefined || promise === null) {
+        if (!promise) {
             return;
         }
 
