@@ -1,5 +1,4 @@
 import { Input } from "../input/input";
-import { GLContext } from "./gl-context";
 import { Stage } from "./stage/stage";
 import { YieldQueue } from "./yield/yield-queue";
 

@@ -1,18 +1,5 @@
-import { Euler } from "../math/euler";
-import { MathUtil } from "../math/math-util";
-import { Matrix4 } from "../math/matrix4";
-import { Quaternion, QuaternionJson } from "../math/quaternion";
-import { Vector3, Vector3Json } from "../math/vector3";
-
-/**
- * Interface for serialising and deserialising Transform structure
- * for storage/database purposes
- */
-export interface TransformJson {
-    readonly position: Vector3Json;
-    readonly rotation: QuaternionJson;
-    readonly scale: Vector3Json;
-}
+import { Object3D } from "three";
+import { Entity } from "./stage/entity";
 
 /**
  * Transform is responsible for allowing positioning, rotating and scaling of
@@ -21,260 +8,127 @@ export interface TransformJson {
  * When assigning new values for a Transform, the values are copied
  */
 export class Transform {
-    // these are the components that should be used to control this transform
-    private readonly _position: Vector3;
-    private readonly _rotation: Quaternion;
-    private readonly _scale: Vector3;
-    private readonly _euler: Euler;
+    private readonly _threeObject: Object3D;
+    private readonly _owner: Entity;
 
-    // these components are updated automatically based on the scene-graph
-    private readonly _localMatrix: Matrix4;
-    private readonly _worldMatrix: Matrix4;
+    private _parent: Transform | null = null;
+    private readonly _children: Array<Transform>;
 
-    // these components are updated on-demand
-    private _requiresLocalInverseUpdate: boolean;
-    private _requiresWorldInverseUpdate: boolean;
-    private _requiresNormalMatrixUpdate: boolean;
-    private readonly _localMatrixInverse: Matrix4;
-    private readonly _worldMatrixInverse: Matrix4;
-    private readonly _normalMatrix: Matrix4;
-
-    // the previously computed hash of this Transform
-    private _hash: number = 0;
-    private _parentHash: number = 0;
-
-    constructor() {
-        this._position = new Vector3();
-        this._rotation = new Quaternion();
-        this._scale = new Vector3(1, 1, 1);
-        this._euler = this._rotation.euler();
-
-        this._localMatrix = new Matrix4();
-        this._worldMatrix = new Matrix4();
-        this._normalMatrix = new Matrix4();
-
-        this._localMatrixInverse = new Matrix4();
-        this._worldMatrixInverse = new Matrix4();
-
-        // inverse of the identity matrix is also the identity matrix
-        this._requiresLocalInverseUpdate = false;
-        this._requiresWorldInverseUpdate = false;
-        this._requiresNormalMatrixUpdate = false;
+    constructor(owner: Entity) {
+        this._children = new Array<Transform>();
+        this._threeObject = new Object3D();
+        this._owner = owner;
     }
 
     /**
-     * Serialise this Transform for storage/database purposes
-     * See TransformJson Interface for details
+     * Returns the THREE.js Object backing
      */
-    public serialise(): TransformJson {
-        return {
-            position: this._position.serialise(),
-            rotation: this._rotation.serialise(),
-            scale: this._scale.serialise()
-        };
+    public get object(): Object3D {
+        return this._threeObject;
     }
 
     /**
-     * Deserialise a previously serialised version of a Transform
-     * 
-     * @param values The serialised Transform to deserialise
+     * Returns the current entity this transform is attached to
      */
-    public static deserialise(values: TransformJson): Transform {
-        return new Transform().deserialise(values);
+    public get owner(): Entity {
+        return this._owner;
     }
 
     /**
-     * Deserialise a previously serialised version of a Transform
-     *
-     * @param values The serialised Transform to deserialise
+     * Returns the parent Transform if any or null.
+     * To set the parent, use Transform.add()
      */
-    public deserialise(values: TransformJson): Transform {
-        this._position.deserialise(values.position);
-        this._rotation.deserialise(values.rotation);
-        this._scale.deserialise(values.scale);
+    public get parent(): Transform | null {
+        return this._parent;
+    }
+
+    /**
+     * Returns the children Transforms as an Array
+     */
+    public get children(): Array<Transform> {
+        return this._children;
+    }
+
+    /**
+     * Detach this Transform from a previous hierarchy
+     * @returns - true if deatched, false otherwise
+     */
+    public detach(): boolean {
+        // nothing to detach
+        if (!this._parent) {
+            return false;
+        }
+
+        // otherwise detach from hierarchy
+        this._parent.remove(this);
+
+        return true;
+    }
+
+    /**
+     * Adds another transform into this transform hierarchy
+     * @param transform - the transform to add into this hierarchy
+     * @param preserveWorld - (optional - default: true) should the world coordinate be preserved?
+     * @returns - this transform
+     */
+    public add(transform: Transform, preserveWorld: boolean = true): Transform {
+        // the transform being added is already a hierarchy of this transform
+        // there is nothing to do in this scenario
+        if (transform._parent === this) {
+            return this;
+        }
+
+        // if the transform being added has another parent, we need to detach from
+        // the previous hierarchy
+        transform.detach();
+
+        // this should not actually happen, but here just in-case
+        // throw an error letting the user know something odd happened
+        if (transform._parent !== null) {
+            throw new Error("Transform.add(Transform, boolean) - an internal error happened, the transform could not be detached correctly, cannot proceed");
+        }
+
+        // set the new parent of the target transform as this transform
+        transform._parent = this;
+
+        if (preserveWorld === true) {
+            this._threeObject.attach(transform._threeObject);
+        }
+        else {
+            this._threeObject.add(transform._threeObject);
+        }
+
+        this._children.push(transform);
 
         return this;
     }
 
-    public get position(): Vector3 {
-        return this._position;
-    }
-
-    public set position(value: Vector3) {
-        this._position.copy(value);
-    }
-
-    public get rotation(): Quaternion {
-        return this._rotation;
-    }
-
-    public set rotation(value: Quaternion) {
-        this._rotation.copy(value);
-    }
-
-    public get scale(): Vector3 {
-        return this._scale;
-    }
-
-    public set scale(value: Vector3) {
-        this._scale.copy(value);
-    }
-
-    public get euler(): Euler {
-        this._rotation.euler(this._euler);
-
-        return this._euler;
-    }
-
-    public set euler(value: Euler) {
-        value.quaternion(this._rotation);
-    }
-
     /**
-     * Returns the 4x4 Matrix reference that represents this Transform in local/object space
+     * Removes the provided transform from this object hierarchy
+     * @param transform - the transform to remove from this object hirarchy
+     * @returns - this transform
      */
-    public get localMatrix(): Matrix4 {
-        return this._localMatrix;
-    }
-
-    /**
-     * Returns the 4x4 Matrix reference that is the inverse of localMatrix
-     */
-    public get localMatrixInverse(): Matrix4 {
-        // update on-demand if needed
-        if (this._requiresLocalInverseUpdate === true) {
-            this._localMatrix.invert(this._localMatrixInverse);
-
-            this._requiresLocalInverseUpdate = false;
+    public remove(transform: Transform): Transform {
+        // the transform being removed is not actually part of this transform
+        // hierarchy, thus there is nothing to do
+        if (transform._parent !== this) {
+            return this;
         }
 
-        return this._localMatrixInverse;
-    }
+        // remove the target from the children array
+        const children: Array<Transform> = this._children;
+        const index: number = children.indexOf(transform);
 
-    /**
-     * Returns the 4x4 Matrix reference that represents this Transform in world space
-     * 
-     * NOTE: The contents of this matrix will override each frame. For root objects, the localMatrix is
-     * also the world matrix.
-     */
-    public get worldMatrix(): Matrix4 {
-        return this._worldMatrix;
-    }
-
-    /**
-     * Returns the 4x4 Matrix reference that is the inverse of worldMatrix
-     */
-    public get worldMatrixInverse(): Matrix4 {
-        // update on-demand if needed
-        if (this._requiresWorldInverseUpdate === true) {
-            this._worldMatrix.invert(this._worldMatrixInverse);
-
-            this._requiresWorldInverseUpdate = false;
+        if (index > -1) {
+            children.splice(index, 1);
         }
 
-        return this._worldMatrixInverse;
-    }
+        // remove from THREE.js hierarchy
+        this._threeObject.remove(transform._threeObject);
 
-    /**
-     * Returns the 4x4 Matrix required for transforming normals
-     */
-    public get normalMatrix(): Matrix4 {
-        if (this._requiresNormalMatrixUpdate === true) {
-            this._normalMatrix.copy(this.worldMatrixInverse).transpose();
+        // reset the target transform parent to be null
+        transform._parent = null;
 
-            this._requiresNormalMatrixUpdate = false;
-        }
-
-        return this._normalMatrix;
-    }
-
-    /**
-     * Returns the previously computed hash of this Transform derived from
-     * its components
-     */
-    public get hash(): number {
-        return this._hash;
-    }
-
-    /**
-     * Generates a hash-code of this Transform. The hash can be used to check if
-     * the transform has actually updated or requires some form of update
-     */
-    public get hashCode(): number {
-        const prime: number = 31;
-        let result: number = 1;
-
-        // hash the position
-        result = prime * result + MathUtil.floatToIntBits(this._position.x);
-        result = prime * result + MathUtil.floatToIntBits(this._position.y);
-        result = prime * result + MathUtil.floatToIntBits(this._position.z);
-
-        // hash the rotation
-        result = prime * result + MathUtil.floatToIntBits(this._rotation.x);
-        result = prime * result + MathUtil.floatToIntBits(this._rotation.y);
-        result = prime * result + MathUtil.floatToIntBits(this._rotation.z);
-        result = prime * result + MathUtil.floatToIntBits(this._rotation.w);
-
-        // hash the scale
-        result = prime * result + MathUtil.floatToIntBits(this._scale.x);
-        result = prime * result + MathUtil.floatToIntBits(this._scale.y);
-        result = prime * result + MathUtil.floatToIntBits(this._scale.z);
-
-        return result;
-    }
-
-    /**
-     * Converts the current world matrix into the local matrix. This is useful
-     * when attaching/detaching from/to parent objects and want to maintain the
-     * current world position of the object.
-     */
-    public worldToLocal(): void {
-        this._worldMatrix.decomposePosRotSca(this._position, this._rotation, this._scale);
-    }
-
-    /**
-     * Called by the renderer to update the world position of this transform.
-     * Passes the transform that represents the parent/root of this transform
-     * 
-     * @param parent The parent transform that should be used to update this transform
-     */
-    public apply(parent: Transform): void {
-        // update the local matrix from position, rotation and scale
-        const isUpdated: boolean = this.updateLocalMatrix();
-
-        const parentHash = parent.hash;
-
-        // we update the world matrix only if either the local transform has changed
-        // or the parent transform has changed
-        if (isUpdated || parentHash !== this._parentHash) {
-            // update the world matrix of this transform from parent
-            Matrix4.multiply(parent.worldMatrix, this._localMatrix, this._worldMatrix);
-
-            this._requiresWorldInverseUpdate = true;
-            this._requiresNormalMatrixUpdate = true;
-        }
-
-        // update hash codes for the next apply() call
-        this._parentHash = parentHash;
-    }
-
-    /**
-     * Updates/Composes local matrix if needed from position, rotation and scale components
-     */
-    private updateLocalMatrix(): boolean {
-        const computedHash: number = this.hashCode;
-
-        // this means the transform has changed since the last update, we need to re-update
-        // the local matrix
-        if (computedHash !== this._hash) {
-            this._localMatrix.composePosRotSca(this._position, this._rotation, this._scale);
-
-            this._requiresLocalInverseUpdate = true;
-            this._hash = computedHash;
-
-            return true;
-        }
-
-        return false;
+        return this;
     }
 }

@@ -1,5 +1,5 @@
 import { Matrix4 } from "../../math/matrix4";
-import { Entity } from "../scriptable/entity";
+import { Entity } from "../stage/entity";
 
 /**
  * All cameras are scene entities like any other as such are part

@@ -2,7 +2,7 @@ import { Camera } from "../camera/camera";
 import { PerspectiveCamera } from "../camera/perspective-camera";
 import { DirectionalLight } from "../lights/directional-light";
 import { Renderer } from "../renderer";
-import { Entity } from "../scriptable/entity";
+import { Entity } from "./entity";
 import { StageRoot } from "./stage-root";
 
 /**

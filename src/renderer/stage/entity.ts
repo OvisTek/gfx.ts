@@ -1,7 +1,6 @@
-import { Stage } from "../stage/stage";
+import { Stage } from "./stage";
 import { Transform } from "../transform";
 import { Renderer } from "../renderer";
-import { Component } from "./component";
 import { Identifiable } from "../identifiable";
 
 /**

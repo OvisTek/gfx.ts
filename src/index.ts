@@ -39,7 +39,7 @@ export * from "./renderer/stage/stage-root";
 export * from "./renderer/stage/stage";
 
 // export scriptable
-export * from "./renderer/scriptable/entity";
+export * from "./renderer/stage/entity";
 
 // export extras materials
 export * from "./extras/materials/basic-texture-material/basic-texture-material";
