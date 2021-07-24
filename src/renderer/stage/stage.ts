@@ -1,9 +1,5 @@
-import { Camera } from "../camera/camera";
-import { PerspectiveCamera } from "../camera/perspective-camera";
-import { DirectionalLight } from "../lights/directional-light";
 import { Renderer } from "../renderer";
 import { Entity } from "./entity";
-import { StageRoot } from "./stage-root";
 
 /**
  * The Stage represents a collection of objects as a hierarchy to be executed
@@ -11,39 +7,13 @@ import { StageRoot } from "./stage-root";
  * 
  * Only one Stage can be active at any one time.
  */
-export class Stage {
-    private readonly _root: StageRoot;
-    private readonly _camera: PerspectiveCamera;
-    private readonly _light: DirectionalLight;
+export abstract class Stage {
+    private readonly _objects: Array<Entity>;
     private readonly _queue: Array<Entity>;
 
     constructor() {
-        this._root = new StageRoot();
-        this._camera = new PerspectiveCamera();
-        this._light = new DirectionalLight();
-
         this._queue = new Array<Entity>();
-
-        this._camera.parent = this._root;
-    }
-
-    /**
-     * Returns the root object of the stage.
-     * There is only a single root object
-     */
-    public get root(): StageRoot {
-        return this._root;
-    }
-
-    public get light(): DirectionalLight {
-        return this._light;
-    }
-
-    /**
-     * Returns the current camera/view of the Stage
-     */
-    public get camera(): Camera {
-        return this._camera;
+        this._objects = new Array<Entity>();
     }
 
     /**
@@ -53,8 +23,17 @@ export class Stage {
      */
     public queue<T extends Entity>(instance: T): Promise<T> {
         return new Promise<T>((accept, reject) => {
-            Renderer.instance.yield.next.then((renderer) => {
-                instance._execCreate(this).then(() => {
+            if (instance.isCreated) {
+                return reject(new Error("Stage.queue(instance) - queued entity is already created and cannot be re-created"));
+            }
+
+            // add the object to the overall objects pool
+            this._objects.push(instance);
+
+            // otherwise, execute this objects create() function at the start
+            // of the next render loop
+            Renderer.instance.yield.next.then((_renderer) => {
+                instance._onCreate(this).then(() => {
                     this._queue.push(instance);
 
                     accept(instance);
@@ -69,9 +48,16 @@ export class Stage {
      * @param newWidth - The new width of the renderer
      * @param newHeight - The new height of the renderer
      */
-    public _resize(newWidth: number, newHeight: number) {
-        this._camera.width = newWidth;
-        this._camera.height = newHeight;
+    public _resize(newWidth: number, newHeight: number): void {
+
+    }
+
+    public _pause(): void {
+
+    }
+
+    public _resume(): void {
+
     }
 
     /**

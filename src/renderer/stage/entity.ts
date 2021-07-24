@@ -2,6 +2,7 @@ import { Stage } from "./stage";
 import { Transform } from "../transform";
 import { Renderer } from "../renderer";
 import { Identifiable } from "../identifiable";
+import { Util } from "../../util/util";
 
 /**
  * Construction options for the Entity
@@ -21,7 +22,7 @@ export abstract class Entity extends Identifiable {
 
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
-    private readonly _stage: Stage;
+    private _stage: Stage | null;
 
     constructor(opt: EntityOptions | null = null) {
         super();
@@ -29,7 +30,7 @@ export abstract class Entity extends Identifiable {
         const options: EntityOptions = opt || Entity._OPT_DEFAULT;
 
         this._transform = new Transform(this);
-        this._stage = Renderer.instance.stage;
+        this._stage = null;
 
         // automatically add this object 
         if (options.autoCreate) {
@@ -88,10 +89,33 @@ export abstract class Entity extends Identifiable {
     }
 
     /**
+     * Sets the new parent for this Object into a new Entity
+     */
+    public set parent(entity: Entity | null) {
+        if (entity) {
+            entity.transform.add(this.transform);
+        }
+        else {
+            this.transform.detach();
+        }
+    }
+
+    /**
      * Returns the Stage that this object is attached to
      */
     public get stage(): Stage {
-        return this._stage;
+        if (this._stage) {
+            return this._stage;
+        }
+
+        throw new Error("Entity.stage - invalid access, stage is null, the object has not been constructed yet");
+    }
+
+    /**
+     * Checks if this object has already been created or is about to be created
+     */
+    public get isCreated(): boolean {
+        return this._stage !== null;
     }
 
     /**
@@ -102,14 +126,35 @@ export abstract class Entity extends Identifiable {
     }
 
     /**
+     * Executed by the Stage when this object should be created
+     * @param stage 
+     * @returns 
+     */
+    public _onCreate(stage: Stage): Promise<void> {
+        this._stage = stage;
+
+        return new Promise<void>((accept, reject) => {
+            try {
+                const value: Promise<void> | void = this.create();
+
+                // resolve the value if its a Promise
+                if (value && Util.isPromise(value)) {
+                    return value.then(accept).catch(reject);
+                }
+
+                return accept();
+            }
+            catch (error) {
+                return reject(error);
+            }
+        });
+    }
+
+    /**
      * Called by the Rendering Engine to construct this object asynchronously. Object
      * will not be executed/rendered until the promise is resolved
      */
-    protected create(): Promise<void> {
-        return new Promise((accept, _) => {
-            return accept();
-        });
-    }
+    protected create(): Promise<void> | void { }
 
     /**
      * Called by the Rendering Engine first time object is executed. This happens at the

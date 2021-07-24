@@ -98,11 +98,7 @@ export class PerspectiveCamera extends Camera {
         return false;
     }
 
-    /**
-     * Called by the Renderer every frame. This will update the projection matrix
-     * if any of the components have changed.
-     */
-    protected update(_dt: number) {
+    protected update(_dt: number): void {
         if (this._requiresUpdate) {
             const camera: ThreePerspectiveCamera = this._threeCamera;
 
@@ -114,5 +110,10 @@ export class PerspectiveCamera extends Camera {
 
             this._requiresUpdate = false;
         }
+    }
+
+    protected onResize(newWidth: number, newHeight: number): void {
+        this.width = newWidth;
+        this.height = newHeight;
     }
 }

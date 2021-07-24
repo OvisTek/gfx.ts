@@ -1,4 +1,5 @@
 import { Object3D } from "three";
+import { Util } from "../util/util";
 import { Identifiable } from "./identifiable";
 import { Entity } from "./stage/entity";
 
@@ -117,13 +118,7 @@ export class Transform extends Identifiable {
             return this;
         }
 
-        // remove the target from the children array
-        const children: Array<Transform> = this._children;
-        const index: number = children.indexOf(transform);
-
-        if (index > -1) {
-            children.splice(index, 1);
-        }
+        Util.removeFromArray(this._children, transform);
 
         // remove from THREE.js hierarchy
         this._threeObject.remove(transform._threeObject);
