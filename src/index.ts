@@ -11,6 +11,7 @@ export { Mouse } from "./input/devices/mouse";
 export { Renderer } from "./renderer/renderer";
 export { Transform } from "./renderer/transform";
 export { Stage } from "./renderer/stage/stage";
+export { Component } from "./renderer/stage/component";
 
 // export camera
 export { Camera } from "./renderer/camera/camera";

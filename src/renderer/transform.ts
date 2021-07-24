@@ -1,4 +1,4 @@
-import { Object3D } from "three";
+import { Euler, Object3D, Quaternion, Vector3 } from "three";
 import { Util } from "../util/util";
 import { Identifiable } from "./identifiable";
 import { Entity } from "./stage/entity";
@@ -28,6 +28,53 @@ export class Transform extends Identifiable {
      */
     public get object(): Object3D {
         return this._threeObject;
+    }
+
+    public get position(): Vector3 {
+        return this._threeObject.position;
+    }
+
+    public set position(pos: Vector3) {
+        const posi: Vector3 = this._threeObject.position;
+        posi.x = pos.x;
+        posi.y = pos.y;
+        posi.z = pos.z;
+    }
+
+    public get orientation(): Quaternion {
+        return this._threeObject.quaternion;
+    }
+
+    public set orientation(quat: Quaternion) {
+        const quati: Quaternion = this._threeObject.quaternion;
+
+        quati.x = quat.x;
+        quati.y = quat.y;
+        quati.z = quat.z;
+        quati.w = quat.w;
+    }
+
+    public get rotation(): Euler {
+        return this._threeObject.rotation;
+    }
+
+    public set rotation(rot: Euler) {
+        const roti: Euler = this._threeObject.rotation;
+
+        roti.x = rot.x;
+        roti.y = rot.y;
+        roti.z = rot.z;
+    }
+
+    public get scale(): Vector3 {
+        return this._threeObject.scale;
+    }
+
+    public set scale(sca: Vector3) {
+        const scai: Vector3 = this._threeObject.scale;
+        scai.x = sca.x;
+        scai.y = sca.y;
+        scai.z = sca.z;
     }
 
     /**

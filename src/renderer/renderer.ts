@@ -35,6 +35,14 @@ export class Renderer {
         this._height = 1024;
     }
 
+    public get threeRenderer(): WebGLRenderer {
+        if (this._threeRenderer) {
+            return this._threeRenderer;
+        }
+
+        throw new Error("Renderer.threeRenderer - invalid access, object has not been constructed yet");
+    }
+
     public get stage(): Stage {
         if (this._stage) {
             return this._stage;
@@ -105,7 +113,9 @@ export class Renderer {
 
         Input.instance.pause();
 
-        // TO-DO propogate onPause event to stage
+        if (this._stage) {
+            this._stage._pause(this);
+        }
     }
 
     public resume(): void {
@@ -113,7 +123,9 @@ export class Renderer {
 
         Input.instance.resume();
 
-        // TO-DO propogate onResume event to stage
+        if (this._stage) {
+            this._stage._resume(this);
+        }
     }
 
     public start(): void {

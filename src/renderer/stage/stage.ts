@@ -1,4 +1,5 @@
 import { Scene } from "three";
+import { PerspectiveCamera } from "../camera/perspective-camera";
 import { Renderer } from "../renderer";
 import { Entity } from "./entity";
 import { StageRoot } from "./stage-root";
@@ -13,6 +14,7 @@ export abstract class Stage {
     private readonly _objects: Array<Entity>;
     private readonly _queue: Array<Entity>;
     private readonly _root: Entity;
+    private readonly _camera: PerspectiveCamera;
 
     private readonly _threeScene: Scene;
 
@@ -22,6 +24,7 @@ export abstract class Stage {
 
         this._root = new StageRoot(this);
         this._threeScene = new Scene();
+        this._camera = new PerspectiveCamera();
 
         // add the root to the scene for rendering
         this._threeScene.add(this._root.transform.object);
@@ -32,6 +35,10 @@ export abstract class Stage {
      */
     public get root(): Entity {
         return this._root;
+    }
+
+    public get camera(): PerspectiveCamera {
+        return this._camera;
     }
 
     /**
@@ -175,6 +182,7 @@ export abstract class Stage {
         }
 
         // perform rendering
+        renderer.threeRenderer.render(this._threeScene, this._camera.threeCamera);
 
         // run the late update loop
         for (let i: number = 0; i < length; i++) {

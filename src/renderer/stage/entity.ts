@@ -3,6 +3,7 @@ import { Transform } from "../transform";
 import { Renderer } from "../renderer";
 import { Identifiable } from "../identifiable";
 import { Util } from "../../util/util";
+import { Component } from "./component";
 
 /**
  * Construction options for the Entity
@@ -22,6 +23,7 @@ export abstract class Entity extends Identifiable {
 
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
+    private readonly _components: Array<Component>;
     protected _stage: Stage | null;
 
     constructor(opt: EntityOptions | null = null) {
@@ -30,12 +32,31 @@ export abstract class Entity extends Identifiable {
         const options: EntityOptions = opt || Entity._OPT_DEFAULT;
 
         this._transform = new Transform(this);
+        this._components = new Array<Component>();
         this._stage = null;
 
         // automatically add this object 
         if (options.autoCreate) {
             Renderer.instance.stage.queue(this);
         }
+    }
+
+    public addComponent(component: Component): void {
+        if (Util.isInArray(this._components, component)) {
+            throw new Error("Entity.addComponent() - attempted to add component that already exists in current entity");
+        }
+
+        this._components.push(component);
+        this.transform.object.add(component.object);
+    }
+
+    public removeComponent(component: Component): void {
+        if (!Util.isInArray(this._components, component)) {
+            throw new Error("Entity.addComponent() - attempted to remove component that does not exist in current entity");
+        }
+
+        Util.removeFromArray(this._components, component);
+        component.object.removeFromParent();
     }
 
     /**

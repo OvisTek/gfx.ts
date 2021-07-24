@@ -26,4 +26,20 @@ export class Util {
 
         return false;
     }
+
+    /**
+     * Checks if the provided Object is in the provided Array
+     * @param array - the array to check against
+     * @param object - the object to check
+     * @returns - true if the object exists, false otherwise
+     */
+    public static isInArray(array: any, object: any): boolean {
+        const index: number = array.indexOf(object);
+
+        if (index > -1) {
+            return true;
+        }
+
+        return false;
+    }
 }
