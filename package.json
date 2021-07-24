@@ -1,5 +1,5 @@
 {
-  "name": "gfx.ts",
+  "name": "@ovistek/gfx.ts",
   "version": "0.0.1",
   "description": "Lightweight TypeScript WebGL Renderer using three.js",
   "main": "dist/index.js",
