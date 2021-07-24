@@ -52,8 +52,8 @@ export abstract class Entity extends Identifiable {
      * 
      * @param type The object type to cast this entity into
      */
-    public cast<T extends Entity>(type: new (...params: any[]) => T): T | undefined {
-        return (this instanceof type) ? this as T : undefined;
+    public cast<T extends Entity>(type: new (...params: any[]) => T): T | null {
+        return (this instanceof type) ? this as T : null;
     }
 
     /**
@@ -64,9 +64,9 @@ export abstract class Entity extends Identifiable {
      */
     public safeCast<T extends Entity>(type: new (...params: any[]) => T): Promise<T> {
         return new Promise((accept, reject) => {
-            const object: T | undefined = this.cast(type);
+            const object: T | null = this.cast(type);
 
-            if (object !== undefined) {
+            if (object) {
                 return accept(object);
             }
 
@@ -106,7 +106,7 @@ export abstract class Entity extends Identifiable {
      * will not be executed/rendered until the promise is resolved
      */
     protected create(): Promise<void> {
-        return new Promise((accept, reject) => {
+        return new Promise((accept, _) => {
             return accept();
         });
     }
@@ -122,14 +122,14 @@ export abstract class Entity extends Identifiable {
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    protected update(deltaTime: number): void { }
+    protected update(_deltaTime: number): void { }
 
     /**
      * Called by the Rendering Engine just after a rendering was done
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    protected lateUpdate(deltaTime: number): void { }
+    protected lateUpdate(_deltaTime: number): void { }
 
     /**
      * Called by the Rendering Engine when it was paused by a user or a script
@@ -152,5 +152,5 @@ export abstract class Entity extends Identifiable {
      * @param newWidth The new width of the Renderer/Canvas
      * @param newHeight The new height of the Renderer/Canvas
      */
-    protected onResize(newWidth: number, newHeight: number): void { }
+    protected onResize(_newWidth: number, _newHeight: number): void { }
 }

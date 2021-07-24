@@ -1,5 +1,5 @@
 import { Camera } from "./camera";
-import { Matrix4 } from "../../math/matrix4";
+import { PerspectiveCamera as ThreePerspectiveCamera } from "three";
 
 /**
  * Perspective Camera for 3D Scenes
@@ -12,24 +12,23 @@ export class PerspectiveCamera extends Camera {
     private _far: number;
     private _requiresUpdate: boolean;
 
-    private readonly _cameraMatrix: Matrix4;
+    private readonly _threeCamera: ThreePerspectiveCamera;
 
-    constructor(fov: number = 50, width: number = 1024, height: number = 1024, near: number = 0.1, far: number = 5000) {
+    constructor(fov: number = 50, width: number = 1024, height: number = 1024, near: number = 0.1, far: number = 5000.0) {
         super();
-
-        this._cameraMatrix = new Matrix4();
 
         this._fov = fov;
         this._width = width;
         this._height = height;
         this._near = near;
         this._far = far;
-
-        // sets the camera matrix to the projection matrix
-        this._cameraMatrix.setToProjection(this.near, this.far, this.fov, this.aspect);
-
-        // no need to update until the variables change
         this._requiresUpdate = false;
+
+        this._threeCamera = new ThreePerspectiveCamera(this.fov, this.aspect, this.near, this.far);
+    }
+
+    public get threeCamera(): ThreePerspectiveCamera {
+        return this._threeCamera;
     }
 
     public get fov(): number {
@@ -99,18 +98,19 @@ export class PerspectiveCamera extends Camera {
         return false;
     }
 
-    public get cameraMatrix(): Matrix4 {
-        return this._cameraMatrix;
-    }
-
     /**
      * Called by the Renderer every frame. This will update the projection matrix
      * if any of the components have changed.
      */
-    protected update(dt: number) {
+    protected update(_dt: number) {
         if (this._requiresUpdate) {
-            // resets the projection matrix to the new values
-            this._cameraMatrix.setToProjection(this.near, this.far, this.fov, this.aspect);
+            const camera: ThreePerspectiveCamera = this._threeCamera;
+
+            camera.fov = this.fov;
+            camera.aspect = this.aspect;
+            camera.near = this.near;
+            camera.far = this.far;
+            camera.updateProjectionMatrix();
 
             this._requiresUpdate = false;
         }
