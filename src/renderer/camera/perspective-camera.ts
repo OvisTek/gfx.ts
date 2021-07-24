@@ -98,7 +98,7 @@ export class PerspectiveCamera extends Camera {
         return false;
     }
 
-    protected update(_dt: number): void {
+    public update(_dt: number): void {
         if (this._requiresUpdate) {
             const camera: ThreePerspectiveCamera = this._threeCamera;
 
@@ -112,7 +112,7 @@ export class PerspectiveCamera extends Camera {
         }
     }
 
-    protected onResize(newWidth: number, newHeight: number): void {
+    public onResize(newWidth: number, newHeight: number): void {
         this.width = newWidth;
         this.height = newHeight;
     }

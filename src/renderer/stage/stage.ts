@@ -1,5 +1,7 @@
+import { Scene } from "three";
 import { Renderer } from "../renderer";
 import { Entity } from "./entity";
+import { StageRoot } from "./stage-root";
 
 /**
  * The Stage represents a collection of objects as a hierarchy to be executed
@@ -10,10 +12,26 @@ import { Entity } from "./entity";
 export abstract class Stage {
     private readonly _objects: Array<Entity>;
     private readonly _queue: Array<Entity>;
+    private readonly _root: Entity;
+
+    private readonly _threeScene: Scene;
 
     constructor() {
         this._queue = new Array<Entity>();
         this._objects = new Array<Entity>();
+
+        this._root = new StageRoot(this);
+        this._threeScene = new Scene();
+
+        // add the root to the scene for rendering
+        this._threeScene.add(this._root.transform.object);
+    }
+
+    /**
+     * Access the top-most root entity for the Stage
+     */
+    public get root(): Entity {
+        return this._root;
     }
 
     /**
@@ -48,16 +66,68 @@ export abstract class Stage {
      * @param newWidth - The new width of the renderer
      * @param newHeight - The new height of the renderer
      */
-    public _resize(newWidth: number, newHeight: number): void {
+    public _resize(newWidth: number, newHeight: number, renderer: Renderer): void {
+        const objects: Array<Entity> = this._objects;
+        const length: number = objects.length;
 
+        for (let i: number = 0; i < length; i++) {
+            const object: Entity = objects[i];
+
+            try {
+                object.onResize(newWidth, newHeight);
+            }
+            catch (error) {
+                renderer.errorOrPass(error);
+            }
+        }
     }
 
-    public _pause(): void {
+    public _pause(renderer: Renderer): void {
+        const objects: Array<Entity> = this._objects;
+        const length: number = objects.length;
 
+        for (let i: number = 0; i < length; i++) {
+            const object: Entity = objects[i];
+
+            try {
+                object.onPause();
+            }
+            catch (error) {
+                renderer.errorOrPass(error);
+            }
+        }
     }
 
-    public _resume(): void {
+    public _destroy(renderer: Renderer): void {
+        const objects: Array<Entity> = this._objects;
+        const length: number = objects.length;
 
+        for (let i: number = 0; i < length; i++) {
+            const object: Entity = objects[i];
+
+            try {
+                object.onDestroy();
+            }
+            catch (error) {
+                renderer.errorOrPass(error);
+            }
+        }
+    }
+
+    public _resume(renderer: Renderer): void {
+        const objects: Array<Entity> = this._objects;
+        const length: number = objects.length;
+
+        for (let i: number = 0; i < length; i++) {
+            const object: Entity = objects[i];
+
+            try {
+                object.onResume();
+            }
+            catch (error) {
+                renderer.errorOrPass(error);
+            }
+        }
     }
 
     /**
@@ -72,28 +142,50 @@ export abstract class Stage {
 
             // loop until the queue is completely empty
             while (newObject) {
-                renderer.errorOrPass(newObject._execStart());
+                try {
+                    newObject.start();
+
+                    // add the object into the root to start rendering IF
+                    // the object does not have a parent
+                    if (newObject.parent === null) {
+                        newObject.parent = this.root;
+                    }
+                }
+                catch (error) {
+                    renderer.errorOrPass(error);
+                }
 
                 newObject = this._queue.pop();
             }
         }
 
-        const gl: WebGL2RenderingContext = renderer.context.gl;
-        const root: StageRoot = this._root;
+        const objects: Array<Entity> = this._objects;
+        const length: number = objects.length;
 
-        // start a new GL frame render
-        gl.enable(gl.DEPTH_TEST);
-        gl.depthFunc(gl.LEQUAL);
-        gl.enable(gl.CULL_FACE);
-        gl.cullFace(gl.BACK);
-        gl.frontFace(gl.CCW);
-        gl.clearColor(0.1, 0.1, 0.1, 1.0);
-        gl.clearDepth(1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        // run the update loop
+        for (let i: number = 0; i < length; i++) {
+            const object: Entity = objects[i];
 
-        // execute root that will recursively execute all child objects
-        renderer.errorOrPass(root._execUpdate(deltaTime));
-        renderer.errorOrPass(root._execLateUpdate(deltaTime));
+            try {
+                object.update(deltaTime);
+            }
+            catch (error) {
+                renderer.errorOrPass(error);
+            }
+        }
+
+        // perform rendering
+
+        // run the late update loop
+        for (let i: number = 0; i < length; i++) {
+            const object: Entity = objects[i];
+
+            try {
+                object.lateUpdate(deltaTime);
+            }
+            catch (error) {
+                renderer.errorOrPass(error);
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 import { Input } from "../input/input";
 import { Stage } from "./stage/stage";
 import { YieldQueue } from "./yield/yield-queue";
+import { WebGLRenderer } from "three";
 
 /**
  * Renderer is a singleton type that can be accessed from anywhere in the application.
@@ -9,15 +10,12 @@ import { YieldQueue } from "./yield/yield-queue";
  * Renderer manages the global event loop and all required callbacks. 
  */
 export class Renderer {
-    private static readonly _instance: Renderer = new Renderer();
+    private static readonly _INSTANCE: Renderer = new Renderer();
 
-    // NOTE: This might have to change away from read-only to allow
-    // users to create multiple stages or levels to be loaded/unloaded
-    private readonly _stage: Stage;
-
-    // GL Contexts
-    private readonly _context: GLContext;
     private readonly _yield: YieldQueue;
+    private _threeRenderer: WebGLRenderer | null;
+    private _stage: Stage | null;
+
     private _devMode: boolean;
     private _isPaused: boolean;
     private _isStarted: boolean;
@@ -27,9 +25,9 @@ export class Renderer {
     private _height: number;
 
     private constructor() {
-        this._stage = new Stage();
-        this._context = new GLContext();
         this._yield = new YieldQueue(this);
+        this._threeRenderer = null;
+        this._stage = null;
         this._devMode = false;
         this._isPaused = false;
         this._isStarted = false;
@@ -38,14 +36,24 @@ export class Renderer {
     }
 
     public get stage(): Stage {
-        return this._stage;
+        if (this._stage) {
+            return this._stage;
+        }
+
+        throw new Error("Renderer.stage - invalid access, stage is null, the object has not been constructed yet");
     }
 
-    /**
-     * Checks if the Renderer is setup properly
-     */
-    public get valid(): boolean {
-        return this._context.valid;
+    public set stage(stage: Stage) {
+        this.setStage(stage);
+    }
+
+    public setStage(stage: Stage, destroyOldStage: boolean = true) {
+        // destroy the old stage if its still active
+        if (this._stage && destroyOldStage) {
+            this._stage._destroy(this);
+        }
+
+        this._stage = stage;
     }
 
     /**
@@ -113,7 +121,7 @@ export class Renderer {
             return;
         }
 
-        if (!this.valid) {
+        if (!this._threeRenderer) {
             throw new Error("Renderer.start() - cannot start as Renderer state is invalid, suggest calling Renderer.init()");
         }
 
@@ -121,13 +129,6 @@ export class Renderer {
 
         // start the main looper
         window.requestAnimationFrame(this.loop);
-    }
-
-    /**
-     * Returns the Canvas element being used by this Renderer
-     */
-    public get context(): GLContext {
-        return this._context;
     }
 
     /**
@@ -140,30 +141,21 @@ export class Renderer {
             throw new Error("Renderer.init(HTMLCanvasElement) - unable to initialise as argument was undefined or null");
         }
 
-        const gl: WebGL2RenderingContext | null = canvas.getContext("webgl2");
-
-        if (!gl) {
-            throw new Error("Renderer.init(HTMLCanvasElement) - webgl2 is not supported");
-        }
-
-        this._context.setup(gl, canvas);
+        this._threeRenderer = new WebGLRenderer({
+            canvas: canvas,
+            alpha: false,
+            antialias: true
+        });
 
         // ensure the input system is listening for events from the rendering canvas
         Input.instance.setup(canvas);
 
-        const oldWidth: number = this._width;
-        const oldHeight: number = this._height;
-
         this._width = canvas.width;
         this._height = canvas.height;
-
-        if (this._width !== oldWidth || this._height !== oldHeight) {
-            this.stage._resize(this._width, this._height);
-        }
     }
 
     public get width(): number {
-        return this.width;
+        return this._width;
     }
 
     public get height(): number {
@@ -190,7 +182,7 @@ export class Renderer {
      * Access the one and only Global Renderer instance
      */
     public static get instance(): Renderer {
-        return Renderer._instance;
+        return Renderer._INSTANCE;
     }
 
     // used for calculating the delta-time
@@ -219,7 +211,9 @@ export class Renderer {
             this._yield._flushStart();
 
             // update the current active stage
-            this._stage._update(deltaTime, this);
+            if (this._stage) {
+                this._stage._update(deltaTime, this);
+            }
 
             // execute scripts that want to execute at end of the frame
             this._yield._flushEnd();

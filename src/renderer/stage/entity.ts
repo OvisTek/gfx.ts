@@ -22,7 +22,7 @@ export abstract class Entity extends Identifiable {
 
     // this is where the stage object will be rendered in the scene
     private readonly _transform: Transform;
-    private _stage: Stage | null;
+    protected _stage: Stage | null;
 
     constructor(opt: EntityOptions | null = null) {
         super();
@@ -96,7 +96,7 @@ export abstract class Entity extends Identifiable {
             entity.transform.add(this.transform);
         }
         else {
-            this.transform.detach();
+            this.stage.root.transform.add(this.transform);
         }
     }
 
@@ -116,6 +116,13 @@ export abstract class Entity extends Identifiable {
      */
     public get isCreated(): boolean {
         return this._stage !== null;
+    }
+
+    /**
+     * Check if this object is the root scene object
+     */
+    public get isRoot(): boolean {
+        return false;
     }
 
     /**
@@ -160,36 +167,36 @@ export abstract class Entity extends Identifiable {
      * Called by the Rendering Engine first time object is executed. This happens at the
      * start of a new frame for all new objects
      */
-    protected start(): void { }
+    public start(): void { }
 
     /**
      * Called by the Rendering Engine just before a rendering is about to be done
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    protected update(_deltaTime: number): void { }
+    public update(_deltaTime: number): void { }
 
     /**
      * Called by the Rendering Engine just after a rendering was done
      * 
      * @param deltaTime The time difference between the last and current frame in seconds
      */
-    protected lateUpdate(_deltaTime: number): void { }
+    public lateUpdate(_deltaTime: number): void { }
 
     /**
      * Called by the Rendering Engine when it was paused by a user or a script
      */
-    protected onPause(): void { }
+    public onPause(): void { }
 
     /**
      * Called by the Rendering Engine when it was resumed from a previously paused state
      */
-    protected onResume(): void { }
+    public onResume(): void { }
 
     /**
      * Called by the Rendering Engine when this object was removed from the Stage
      */
-    protected onDestroy(): void { }
+    public onDestroy(): void { }
 
     /**
      * Called by the Rendering Engine when the Canvas/Renderer was resized to a new size
@@ -197,5 +204,5 @@ export abstract class Entity extends Identifiable {
      * @param newWidth The new width of the Renderer/Canvas
      * @param newHeight The new height of the Renderer/Canvas
      */
-    protected onResize(_newWidth: number, _newHeight: number): void { }
+    public onResize(_newWidth: number, _newHeight: number): void { }
 }
