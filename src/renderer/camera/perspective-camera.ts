@@ -14,7 +14,7 @@ export class PerspectiveCamera extends Camera {
 
     private readonly _threeCamera: ThreePerspectiveCamera;
 
-    constructor(fov: number = 50, width: number = 1024, height: number = 1024, near: number = 0.1, far: number = 5000.0) {
+    constructor(fov: number = 40, width: number = 1024, height: number = 1024, near: number = 0.1, far: number = 5000.0) {
         super();
 
         this._fov = fov;

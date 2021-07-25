@@ -1,5 +1,6 @@
 import { Scene } from "three";
 import { PerspectiveCamera } from "../camera/perspective-camera";
+import { Identifiable } from "../identifiable";
 import { Renderer } from "../renderer";
 import { Entity } from "./entity";
 import { StageRoot } from "./stage-root";
@@ -10,7 +11,7 @@ import { StageRoot } from "./stage-root";
  * 
  * Only one Stage can be active at any one time.
  */
-export abstract class Stage {
+export abstract class Stage extends Identifiable {
     private readonly _objects: Array<Entity>;
     private readonly _queue: Array<Entity>;
     private readonly _root: Entity;
@@ -19,12 +20,15 @@ export abstract class Stage {
     private readonly _threeScene: Scene;
 
     constructor() {
+        super();
+        const renderer: Renderer = Renderer.instance;
+
         this._queue = new Array<Entity>();
         this._objects = new Array<Entity>();
 
         this._root = new StageRoot(this);
         this._threeScene = new Scene();
-        this._camera = new PerspectiveCamera();
+        this._camera = new PerspectiveCamera(40, renderer.width, renderer.height);
 
         // add the root to the scene for rendering
         this._threeScene.add(this._root.transform.object);

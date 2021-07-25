@@ -8,7 +8,7 @@ export { Keyboard } from "./input/devices/keyboard";
 export { Mouse } from "./input/devices/mouse";
 
 // export core
-export { Renderer } from "./renderer/renderer";
+export { Renderer, RendererOptions } from "./renderer/renderer";
 export { Transform } from "./renderer/transform";
 export { Stage } from "./renderer/stage/stage";
 export { Component } from "./renderer/stage/component";
