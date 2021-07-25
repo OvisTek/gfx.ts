@@ -1,7 +1,7 @@
 import { Input } from "../input/input";
 import { Stage } from "./stage/stage";
 import { YieldQueue } from "./yield/yield-queue";
-import { Vector2, WebGLRenderer } from "three";
+import { ACESFilmicToneMapping, sRGBEncoding, Vector2, WebGLRenderer } from "three";
 
 export interface RendererOptions {
     antialias: boolean,
@@ -206,6 +206,11 @@ export class Renderer {
             antialias: opt.antialias
         });
 
+        this._threeRenderer.setPixelRatio(window.devicePixelRatio);
+        this._threeRenderer.outputEncoding = sRGBEncoding;
+        this._threeRenderer.toneMapping = ACESFilmicToneMapping;
+        this._threeRenderer.toneMappingExposure = 0.5;
+
         // sets the canvas instance
         this._threeCanvas = canvas;
 
@@ -289,6 +294,7 @@ export class Renderer {
             return;
         }
 
+        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(width, height);
 
         // send callback to the scene on resize

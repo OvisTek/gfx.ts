@@ -28,7 +28,7 @@ export abstract class Stage extends Identifiable {
 
         this._root = new StageRoot(this);
         this._threeScene = new Scene();
-        this._camera = new PerspectiveCamera(40, renderer.width, renderer.height);
+        this._camera = new PerspectiveCamera(60, renderer.width, renderer.height);
 
         // add the root to the scene for rendering
         this._threeScene.add(this._root.transform.object);
