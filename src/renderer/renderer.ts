@@ -30,6 +30,7 @@ export class Renderer {
     private readonly _fullScreenListener: any;
 
     private _threeRenderer: WebGLRenderer | null;
+    private _threeCanvas: HTMLCanvasElement | null;
     private _stage: Stage | null;
 
     private _devMode: boolean;
@@ -48,6 +49,7 @@ export class Renderer {
 
         this._yield = new YieldQueue(this);
         this._threeRenderer = null;
+        this._threeCanvas = null;
         this._stage = null;
         this._devMode = false;
         this._isPaused = false;
@@ -63,6 +65,14 @@ export class Renderer {
         }
 
         throw new Error("Renderer.threeRenderer - invalid access, object has not been constructed yet");
+    }
+
+    public get canvas(): HTMLCanvasElement {
+        if (this._threeCanvas) {
+            return this._threeCanvas;
+        }
+
+        throw new Error("Renderer.canvas - invalid access, object has not been constructed yet");
     }
 
     public get stage(): Stage {
@@ -195,6 +205,9 @@ export class Renderer {
             alpha: opt.alpha,
             antialias: opt.antialias
         });
+
+        // sets the canvas instance
+        this._threeCanvas = canvas;
 
         // sets the fullscreen options
         this.fullscreen = opt.fullscreen;
