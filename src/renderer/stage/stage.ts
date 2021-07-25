@@ -41,8 +41,18 @@ export abstract class Stage extends Identifiable {
         return this._root;
     }
 
+    /**
+     * Access the default camera for the Stage
+     */
     public get camera(): PerspectiveCamera {
         return this._camera;
+    }
+
+    /**
+     * Access the three.js Scene backing for the Stage
+     */
+    public get threeScene(): Scene {
+        return this._threeScene;
     }
 
     /**
