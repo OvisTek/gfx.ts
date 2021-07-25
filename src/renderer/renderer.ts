@@ -132,6 +132,13 @@ export class Renderer {
         return this._isPaused;
     }
 
+    /**
+     * Check if the Renderer has started running
+     */
+    public get started(): boolean {
+        return this._isStarted;
+    }
+
     public get yield(): YieldQueue {
         return this._yield;
     }

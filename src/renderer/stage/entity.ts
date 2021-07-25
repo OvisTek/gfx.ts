@@ -37,7 +37,18 @@ export abstract class Entity extends Identifiable {
 
         // automatically add this object 
         if (options.autoCreate) {
-            Renderer.instance.stage.queue(this);
+            // only queue if the Renderer is running, otherwise we
+            // queue when the first loop of the renderer runs
+            if (Renderer.instance.started) {
+                Renderer.instance.stage.queue(this);
+            }
+            else {
+                Renderer.instance.yield.next.then((renderer) => {
+                    renderer.stage.queue(this);
+                }).catch((err) => {
+                    Renderer.instance.errorOrPass(err);
+                });
+            }
         }
     }
 
